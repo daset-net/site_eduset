@@ -1,20 +1,21 @@
 :root {
-    /* Cores Base do Dark Mode - Tons mais suaves e menos contrastantes */
-    --bg-dark: #111827;
-    --bg-darker: #0f172a;
-    --text-main: #f1f5f9;
-    --text-muted: #94a3b8;
+    /* Cores Base do Light Mode - Clean e Elegante */
+    --bg-light: #ffffff;
+    --bg-alt: #f8fafc; /* Fundo cinza bem claro para intercalar seções */
+    --text-main: #1e293b; /* Texto principal escuro (quase preto) */
+    --text-muted: #475569; /* Texto secundário cinza escuro */
     
-    /* Cores da Logo Eduset (Ajustadas para Dark Mode - Sem Neon) */
-    --eduset-blue: #3b82f6; /* Azul moderno, mas suave e corporativo */
-    --eduset-blue-dark: #044cac; /* Azul original Eduset */
-    --eduset-green: #22c55e; /* Verde suave */
-    --eduset-green-dark: #044c2b; /* Verde original Eduset */
+    /* Cores da Logo Eduset */
+    --eduset-blue: #044cac; /* Azul original Eduset */
+    --eduset-blue-light: #2563eb; /* Azul um pouco mais vivo para interações */
+    --eduset-green: #044c2b; /* Verde original Eduset */
     
-    /* Glassmorphism - Mais opaco, menos brilhante */
-    --glass-bg: rgba(30, 41, 59, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.05);
-    --glass-highlight: rgba(255, 255, 255, 0.08);
+    /* Efeitos e Bordas */
+    --card-bg: #ffffff;
+    --border-light: #e2e8f0;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
     
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -25,9 +26,9 @@
     box-sizing: border-box;
 }
 
-body.dark-theme {
+body {
     font-family: 'Poppins', sans-serif;
-    background-color: var(--bg-dark);
+    background-color: var(--bg-light);
     color: var(--text-main);
     line-height: 1.6;
     overflow-x: hidden;
@@ -50,23 +51,25 @@ a {
 }
 
 /* =========================================
-   HEADER GLASSMORPHISM
+   HEADER
    ========================================= */
 .glass-header {
     position: fixed;
     top: 0; left: 0; width: 100%;
     z-index: 1000;
     padding: 15px 0;
-    background: transparent;
+    background: var(--bg-light); /* Fundo branco fixo */
     transition: var(--transition);
+    border-bottom: 1px solid transparent;
 }
 
 .glass-header.scrolled {
-    background: rgba(15, 23, 42, 0.9); /* Menos vidro, mais sólido */
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
 }
 
 .header-container {
@@ -79,6 +82,7 @@ a {
     font-size: 28px;
     font-weight: 800;
     letter-spacing: -1px;
+    color: var(--text-main);
 }
 
 .main-nav ul {
@@ -91,24 +95,42 @@ a {
     font-weight: 500;
     font-size: 15px;
     color: var(--text-muted);
+    position: relative;
 }
 
 .main-nav a:hover, .main-nav a.active {
-    color: var(--text-main);
+    color: var(--eduset-blue);
+}
+
+.main-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 0;
+    width: 0%;
+    height: 2px;
+    background: var(--eduset-blue);
+    transition: var(--transition);
+}
+
+.main-nav a:hover::after, .main-nav a.active::after {
+    width: 100%;
 }
 
 .btn-login {
-    background: var(--glass-highlight);
-    border: 1px solid var(--glass-border);
+    background: var(--bg-alt);
+    border: 1px solid var(--border-light);
+    color: var(--text-main);
     padding: 8px 20px;
-    border-radius: 6px; /* Bordas menos arredondadas = visual mais corporativo */
+    border-radius: 6px;
     font-weight: 500;
     font-size: 14px;
+    transition: var(--transition);
 }
 
 .btn-login:hover {
-    background: var(--eduset-blue-dark);
-    border-color: var(--eduset-blue-dark);
+    background: var(--eduset-blue);
+    border-color: var(--eduset-blue);
+    color: #ffffff;
 }
 
 .mobile-menu-btn {
@@ -120,7 +142,7 @@ a {
 }
 
 /* =========================================
-   HERO MODERN (SEM NEON)
+   HERO MODERN (LIGHT)
    ========================================= */
 .hero-modern {
     position: relative;
@@ -128,12 +150,7 @@ a {
     min-height: 80vh;
     display: flex;
     align-items: center;
-    background: linear-gradient(180deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
-}
-
-/* Removidos os glows agressivos (glow-circle) que estavam no HTML */
-.glow-circle {
-    display: none; /* Esconde completamente as luzes neon de fundo */
+    background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
 }
 
 .hero-content {
@@ -146,7 +163,7 @@ a {
 .badge {
     display: inline-block;
     padding: 6px 16px;
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(4, 76, 172, 0.1);
     color: var(--eduset-blue);
     border-radius: 50px;
     font-size: 13px;
@@ -157,15 +174,16 @@ a {
 }
 
 .hero-title {
-    font-size: 56px; /* Levemente menor e mais elegante */
-    font-weight: 700;
+    font-size: 56px;
+    font-weight: 800;
     line-height: 1.2;
     letter-spacing: -1px;
     margin-bottom: 24px;
+    color: var(--text-main);
 }
 
 .hero-title span {
-    color: var(--eduset-blue); /* Cor sólida, sem gradiente exagerado */
+    color: var(--eduset-blue);
 }
 
 .hero-subtitle {
@@ -173,24 +191,25 @@ a {
     color: var(--text-muted);
     max-width: 600px;
     margin: 0 auto 40px;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .hero-search-box form {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.05); /* Fundo sólido e leve */
-    border: 1px solid var(--glass-border);
+    background: var(--card-bg);
+    border: 1px solid var(--border-light);
     padding: 8px 8px 8px 24px;
-    border-radius: 8px; /* Mais corporativo */
+    border-radius: 8px;
     max-width: 600px;
     margin: 0 auto 50px;
     transition: var(--transition);
+    box-shadow: var(--shadow-md);
 }
 
 .hero-search-box form:focus-within {
-    border-color: rgba(59, 130, 246, 0.4);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--eduset-blue);
+    box-shadow: var(--shadow-lg);
 }
 
 .search-icon {
@@ -210,11 +229,11 @@ a {
 }
 
 .hero-search-box input::placeholder {
-    color: var(--text-muted);
+    color: #94a3b8;
 }
 
 .btn-glow {
-    background: var(--eduset-blue-dark); /* Cor sólida elegante original */
+    background: var(--eduset-blue);
     border: none;
     padding: 14px 28px;
     border-radius: 6px;
@@ -226,14 +245,16 @@ a {
 }
 
 .btn-glow:hover {
-    background: var(--eduset-blue);
+    background: var(--eduset-blue-light);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(4, 76, 172, 0.3);
 }
 
 .hero-stats {
     display: flex;
     justify-content: center;
     gap: 60px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-light);
     padding-top: 40px;
 }
 
@@ -260,7 +281,7 @@ a {
    ========================================= */
 .areas-modern {
     padding: 100px 0;
-    background-color: var(--bg-dark);
+    background-color: var(--bg-light);
 }
 
 .section-header {
@@ -270,8 +291,9 @@ a {
 
 .section-title {
     font-size: 32px;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 16px;
+    color: var(--text-main);
 }
 
 .section-desc {
@@ -286,28 +308,27 @@ a {
 }
 
 .glass-card {
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--border-light);
     padding: 35px 25px;
     border-radius: 12px;
     transition: var(--transition);
+    box-shadow: var(--shadow-sm);
 }
 
 .glass-card:hover {
     transform: translateY(-5px);
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
-    /* Sem sombras neon agressivas */
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(4, 76, 172, 0.2);
 }
 
 .featured-card {
-    border-color: rgba(59, 130, 246, 0.3);
+    border-bottom: 4px solid var(--eduset-blue);
 }
 
 .card-icon {
     width: 56px; height: 56px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(4, 76, 172, 0.05);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -319,28 +340,30 @@ a {
 
 .glass-card h3 {
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 10px;
+    color: var(--text-main);
 }
 
 .glass-card p {
     color: var(--text-muted);
     font-size: 14px;
     margin-bottom: 20px;
-    font-weight: 300;
 }
 
 .card-link {
     color: var(--eduset-blue);
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 8px;
+    transition: var(--transition);
 }
 
 .glass-card:hover .card-link {
-    color: var(--eduset-green);
+    color: var(--eduset-blue-light);
+    gap: 12px; /* Anima a setinha para a direita */
 }
 
 /* =========================================
@@ -348,13 +371,13 @@ a {
    ========================================= */
 .cursos-api-section {
     padding: 80px 0 100px;
-    background: var(--bg-darker);
+    background: var(--bg-alt);
 }
 
 .loader-pulse {
     width: 40px; height: 40px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.1);
+    border: 3px solid var(--border-light);
     border-top-color: var(--eduset-blue);
     margin: 50px auto;
     animation: spin 1s linear infinite;
@@ -368,8 +391,8 @@ a {
    MODERN FOOTER
    ========================================= */
 .modern-footer {
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    background: #090e17;
+    border-top: 1px solid var(--border-light);
+    background: #f1f5f9; /* Cinza claro no rodapé */
     padding: 60px 0 0;
 }
 
@@ -389,8 +412,9 @@ a {
 
 .footer-links h4, .footer-contact h4 {
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 20px;
+    color: var(--text-main);
 }
 
 .footer-links ul {
@@ -399,7 +423,7 @@ a {
 
 .footer-links li { margin-bottom: 10px; }
 .footer-links a { color: var(--text-muted); font-size: 14px; }
-.footer-links a:hover { color: var(--text-main); }
+.footer-links a:hover { color: var(--eduset-blue); }
 
 .footer-contact p { color: var(--text-muted); font-size: 14px; }
 
@@ -412,7 +436,7 @@ a {
 .social-icons a {
     width: 36px; height: 36px;
     border-radius: 6px;
-    background: rgba(255,255,255,0.05);
+    background: #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -420,13 +444,13 @@ a {
 }
 
 .social-icons a:hover {
-    background: rgba(255,255,255,0.1);
-    color: var(--text-main);
+    background: var(--eduset-blue);
+    color: #ffffff;
 }
 
 .footer-bottom {
     padding: 24px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-light);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -439,7 +463,7 @@ a {
     align-items: center;
     gap: 8px;
     color: var(--eduset-green);
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* =========================================

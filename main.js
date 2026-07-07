@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 mainNav.style.top = '70px';
                 mainNav.style.left = '0';
                 mainNav.style.width = '100%';
-                mainNav.style.background = 'var(--bg-dark)';
+                mainNav.style.background = 'var(--bg-light)';
                 mainNav.style.padding = '20px';
-                mainNav.style.borderBottom = '1px solid var(--glass-border)';
+                mainNav.style.borderBottom = '1px solid var(--border-light)';
             }
         });
     }
