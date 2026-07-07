@@ -7,6 +7,10 @@ RUN rm -rf /usr/local/lsws/Example/html/*
 COPY index.html /usr/local/lsws/Example/html/
 COPY style.css /usr/local/lsws/Example/html/
 COPY main.js /usr/local/lsws/Example/html/
+COPY exemplo.html /usr/local/lsws/Example/html/
+
+# Ajusta as permissões para o usuário do servidor web (nobody ou lsadm)
+RUN chown -R nobody:nobody /usr/local/lsws/Example/html/
 
 # Expõe as portas padrão
 # 80 e 443: HTTP/HTTPS
