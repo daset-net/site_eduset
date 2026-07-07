@@ -4,53 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - EDUSET</title>
-    <meta name="description" content="Garanta um desconto especial Inscreva-se para novidades Encontre seu curso Search Escolha sua Área de Interesse EJA Técnico Superior Sequencial Pós-Graduação"/>
     
-    <!-- Google Fonts -->
+    <!-- Fontes do site original -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css?v=2">
-    
-    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="style.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Top Bar -->
+
+    <!-- Top Bar idêntica ao original -->
     <div class="top-bar">
-        <div class="container">
-            <span>Garanta um desconto especial</span>
-            <a href="#newsletter" class="btn-sm">Inscreva-se para novidades</a>
+        <div class="container top-bar-content">
+            <span class="top-bar-text">Garanta um desconto especial</span>
+            <a href="#newsletter" class="top-bar-btn">Inscreva-se para novidades</a>
         </div>
     </div>
 
-    <!-- Header -->
+    <!-- Header Principal -->
     <header class="main-header">
-        <div class="container header-content">
+        <div class="container header-container">
             <div class="logo">
-                <a href="/">
-                    <!-- Placeholder Logo if the original one is not available, using text for now or trying to fetch original -->
-                    <h1 style="color: var(--primary-color); font-weight: 900; margin: 0; font-size: 2rem;">EDU<span style="color: var(--secondary-color)">SET</span></h1>
-                </a>
+                <a href="/">EDUSET</a>
             </div>
             
-            <div class="search-bar">
+            <div class="search-box">
                 <form action="/buscar" method="get">
                     <input type="text" name="s" placeholder="Encontre seu curso..." required>
                     <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
             </div>
 
-            <nav class="main-nav">
-                <ul class="nav-list">
-                    <li><a href="#home" class="active">Início</a></li>
+            <nav class="main-menu">
+                <ul>
+                    <li><a href="#home">Início</a></li>
                     <li><a href="#areas">Cursos</a></li>
                     <li><a href="#sobre">Sobre Nós</a></li>
                     <li><a href="#contato">Contato</a></li>
                 </ul>
             </nav>
-
+            
             <button class="mobile-menu-btn" id="mobile-menu-btn">
                 <i class="fas fa-bars"></i>
             </button>
@@ -58,17 +53,9 @@
     </header>
 
     <main>
-        <!-- Hero Section -->
-        <section id="home" class="hero" style="background-image: url('https://eduset.com.br/wp-content/uploads/2025/07/capa_promocao_eduset_computador.jpg');">
-            <div class="hero-overlay"></div>
-            <div class="container hero-content-inner">
-                <h2 class="hero-title">O Futuro da Educação Começa Aqui</h2>
-                <p class="hero-subtitle">Descubra uma nova forma de aprender com nossos cursos focados no mercado de trabalho.</p>
-                <div class="hero-actions">
-                    <a href="#areas" class="btn btn-primary">Ver Áreas de Interesse</a>
-                    <a href="#sobre" class="btn btn-outline">Saiba Mais</a>
-                </div>
-            </div>
+        <!-- Banner Hero - Apenas a imagem, como no original -->
+        <section id="home" class="hero-section">
+            <img src="https://eduset.com.br/wp-content/uploads/2025/07/capa_promocao_eduset_computador.jpg" alt="Cursos em Alta! Conquiste seu Diploma">
         </section>
 
         <!-- Áreas de Interesse -->
@@ -77,64 +64,69 @@
                 <h2 class="section-title">Escolha sua Área de Interesse</h2>
                 
                 <div class="areas-grid">
-                    <!-- EJA -->
-                    <a href="#cursos-eja" class="area-card">
-                        <div class="area-icon" style="background-color: var(--secondary-color);">
-                            <i class="fas fa-book-open"></i>
-                        </div>
+                    <a href="/eja" class="area-card">
+                        <div class="icon-box"><i class="fas fa-book-reader"></i></div>
                         <h3>EJA</h3>
-                        <p>Educação de Jovens e Adultos</p>
                     </a>
                     
-                    <!-- Técnico -->
-                    <a href="#cursos-tecnico" class="area-card">
-                        <div class="area-icon" style="background-color: var(--secondary-color);">
-                            <i class="fas fa-tools"></i>
-                        </div>
+                    <a href="/tecnico" class="area-card">
+                        <div class="icon-box"><i class="fas fa-laptop-code"></i></div>
                         <h3>Técnico</h3>
-                        <p>Cursos de rápida inserção profissional</p>
                     </a>
                     
-                    <!-- Superior -->
-                    <a href="#cursos-superior" class="area-card">
-                        <div class="area-icon" style="background-color: var(--secondary-color);">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
+                    <a href="/superior" class="area-card">
+                        <div class="icon-box"><i class="fas fa-user-graduate"></i></div>
                         <h3>Superior</h3>
-                        <p>Graduação de alta qualidade</p>
                     </a>
                     
-                    <!-- Sequencial -->
-                    <a href="#cursos-sequencial" class="area-card">
-                        <div class="area-icon" style="background-color: var(--secondary-color);">
-                            <i class="fas fa-certificate"></i>
-                        </div>
+                    <a href="/sequencial" class="area-card">
+                        <div class="icon-box"><i class="fas fa-certificate"></i></div>
                         <h3>Sequencial</h3>
-                        <p>Formação em curto prazo</p>
                     </a>
                     
-                    <!-- Pós-Graduação -->
-                    <a href="#cursos-pos" class="area-card">
-                        <div class="area-icon" style="background-color: var(--secondary-color);">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
+                    <a href="/pos" class="area-card">
+                        <div class="icon-box"><i class="fas fa-medal"></i></div>
                         <h3>Pós-Graduação</h3>
-                        <p>Especialize-se e cresça na carreira</p>
                     </a>
                 </div>
             </div>
         </section>
 
-        <!-- Lista de Cursos Recentes (Injetada via JS) -->
-        <section id="ultimos-cursos" class="courses-section bg-light">
+        <!-- Cursos Mais Procurados (Via API) -->
+        <section class="cursos-procurados bg-light">
             <div class="container">
-                <h2 class="section-title">Cursos em Destaque</h2>
-                <p class="section-subtitle">Conheça nossos cursos mais procurados (Carregados via API)</p>
-                
+                <h2 class="section-title">Cursos mais procurados</h2>
                 <div id="courses-container" class="courses-grid">
-                    <!-- Loading state -->
-                    <div class="loading-spinner">
-                        <i class="fas fa-spinner fa-spin"></i> Carregando cursos...
+                    <!-- Preenchido pelo JS -->
+                    <p class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando cursos...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção: Acelere seu crescimento -->
+        <section class="crescimento-section">
+            <div class="container">
+                <h2 class="section-title">Acelere seu crescimento pessoal e profissional</h2>
+                <div class="crescimento-grid">
+                    <div class="beneficio-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>Flexibilidade</h3>
+                        <p>Estude no seu tempo e no seu ritmo.</p>
+                    </div>
+                    <div class="beneficio-card">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <h3>Qualidade</h3>
+                        <p>Professores altamente qualificados.</p>
+                    </div>
+                    <div class="beneficio-card">
+                        <i class="fas fa-certificate"></i>
+                        <h3>Certificado MEC</h3>
+                        <p>Certificado válido em todo o Brasil.</p>
+                    </div>
+                    <div class="beneficio-card">
+                        <i class="fas fa-wallet"></i>
+                        <h3>Preço Justo</h3>
+                        <p>Mensalidades que cabem no seu bolso.</p>
                     </div>
                 </div>
             </div>
@@ -144,34 +136,38 @@
     <footer class="main-footer">
         <div class="container footer-grid">
             <div class="footer-col">
-                <h3 class="footer-logo">EDU<span style="color: var(--secondary-color)">SET</span></h3>
-                <p>Nossa missão é democratizar a educação de qualidade com tecnologia e metodologias focadas no mercado de trabalho.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Links Rápidos</h4>
+                <h2 class="footer-title">Institucional</h2>
                 <ul>
-                    <li><a href="#home">Início</a></li>
-                    <li><a href="#areas">Áreas de Interesse</a></li>
                     <li><a href="#sobre">Sobre a Eduset</a></li>
                     <li><a href="#contato">Fale Conosco</a></li>
+                    <li><a href="#termos">Termos de Uso</a></li>
                 </ul>
             </div>
+            
             <div class="footer-col">
-                <h4>Contato</h4>
+                <h2 class="footer-title">Cursos</h2>
                 <ul>
-                    <li><i class="fas fa-envelope"></i> contato@eduset.com.br</li>
-                    <li><i class="fas fa-phone"></i> (00) 0000-0000</li>
+                    <li><a href="/eja">EJA</a></li>
+                    <li><a href="/tecnico">Cursos Técnicos</a></li>
+                    <li><a href="/superior">Ensino Superior</a></li>
+                    <li><a href="/pos">Pós-Graduação</a></li>
                 </ul>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
-                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h2 class="footer-title">Atendimento</h2>
+                <p><strong>Horário de Atendimento:</strong><br>Segunda à Sexta, entre 9h e 21h.</p>
             </div>
         </div>
+        
+        <div class="container mec-text">
+            <h2>Reconhecimento MEC</h2>
+            <p>Oferecemos cursos reconhecidos pelo Ministério da Educação (MEC), garantindo aos nossos alunos uma formação de excelência e reconhecida nacionalmente. Estudar em uma instituição reconhecida pelo MEC proporciona segurança e credibilidade, abrindo portas para oportunidades profissionais e acadêmicas. Conte conosco para uma educação de qualidade reconhecida pelo MEC.</p>
+        </div>
+
         <div class="footer-bottom">
             <div class="container">
-                <p>&copy; 2026 EDUSET. Todos os direitos reservados. Otimizado para alta performance.</p>
+                <p>Desenvolvido e mantido por: <br><strong>EDUSET SOLUÇÕES E TECNOLOGIA INOVA SIMPLES (I.S.)</strong><br>CNPJ: 58.620.468/0001-69</p>
             </div>
         </div>
     </footer>
