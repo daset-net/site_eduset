@@ -1,1 +1,18 @@
-/conexao/
+# Dados gerados em runtime
+/data/
+public/data/
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Dependências (não usadas — Vue via CDN)
+node_modules/
+vendor/
+
+# Credenciais — NUNCA versionar
+conexao/
+conexao_eduset/
+*.env
+.env

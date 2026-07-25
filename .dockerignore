@@ -1,0 +1,8 @@
+.git
+.gitignore
+conexao
+conexao_eduset
+*.md
+data
+node_modules
+*.log
