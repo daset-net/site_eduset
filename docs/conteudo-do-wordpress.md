@@ -68,13 +68,17 @@ em relação à EDUALFA, e vale manter nos textos.
 | `whatsapp` | 5512997640917 | |
 | `telefone_exibicao` | (12) 99764-0917 | |
 | `horario_atendimento` | Segunda a sexta, das 9h às 21h | o "Fale Conosco" dizia **9h às 18h**; adotado o do rodapé e da Institucional (9h–21h) |
+| `instagram` | https://www.instagram.com/eduset_oficial | |
 
-Redes sociais: **o site antigo não tinha nenhum link** de Instagram, Facebook ou YouTube em página
-alguma. As chaves `instagram`, `facebook` e `youtube` seguem vazias — quando forem preenchidas, os
-ícones aparecem sozinhos no rodapé.
+Os três indicadores da home (`stat_alunos`, `stat_cursos`, `stat_satisfacao`) ficaram como estão —
+"Milhares", "60+" e "98% de satisfação". O 98% veio da EDUALFA e não tem lastro no material do
+EDUSET; foi mantido por decisão do dono do site.
 
-O formulário de inscrição do rodapé antigo perguntava **"Como conheceu?"** com as opções
-*Google, Instagram, Facebook, Indicação* — indício de que essas redes existem, mas não estavam linkadas.
+Redes sociais: **o site antigo não linkava nenhuma rede** em página alguma, embora o formulário do
+rodapé perguntasse "Como conheceu?" com as opções *Google, Instagram, Facebook, Indicação*.
+
+O perfil foi informado depois e já está no ar: `instagram` = <https://www.instagram.com/eduset_oficial>.
+`facebook` e `youtube` seguem vazios — quando forem preenchidos, os ícones aparecem sozinhos no rodapé.
 
 ---
 
@@ -142,10 +146,11 @@ O WordPress tinha um menu institucional fixo no topo e no rodapé:
 | Unidades | **não portado** — dados na seção 3 |
 | Contrato Digital | contrato de prestação de serviços, texto completo |
 
-O **Contrato Digital** merece atenção jurídica: ele identifica outra empresa —
-**EDUSET TECNOLOGIA EDUCACIONAL LTDA, CNPJ 52.341.668/0001-00** — enquanto o rodapé e a página
-Institucional usam **EDUSET SOLUCOES E TECNOLOGIA INOVA SIMPLES, CNPJ 58.620.468/0001-69**
-(este último é o que está no `avaset_configuracoes`). São dois CNPJs diferentes no mesmo site.
+O **Contrato Digital** do WordPress identificava outra empresa —
+*EDUSET TECNOLOGIA EDUCACIONAL LTDA, CNPJ 52.341.668/0001-00* — diferente do rodapé e da página
+Institucional. **Decisão tomada:** o CNPJ do site é o
+**58.620.468/0001-69 (EDUSET SOLUCOES E TECNOLOGIA INOVA SIMPLES)**, que é também o que está no
+`avaset_configuracoes`. Se o Contrato Digital for portado, precisa ser atualizado para esse CNPJ.
 
 Pontos do contrato que valem virar FAQ no site novo:
 
