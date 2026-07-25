@@ -22,9 +22,9 @@ const COL_ANEXOS     = 'ava_pacote_anexo';    // apostila e jornada em PDF
 const CACHE_TTL    = 600; // segundos
 const HTTP_TIMEOUT = 8;
 
-const COR_AZUL  = 'linear-gradient(140deg,#0f2f6b,#1e56d6)';
-const COR_CIANO = 'linear-gradient(140deg,#1747b8,#22c9ec)';
-const COR_NAVY  = 'linear-gradient(140deg,#061a3a,#1747b8)';
+const COR_AZUL  = 'linear-gradient(140deg,#002d63,#004aad)';
+const COR_VERDE = 'linear-gradient(140deg,#044928,#17a45f)';
+const COR_MISTA = 'linear-gradient(140deg,#004aad,#0c7a44)';
 
 // Emoji por palavra-chave, usado só quando o curso não tem emoji nem capa definidos.
 $EMOJIS = [
@@ -322,7 +322,7 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
     return $oa <=> $ob ?: strcmp((string) $a['id_curso'], (string) $b['id_curso']);
   });
 
-  $cores  = [COR_AZUL, COR_CIANO, COR_NAVY];
+  $cores  = [COR_AZUL, COR_VERDE, COR_MISTA];
   $cursos = [];
   $i = 0;
 

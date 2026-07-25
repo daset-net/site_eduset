@@ -43,7 +43,7 @@
 .admin-login input:focus {
   outline: none;
   border-color: var(--blue-400);
-  box-shadow: 0 0 0 3px rgba(47,116,240,.15);
+  box-shadow: 0 0 0 3px rgba(18,102,214,.15);
 }
 .admin textarea { resize: vertical; line-height: 1.6; }
 .area-lista { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 14px; }
