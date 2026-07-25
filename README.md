@@ -82,6 +82,12 @@ site_eduset/
    TOKEN_MATRICULA_EXTERNA=<mesmo api_token_matricula_externa do AVASET>
    ```
 
+   Os dois últimos são **os mesmos valores** já gravados no `avaset_configuracoes`
+   do AVASET da EDUSET (chaves `api_token_matricula_externa` e `site_purga_token`).
+   Se não baterem, a matrícula pelo site responde 401 e a purga é recusada. Os
+   valores em claro estão em `conexao_eduset/conexao_directus_avaset_unico_eduset.txt`
+   (fora do Git e da imagem).
+
    O `TOKEN_PURGA_SITE` é opcional: sem ele, `api/purgar.php` responde 503 e o
    cache só vence pelo tempo. Com ele, o AVASET limpa o cache na hora (veja
    *Cache e resiliência*).
