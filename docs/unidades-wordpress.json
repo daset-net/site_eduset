@@ -1,0 +1,218 @@
+[
+ {
+  "slug": "aguas-claras-distrito-federal",
+  "codigo": "1327",
+  "endereco": "Avenida Castanheiras - Lote 1310/1370, Lj. 25",
+  "cidade_estado": "Águas Claras - Distrito Federal",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "amapa-macapa",
+  "codigo": "1319",
+  "endereco": "Rua Adilson José Pinto Pereira, 669 - Sala 3",
+  "cidade_estado": "Macapá - Amapá",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "belem-para",
+  "codigo": "1383",
+  "endereco": "Travessa São Roque, 319 - Sala 05",
+  "cidade_estado": "Pará - Belém",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "belo-horizonte-minas-gerais",
+  "codigo": "1381",
+  "endereco": "Rua Manoel Elias De Aguiar, 22 - Loja 13",
+  "cidade_estado": "Belo Horizonte - Minas Gerais",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "boa-vista-roraima",
+  "codigo": "1405",
+  "endereco": "Av Nazaré Filgueiras, 3046 - C - RR - Boa Vista - RR, 69318-186 - BR",
+  "cidade_estado": "Boa Vista - Roraima",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "camacari-bahia",
+  "codigo": "1325",
+  "endereco": "Avenida Eixo Urbano Central, 38",
+  "cidade_estado": "Camaçari - Bahia",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "campo-grande-mato-grosso-do-sul",
+  "codigo": "1417",
+  "endereco": "Avenida Mascarenhas De Moraes, 2980 - Monte Castelo",
+  "cidade_estado": "Campo Grande - Mato Grosso do Sul",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "cuiaba-mato-grosso",
+  "codigo": "1413",
+  "endereco": "Rua Benjamim Pedroso Da Silva, 146 - Quadra 21, Antiga Rua Pará",
+  "cidade_estado": "Cuiabá - Mato Grosso",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "curitiba-parana",
+  "codigo": "1387",
+  "endereco": "Avenida Marechal Floriano Peixoto, 612 - De 181/182 A 930/931",
+  "cidade_estado": "Curitiba - Paraná",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "florianopolis-santa-catarina",
+  "codigo": "1407",
+  "endereco": "Rua Felipe Schmidt, 316 - Sala 202",
+  "cidade_estado": "Florianópolis - Santa Catarina",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "fortaleza-ceara",
+  "codigo": "1283",
+  "endereco": "Avenida João Pessoa, 3965 - Térreo",
+  "cidade_estado": "Fortaleza - Ceara",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "goiania-goias",
+  "codigo": "1329",
+  "endereco": "Avenida 85,, 2162 - Qd. G-21 / Lt 29",
+  "cidade_estado": "Goiânia - Goiás",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "joao-pessoa-paraiba",
+  "codigo": "1385",
+  "endereco": "Rua Empresário João Rodrigues Alves, 125 - Loja 107a",
+  "cidade_estado": "João Pessoa - Paraíba",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "maceio-alagoas",
+  "codigo": "1321",
+  "endereco": "Rua Rita De Cassia, 36 - Quadra 08 Lote 04 Sala 030",
+  "cidade_estado": "Maceió - Alagoas",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "manaus-amazonas",
+  "codigo": "1323",
+  "endereco": "Avenida Autáz Mirim, 5224 - AM - Manaus",
+  "cidade_estado": "Manaus - Amazonas",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "natal-rio-grande-do-norte",
+  "codigo": "1422",
+  "endereco": "Avenida Dos Xavantes, 1095 - Loja 04",
+  "cidade_estado": "Natal - Rio Grande do Norte",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "palmas-tocantins",
+  "codigo": "1425",
+  "endereco": "Quadra Acno 1 Rua De Pedestre No 4, 5 - Quadra Aco 2",
+  "cidade_estado": "Palmas - Tocantins",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "porto-alegre-rio-grande-do-sul",
+  "codigo": "1420",
+  "endereco": "Avenida Edgar Pires De Castro, 1940 - Lojas 9 E 10 - Aberta Dos Morros",
+  "cidade_estado": "Porto Alegre - Rio Grande do Sul",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "porto-velho-rondonia",
+  "codigo": "1402",
+  "endereco": "Rua Do Cravo, 2708 - De 2529/2530 A 2749/2750",
+  "cidade_estado": "Porto Velho - Rondônia",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "recife-pernambuco",
+  "codigo": "1415",
+  "endereco": "Avenida Conde Da Boa Vista, 1147",
+  "cidade_estado": "Recife - Pernambuco",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "rio-branco-acre",
+  "codigo": "1317",
+  "endereco": "Avenida Ceará, 803 - Sala 02",
+  "cidade_estado": "Rio Branco - Acre",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "rio-de-janeiro-rio-de-janeiro",
+  "codigo": "1393",
+  "endereco": "Rua Amaral Costa, 333 - Loja B",
+  "cidade_estado": "Rio de Janeiro - Rio de Janeiro",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "sao-gabriel-do-oeste-mato-grosso",
+  "codigo": "1378",
+  "endereco": "Avenida Mato Grosso Do Sul, 1610",
+  "cidade_estado": "São Grabriel do Oeste - Mato Grosso",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "sao-luis-maranhao",
+  "codigo": "1338",
+  "endereco": "Rua Das Mitras, 10 - Loja 08 - Piso Térreo",
+  "cidade_estado": "São Luís - Maranhão",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "sao-paulo-sao-paulo",
+  "codigo": "1427",
+  "endereco": "Avenida Paulista, 1498 - 1484 - Conj 1498 Loja 48 -Edif D. Andrea Matarazzo",
+  "cidade_estado": "São Paulo - São Paulo",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "sergipe-aracaju",
+  "codigo": "1409",
+  "endereco": "Rua Maruim, 95 - Salas, 05, 06, 07 E 08, Térreo",
+  "cidade_estado": "Sergipe - Aracaju",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ },
+ {
+  "slug": "teresina-piaui",
+  "codigo": "1399",
+  "endereco": "Rua Luiz Antonio De Sousa, 13 - Quadra 25, Conjunto Parque PiauÍ",
+  "cidade_estado": "Teresina - Piauí",
+  "categoria": "Unidade Remota",
+  "horarios": "Segunda | 09:00 - 12:00 | | 13:00 - 18:00 | Terça | 09:00 - 12:00 | | 13:00 - 18:00 | Quarta | 09:00 - 12:00 | | 13:00 - 18:00 | Quinta | 09:00 - 12:00 | | 13:00 - 18:00 | Sexta | 09:00 - 12:00 | | 13:00 - 18:00"
+ }
+]
