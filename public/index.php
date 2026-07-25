@@ -14,7 +14,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= e(config('seo_descricao', 'EDUSET — Educação que transforma. Supletivo EJA, Cursos Técnicos e Cursos Livres com certificação reconhecida, 100% online e no seu ritmo.')) ?>">
-  <meta name="theme-color" content="#004aad">
+  <meta name="theme-color" content="#044928">
   <title><?= e(config('seo_titulo', 'EDUSET · Educação que transforma vidas')) ?></title>
 
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
