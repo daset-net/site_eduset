@@ -11,6 +11,32 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000');
 $polo = poloUnidade();
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
+
+// Os selos de cada modalidade saem do próprio catálogo: só entra curso que o
+// site está exibindo de verdade, para o cartão não prometer o que não existe.
+[$cursosDoSite] = catalogo();
+$tagsModalidade = ['eja' => [], 'tecnico' => [], 'livre' => []];
+foreach ($cursosDoSite as $c) {
+  $slug = $c['categoria'] ?? '';
+  if (!isset($tagsModalidade[$slug])) continue;
+  if (!in_array($c['nome'], $tagsModalidade[$slug], true)) $tagsModalidade[$slug][] = $c['nome'];
+}
+
+/**
+ * Selos do cartão da modalidade: os primeiros cursos e quantos ainda restam.
+ * Nome comprido é cortado para caber no chip; o texto inteiro fica no title.
+ */
+function selosModalidade(array $tags, int $limite = 3): string {
+  if (!$tags) return '';
+  $html = '';
+  foreach (array_slice($tags, 0, $limite) as $t) {
+    $curto = mb_strimwidth($t, 0, 30, '…', 'UTF-8');
+    $title = $curto !== $t ? ' title="' . e($t) . '"' : '';
+    $html .= '<span' . $title . '>' . e($curto) . '</span>';
+  }
+  if (count($tags) > $limite) $html .= '<span>+' . (count($tags) - $limite) . '</span>';
+  return '<div class="tags">' . $html . '</div>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -79,8 +105,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
           <?= e(config('hero_subtitulo', 'EJA, Cursos Técnicos e Cursos Livres reconhecidos. Estude 100% online, no seu tempo e de onde estiver.')) ?>
         </p>
         <div class="hero__actions">
-          <a href="#contato" class="btn btn-primary">Matricule-se agora <i class="ri-arrow-right-line"></i></a>
-          <a href="#cursos" class="btn btn-ghost-light">Conheça os cursos</a>
+          <a href="#cursos" class="btn btn-primary">Conheça os cursos <i class="ri-arrow-right-line"></i></a>
         </div>
         <ul class="hero__feats">
           <li><i class="ri-medal-line"></i><div><strong>Certificado válido</strong><span>em todo Brasil</span></div></li>
@@ -142,8 +167,8 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
         <div class="cat-card" data-reveal @click="filtrar('eja')" style="cursor:pointer">
           <div class="ic"><i class="ri-book-open-line"></i></div>
           <h3>Supletivo EJA</h3>
-          <p>Conclua o Ensino Fundamental ou Médio de forma rápida, flexível e com certificação reconhecida pelo MEC.</p>
-          <div class="tags"><span>Ensino Fundamental</span><span>Ensino Médio</span><span>EAD</span></div>
+          <p>Conclua o Ensino Fundamental ou Médio de forma rápida, flexível e com certificação reconhecida nacionalmente.</p>
+          <?= selosModalidade($tagsModalidade['eja']) ?>
           <span class="more">Ver cursos <i class="ri-arrow-right-line"></i></span>
         </div>
 
@@ -151,7 +176,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
           <div class="ic"><i class="ri-tools-line"></i></div>
           <h3>Curso Técnico</h3>
           <p>Forme-se em uma profissão em alta no mercado com cursos técnicos práticos e reconhecidos nacionalmente.</p>
-          <div class="tags"><span>Enfermagem</span><span>Administração</span><span>TI</span></div>
+          <?= selosModalidade($tagsModalidade['tecnico']) ?>
           <span class="more">Ver cursos <i class="ri-arrow-right-line"></i></span>
         </div>
 
@@ -159,7 +184,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
           <div class="ic"><i class="ri-lightbulb-flash-line"></i></div>
           <h3>Curso Livre</h3>
           <p>Atualize-se e desenvolva novas habilidades com cursos livres de curta duração e certificado imediato.</p>
-          <div class="tags"><span>Marketing</span><span>Excel</span><span>Design</span></div>
+          <?= selosModalidade($tagsModalidade['livre']) ?>
           <span class="more">Ver cursos <i class="ri-arrow-right-line"></i></span>
         </div>
       </div>
