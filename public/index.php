@@ -51,8 +51,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
       </nav>
 
       <div class="header__cta">
-        <a href="#cursos" class="btn btn-outline">Ver cursos</a>
-        <a href="#contato" class="btn btn-primary">Matricule-se <i class="ri-arrow-right-line"></i></a>
+        <a href="#cursos" class="btn btn-primary">Ver cursos <i class="ri-arrow-right-line"></i></a>
         <button class="nav-toggle" @click="menuOpen = !menuOpen" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
