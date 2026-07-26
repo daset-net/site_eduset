@@ -551,77 +551,125 @@ function nomePublico(string $nome): string {
   return $partes[0] . ' ' . mb_strtoupper(mb_substr(end($partes), 0, 1, 'UTF-8'), 'UTF-8') . '.';
 }
 
-/**
- * Depoimentos de um curso, prontos para exibir. Cache em disco por curso.
- * A cada dia a lista gira, para a mesma página não repetir sempre a mesma voz.
- */
-function depoimentosDoCurso(string $idCurso, int $limite = 3): array {
-  if ($idCurso === '') return [];
+/** Uma linha da coleção no formato que a página exibe. */
+function normalizarDepoimentos(array $linhas): array {
+  $lista = [];
+  foreach ($linhas as $l) {
+    $texto = trim((string) ($l['depoimento'] ?? ''));
+    $nome  = trim((string) ($l['nome'] ?? ''));
+    if ($texto === '' || $nome === '') continue;
+    $lista[] = [
+      'nome'     => nomePublico($nome),
+      'iniciais' => iniciaisNome($nome),
+      'texto'    => $texto,
+      'curso'    => trim((string) ($l['curso'] ?? '')),
+      'idCurso'  => strtoupper(trim((string) ($l['id_curso'] ?? ''))),
+      'estrelas' => estrelasDepoimento($l['satisfacao'] ?? ''),
+    ];
+  }
+  return $lista;
+}
 
+/** Lê um cache de depoimentos; devolve null quando não existe ou está vencido. */
+function cacheDepoimentos(string $arquivo, bool $aceitaVencido = false): ?array {
+  if (!is_readable($arquivo)) return null;
+  if (!$aceitaVencido && (time() - filemtime($arquivo) >= CACHE_TTL)) return null;
+  $dados = json_decode((string) file_get_contents($arquivo), true);
+  return is_array($dados) ? $dados : null;
+}
+
+/** Todos os depoimentos cadastrados de um curso (até 40), com cache em disco. */
+function poolDepoimentosCurso(string $idCurso): array {
   $cache = caminhoCache('depo_' . preg_replace('/[^A-Za-z0-9]/', '', $idCurso));
-  $lista = null;
 
-  if (is_readable($cache) && (time() - filemtime($cache) < CACHE_TTL)) {
-    $lista = json_decode((string) file_get_contents($cache), true);
-  }
+  $pool = cacheDepoimentos($cache);
+  if ($pool !== null) return $pool;
 
-  if (!is_array($lista)) {
-    $linhas = buscarColecao(COL_DEPOIMENTOS, [
-      'fields' => 'nome,depoimento,curso,id_curso,satisfacao',
-      'filter' => json_encode(['id_curso' => ['_eq' => $idCurso]]),
-      'limit'  => 12,
-    ]);
+  $linhas = buscarColecao(COL_DEPOIMENTOS, [
+    'fields' => 'nome,depoimento,curso,id_curso,satisfacao',
+    'filter' => json_encode(['id_curso' => ['_eq' => $idCurso]]),
+    'limit'  => 40,
+  ]);
 
-    // Coleção ausente ou fora do ar: usa o que já foi guardado, mesmo vencido.
-    if ($linhas === null) {
-      $lista = is_readable($cache) ? json_decode((string) file_get_contents($cache), true) : [];
-      if (!is_array($lista)) $lista = [];
-    } else {
-      $lista = [];
-      foreach ($linhas as $l) {
-        $texto = trim((string) ($l['depoimento'] ?? ''));
-        $nome  = trim((string) ($l['nome'] ?? ''));
-        if ($texto === '' || $nome === '') continue;
-        $lista[] = [
-          'nome'     => nomePublico($nome),
-          'iniciais' => iniciaisNome($nome),
-          'texto'    => $texto,
-          'curso'    => trim((string) ($l['curso'] ?? '')),
-          'estrelas' => estrelasDepoimento($l['satisfacao'] ?? ''),
-        ];
-      }
-      @file_put_contents($cache, json_encode($lista, JSON_UNESCAPED_UNICODE));
-    }
-  }
+  // Coleção ausente ou fora do ar: usa o que já foi guardado, mesmo vencido.
+  if ($linhas === null) return cacheDepoimentos($cache, true) ?? [];
 
-  if (!$lista) return [];
-
-  $giro = (int) floor(time() / 86400) % count($lista);
-  return array_slice(array_merge($lista, $lista), $giro, min($limite, count($lista)));
+  $pool = normalizarDepoimentos($linhas);
+  @file_put_contents($cache, json_encode($pool, JSON_UNESCAPED_UNICODE));
+  return $pool;
 }
 
 /**
- * Um depoimento por modalidade para a vitrine da home, sempre de curso que o
- * site está exibindo. O curso escolhido gira a cada dia; se o sorteado não tem
- * depoimento cadastrado, tenta os seguintes daquela modalidade.
+ * Depoimentos deste curso, sorteados a cada visita.
+ * O conjunto vem do cache; o sorteio acontece a cada carregamento da página,
+ * então quem abre o site duas vezes não lê o mesmo depoimento.
  */
-function depoimentosDestaque(array $cursos, int $tentativas = 6): array {
-  $dia   = (int) floor(time() / 86400);
+function depoimentosDoCurso(string $idCurso, int $limite = 1): array {
+  if ($idCurso === '') return [];
+
+  $pool = poolDepoimentosCurso($idCurso);
+  if (!$pool) return [];
+
+  shuffle($pool);
+  return array_slice($pool, 0, max(1, $limite));
+}
+
+/**
+ * Conjunto da vitrine da home, separado por modalidade e guardado em cache.
+ *
+ * Em vez de ler as 3 mil linhas, pega uma janela aleatória da coleção e fica
+ * com o que for de curso que o site exibe. A janela muda quando o cache vence;
+ * quem sorteia a cada visita é depoimentosDestaque().
+ */
+function poolDepoimentosHome(array $cursos): array {
+  $cache = caminhoCache('depo_home');
+
+  $pool = cacheDepoimentos($cache);
+  if ($pool !== null) return $pool;
+
+  $modalidadePorCurso = [];
+  foreach ($cursos as $c) {
+    $modalidadePorCurso[strtoupper((string) $c['id'])] = ['slug' => $c['categoria'], 'nome' => $c['nome']];
+  }
+
+  $ultimo = buscarColecao(COL_DEPOIMENTOS, ['fields' => 'id', 'sort' => '-id', 'limit' => 1]);
+  if ($ultimo === null) return cacheDepoimentos($cache, true) ?? [];
+
+  $maior  = (int) ($ultimo[0]['id'] ?? 0);
+  $janela = 150;
+  $inicio = $maior > $janela ? random_int(1, $maior - $janela) : 1;
+
+  $linhas = buscarColecao(COL_DEPOIMENTOS, [
+    'fields' => 'nome,depoimento,curso,id_curso,satisfacao',
+    'filter' => json_encode(['id' => ['_gte' => $inicio]]),
+    'sort'   => 'id',
+    'limit'  => $janela,
+  ]);
+  if ($linhas === null) return cacheDepoimentos($cache, true) ?? [];
+
+  $pool = ['eja' => [], 'tecnico' => [], 'livre' => []];
+  foreach (normalizarDepoimentos($linhas) as $d) {
+    $curso = $modalidadePorCurso[$d['idCurso']] ?? null;
+    if (!$curso || !isset($pool[$curso['slug']])) continue;   // curso que o site não exibe
+    if ($d['curso'] === '') $d['curso'] = $curso['nome'];
+    $pool[$curso['slug']][] = $d;
+  }
+
+  @file_put_contents($cache, json_encode($pool, JSON_UNESCAPED_UNICODE));
+  return $pool;
+}
+
+/**
+ * Um depoimento por modalidade para a vitrine da home, sorteado a cada visita.
+ * Modalidade sem depoimento na janela atual simplesmente não entra.
+ */
+function depoimentosDestaque(array $cursos): array {
+  $pool  = poolDepoimentosHome($cursos);
   $saida = [];
 
   foreach (['eja', 'tecnico', 'livre'] as $slug) {
-    $daModalidade = array_values(array_filter($cursos, fn($c) => ($c['categoria'] ?? '') === $slug));
-    if (!$daModalidade) continue;
-
-    for ($i = 0; $i < min($tentativas, count($daModalidade)); $i++) {
-      $curso   = $daModalidade[($dia + $i) % count($daModalidade)];
-      $achados = depoimentosDoCurso((string) $curso['id'], 1);
-      if ($achados) {
-        $achados[0]['curso'] = $achados[0]['curso'] !== '' ? $achados[0]['curso'] : $curso['nome'];
-        $saida[] = $achados[0];
-        break;
-      }
-    }
+    $daModalidade = $pool[$slug] ?? [];
+    if ($daModalidade) $saida[] = $daModalidade[array_rand($daModalidade)];
   }
   return $saida;
 }
