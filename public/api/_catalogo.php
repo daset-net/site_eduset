@@ -18,6 +18,7 @@ const COL_PACOTE     = 'ava_pacote_curso';    // grade curricular (uma linha por
 const COL_EXERCICIOS = 'ava_pacote_materia';  // atividades da matéria (uma linha por questão)
 const COL_PROVAS     = 'ava_pacote_prova';    // prova final (uma linha por questão)
 const COL_ANEXOS     = 'ava_pacote_anexo';    // apostila e jornada em PDF
+const COL_UNIDADES   = 'tabela_unidades';     // polos, para o link de divulgação
 
 const CACHE_TTL    = 600; // segundos
 const HTTP_TIMEOUT = 8;
@@ -190,6 +191,79 @@ function config(string $chave, string $padrao = ''): string {
     }
   }
   return ($mapa[$chave] ?? '') !== '' ? $mapa[$chave] : $padrao;
+}
+
+// ---------------------------------------------------------------- polo (unidade)
+// Link de divulgação de um polo: eduset.com.br/?polo=centro.aracaju.se
+// O código é o e-mail da unidade sem o domínio. Guardado em cookie por 30 dias,
+// ele viaja na matrícula e trava o aluno naquela unidade; sem ele, o AVASET
+// registra a venda na unidade EAD do estado do aluno.
+const POLO_COOKIE = 'eduset_polo';
+const POLO_DIAS   = 30;
+
+/** O código do polo desta visita — do link, ou do cookie deixado por ele. */
+function poloSlug(): string {
+  static $slug = null;
+  if ($slug !== null) return $slug;
+
+  $valido = fn(string $v): bool => (bool) preg_match('/^[a-z0-9._-]{2,80}$/', $v);
+
+  $doLink = strtolower(trim((string) ($_GET['polo'] ?? '')));
+  if ($valido($doLink)) {
+    if (!headers_sent()) {
+      setcookie(POLO_COOKIE, $doLink, [
+        'expires'  => time() + POLO_DIAS * 86400,
+        'path'     => '/',
+        'samesite' => 'Lax',
+      ]);
+    }
+    return $slug = $doLink;
+  }
+
+  $doCookie = strtolower(trim((string) ($_COOKIE[POLO_COOKIE] ?? '')));
+  return $slug = $valido($doCookie) ? $doCookie : '';
+}
+
+/**
+ * Dados públicos do polo do link (nome/cidade/estado), só para o selo da página.
+ * Devolve null se não houver link, se a unidade não existir ou estiver inativa —
+ * e nesse caso a página não mostra selo nenhum, mas o código continua viajando
+ * na matrícula: quem decide de verdade é o AVASET.
+ */
+function poloUnidade(): ?array {
+  static $unidade = false;
+  if ($unidade !== false) return $unidade;
+
+  $slug = poloSlug();
+  if ($slug === '') return $unidade = null;
+
+  $cache = caminhoCache('polo_' . $slug);
+  if (is_readable($cache) && (time() - filemtime($cache) < CACHE_TTL)) {
+    $guardado = json_decode((string) file_get_contents($cache), true);
+    if (is_array($guardado)) return $unidade = ($guardado['nome'] ?? '') !== '' ? $guardado : null;
+  }
+
+  $linhas = buscarColecao(COL_UNIDADES, [
+    'fields' => 'unidade_nome,unidade_email,cidade,estado,situacao',
+    'filter' => json_encode([
+      'unidade_email' => ['_starts_with' => $slug . '@'],
+      'situacao'      => ['_eq' => 'ativo'],
+    ]),
+    'limit'  => 1,
+  ]);
+
+  // Falha de rede/permissão: não grava cache para tentar de novo na próxima.
+  if ($linhas === null) return $unidade = null;
+
+  $achado = $linhas[0] ?? null;
+  $dados  = [
+    'nome'   => (string) ($achado['unidade_nome'] ?? ''),
+    'cidade' => (string) ($achado['cidade'] ?? ''),
+    'estado' => (string) ($achado['estado'] ?? ''),
+  ];
+  @file_put_contents($cache, json_encode($dados, JSON_UNESCAPED_UNICODE));
+
+  return $unidade = $dados['nome'] !== '' ? $dados : null;
 }
 
 /** URL da imagem de capa (servida pelo proxy, para não expor o token). */

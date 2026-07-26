@@ -19,6 +19,10 @@ if (!$curso) {
 $conteudo = conteudoCurso($curso);
 $ano = date('Y');
 
+// Link de divulgação de um polo (?polo=codigo): precisa ser lido antes de
+// qualquer saída, porque é aqui que o cookie da visita é gravado.
+$polo = poloUnidade();
+
 // Até 3 cursos da mesma modalidade para o rodapé da página.
 $relacionados = array_values(array_filter(
   $todos,
@@ -311,6 +315,13 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
       </div>
 
       <form class="contact-form" id="form-matricula" data-curso="<?= e($curso['id']) ?>" novalidate>
+        <?php if ($polo): ?>
+        <!-- Veio pelo link de divulgação de um polo: a matrícula fica com ele. -->
+        <div class="form-polo">
+          <i class="ri-map-pin-2-line"></i>
+          <span>Matrícula pela unidade <strong><?= e($polo['nome']) ?></strong></span>
+        </div>
+        <?php endif; ?>
         <div class="form-alert" id="form-alerta" hidden></div>
 
         <p class="form-etapa">1. Seus dados</p>

@@ -6,6 +6,10 @@ require __DIR__ . '/api/_catalogo.php';
 $ano = date('Y');
 $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000');
 
+// Link de divulgação de um polo (?polo=codigo): guarda o cookie da visita antes
+// de qualquer saída e, se a unidade existir, anuncia por quem o visitante veio.
+$polo = poloUnidade();
+
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 ?>
 <!DOCTYPE html>
@@ -61,7 +65,13 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <section class="hero" id="home">
     <div class="container hero__grid">
       <div class="hero__content">
-        <span class="hero__badge"><span class="dot"></span> <?= e(config('hero_badge', 'Matrículas abertas · Turmas ' . $ano)) ?></span>
+        <span class="hero__badge"><span class="dot"></span>
+          <?php if ($polo): ?>
+            Unidade <?= e($polo['nome']) ?>
+          <?php else: ?>
+            <?= e(config('hero_badge', 'Matrículas abertas · Turmas ' . $ano)) ?>
+          <?php endif; ?>
+        </span>
         <h1>
           <?= e(config('hero_titulo', 'Seu futuro começa com uma')) ?>
           <?php if (config('hero_destaque')): ?><span class="hl"><?= e(config('hero_destaque')) ?></span><?php endif; ?>

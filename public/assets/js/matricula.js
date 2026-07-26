@@ -29,6 +29,16 @@
 
   guardarAfiliado();
 
+  // -------------------------------------------------------------------- polo
+  // Link de divulgação de uma unidade (?polo=codigo). Quem guarda o cookie é o
+  // PHP (_catalogo.php), que já lê o link na primeira página aberta; aqui só
+  // levamos o código junto com a matrícula para o AVASET travar a unidade.
+  function polo() {
+    var achado = document.cookie.match(/(?:^|;\s*)eduset_polo=([^;]*)/);
+    var valor = achado ? decodeURIComponent(achado[1]).toLowerCase() : '';
+    return /^[a-z0-9._-]{2,80}$/.test(valor) ? valor : '';
+  }
+
   // ---------------------------------------------------------------- máscaras
   function mascarar(campo, formatar) {
     if (!campo) return;
@@ -157,6 +167,7 @@
       nome_responsavel: form.nome_responsavel.value,
       cpf_responsavel: form.cpf_responsavel.value,
       afiliado_email: afiliado(),
+      polo: polo(),
       site: form.site.value
     };
 

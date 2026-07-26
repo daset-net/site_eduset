@@ -152,6 +152,15 @@ if (excedeuLimite()) {
 $afiliado = trim((string) ($dados['afiliado_email'] ?? ''));
 if (!filter_var($afiliado, FILTER_VALIDATE_EMAIL)) $afiliado = '';
 
+// Polo do link de divulgação. O navegador manda, mas o cookie é do servidor;
+// vale mais o que o PHP já leu do link/cookie desta visita. Quem valida se o
+// polo existe e está ativo é o AVASET — aqui só conferimos o formato.
+$polo = poloSlug();
+if ($polo === '') {
+  $polo = strtolower(trim((string) ($dados['polo'] ?? '')));
+  if (!preg_match('/^[a-z0-9._-]{2,80}$/', $polo)) $polo = '';
+}
+
 $payload = [
   // aluno
   'nome'        => $nome,
@@ -189,6 +198,7 @@ $payload = [
   'gestor_nome' => 'Site EDUSET',
 ];
 if ($afiliado !== '') $payload['afiliado_email'] = $afiliado;
+if ($polo !== '')     $payload['polo'] = $polo;
 
 // ---------------------------------------------------------------- envio
 $url = conexao('AVASET_MATRICULA_URL', MATRICULA_URL_PADRAO);
