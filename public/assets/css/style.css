@@ -1056,6 +1056,8 @@ ul { list-style: none; }
   display: grid; grid-template-columns: 1.1fr .9fr;
   gap: 40px; align-items: center;
 }
+/* Curso sem depoimento cadastrado: o texto ocupa a largura toda. */
+.curso-prova--sozinho { grid-template-columns: 1fr; }
 .curso-prova h2 { font-size: clamp(24px, 3vw, 34px); font-weight: 700; margin: 10px 0 14px; }
 .curso-prova > div > p { color: var(--muted); margin-bottom: 24px; }
 .curso-prova__stats { display: flex; flex-wrap: wrap; gap: 32px; }

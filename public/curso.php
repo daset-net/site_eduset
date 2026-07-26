@@ -31,6 +31,10 @@ $relacionados = array_values(array_filter(
 shuffle($relacionados);
 $relacionados = array_slice($relacionados, 0, 3);
 
+// Depoimento de quem fez este curso (site_alunos_depoimentos). Sem depoimento
+// cadastrado o bloco some: a página não empresta elogio de outro curso.
+$depoimento = depoimentosDoCurso($curso['id'], 1)[0] ?? null;
+
 $economia = max(0, (float) str_replace(['.', ','], ['', '.'], $curso['precoDe'])
                  - (float) str_replace(['.', ','], ['', '.'], $curso['preco']));
 
@@ -281,7 +285,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
   <!-- ===================== PROVA SOCIAL ===================== -->
   <section class="section">
     <div class="container">
-      <div class="curso-prova">
+      <div class="curso-prova<?= $depoimento ? '' : ' curso-prova--sozinho' ?>">
         <div>
           <span class="eyebrow">Quem já fez</span>
           <h2>Mais de <span class="gradient-text">12 mil alunos</span> já começaram aqui</h2>
@@ -292,11 +296,16 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
             <div><strong>100%</strong><span>online e no seu ritmo</span></div>
           </div>
         </div>
+        <?php if ($depoimento): ?>
         <div class="testi">
-          <div class="stars"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
-          <p>“Achei que não ia conseguir estudar trabalhando. Fiz pelo celular, no intervalo e à noite, e consegui o certificado. Mudou a minha vida.”</p>
-          <div class="who"><div class="av">MR</div><div><strong>Marcos R.</strong><span>Aluno EDUSET</span></div></div>
+          <div class="stars"><?php for ($i = 0; $i < $depoimento['estrelas']; $i++): ?><i class="ri-star-fill"></i><?php endfor; ?></div>
+          <p>“<?= e($depoimento['texto']) ?>”</p>
+          <div class="who">
+            <div class="av"><?= e($depoimento['iniciais']) ?></div>
+            <div><strong><?= e($depoimento['nome']) ?></strong><span><?= e($depoimento['curso'] !== '' ? $depoimento['curso'] : $curso['nome']) ?></span></div>
+          </div>
         </div>
+        <?php endif; ?>
       </div>
     </div>
   </section>

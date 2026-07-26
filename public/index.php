@@ -22,6 +22,10 @@ foreach ($cursosDoSite as $c) {
   if (!in_array($c['nome'], $tagsModalidade[$slug], true)) $tagsModalidade[$slug][] = $c['nome'];
 }
 
+// Vitrine de depoimentos: um por modalidade, direto do site_alunos_depoimentos.
+// Sem depoimento cadastrado a seção inteira some — nada de elogio inventado.
+$depoimentosHome = depoimentosDestaque($cursosDoSite);
+
 /**
  * Selos do cartão da modalidade: os primeiros cursos e quantos ainda restam.
  * Nome comprido é cortado para caber no chip; o texto inteiro fica no title.
@@ -290,6 +294,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
   </section>
 
   <!-- ===================== DEPOIMENTOS ===================== -->
+  <?php if ($depoimentosHome): ?>
   <section class="section section--soft">
     <div class="container">
       <div class="section-head" data-reveal>
@@ -297,24 +302,17 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <h2>Histórias de quem <span class="gradient-text">estudou conosco</span></h2>
       </div>
       <div class="testi-grid">
+        <?php foreach ($depoimentosHome as $d): ?>
         <div class="testi" data-reveal>
-          <div class="stars"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
-          <p>“Consegui concluir o Ensino Médio pelo EJA em poucos meses. O suporte foi incrível e o certificado saiu rapidinho!”</p>
-          <div class="who"><div class="av">MR</div><div><strong>Maria Ribeiro</strong><span>Supletivo EJA</span></div></div>
+          <div class="stars"><?php for ($i = 0; $i < $d['estrelas']; $i++): ?><i class="ri-star-fill"></i><?php endfor; ?></div>
+          <p>“<?= e($d['texto']) ?>”</p>
+          <div class="who"><div class="av"><?= e($d['iniciais']) ?></div><div><strong><?= e($d['nome']) ?></strong><span><?= e($d['curso']) ?></span></div></div>
         </div>
-        <div class="testi" data-reveal>
-          <div class="stars"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
-          <p>“Fiz o curso técnico em Enfermagem e hoje já estou trabalhando na área. Recomendo demais a EDUSET!”</p>
-          <div class="who"><div class="av">JS</div><div><strong>João Silva</strong><span>Técnico em Enfermagem</span></div></div>
-        </div>
-        <div class="testi" data-reveal>
-          <div class="stars"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
-          <p>“Os cursos livres me ajudaram a evoluir no trabalho. Conteúdo direto ao ponto e com certificado na hora.”</p>
-          <div class="who"><div class="av">AC</div><div><strong>Ana Costa</strong><span>Marketing Digital</span></div></div>
-        </div>
+        <?php endforeach; ?>
       </div>
     </div>
   </section>
+  <?php endif; ?>
 
   <!-- ===================== CONTATO ===================== -->
   <section class="section" id="contato">

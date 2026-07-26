@@ -19,6 +19,7 @@ const COL_EXERCICIOS = 'ava_pacote_materia';  // atividades da matéria (uma lin
 const COL_PROVAS     = 'ava_pacote_prova';    // prova final (uma linha por questão)
 const COL_ANEXOS     = 'ava_pacote_anexo';    // apostila e jornada em PDF
 const COL_UNIDADES   = 'tabela_unidades';     // polos, para o link de divulgação
+const COL_DEPOIMENTOS = 'site_alunos_depoimentos'; // depoimentos de alunos, por curso
 
 const CACHE_TTL    = 600; // segundos
 const HTTP_TIMEOUT = 8;
@@ -511,6 +512,118 @@ function planoVigente(string $idCurso): ?array {
   if (!$linhas) return null;
 
   return ofertaDoCiclo($linhas);
+}
+
+// ---------------------------------------------------------------- depoimentos
+/**
+ * Depoimentos de alunos (site_alunos_depoimentos), sempre amarrados ao curso.
+ *
+ * A coleção guarda o depoimento junto do id_curso, então o site nunca precisa
+ * inventar elogio: a página do curso mostra quem fez aquele curso, e a home
+ * mostra um de cada modalidade. Onde a coleção ainda não existe, as funções
+ * devolvem lista vazia e a página cai no texto fixo dela.
+ */
+
+/** Nota em estrelas — o campo vem como texto livre ("5 estrelas"). */
+function estrelasDepoimento($valor): int {
+  return preg_match('/\d+/', (string) $valor, $m) ? max(1, min(5, (int) $m[0])) : 5;
+}
+
+/** Iniciais para o avatar redondo: "Ana Costa" => "AC". */
+function iniciaisNome(string $nome): string {
+  $partes = preg_split('/\s+/u', trim($nome)) ?: [];
+  $partes = array_values(array_filter($partes, fn($p) => mb_strlen($p, 'UTF-8') > 2));
+  if (!$partes) return '★';
+  $primeira = mb_substr($partes[0], 0, 1, 'UTF-8');
+  $ultima   = count($partes) > 1 ? mb_substr(end($partes), 0, 1, 'UTF-8') : '';
+  return mb_strtoupper($primeira . $ultima, 'UTF-8');
+}
+
+/**
+ * Nome como o site publica: primeiro nome inteiro e o sobrenome abreviado.
+ * O depoimento é de aluno real, então a página não expõe o nome completo.
+ */
+function nomePublico(string $nome): string {
+  $partes = preg_split('/\s+/u', trim($nome)) ?: [];
+  $partes = array_values(array_filter($partes, fn($p) => $p !== ''));
+  if (!$partes) return 'Aluno';
+  if (count($partes) === 1) return $partes[0];
+  return $partes[0] . ' ' . mb_strtoupper(mb_substr(end($partes), 0, 1, 'UTF-8'), 'UTF-8') . '.';
+}
+
+/**
+ * Depoimentos de um curso, prontos para exibir. Cache em disco por curso.
+ * A cada dia a lista gira, para a mesma página não repetir sempre a mesma voz.
+ */
+function depoimentosDoCurso(string $idCurso, int $limite = 3): array {
+  if ($idCurso === '') return [];
+
+  $cache = caminhoCache('depo_' . preg_replace('/[^A-Za-z0-9]/', '', $idCurso));
+  $lista = null;
+
+  if (is_readable($cache) && (time() - filemtime($cache) < CACHE_TTL)) {
+    $lista = json_decode((string) file_get_contents($cache), true);
+  }
+
+  if (!is_array($lista)) {
+    $linhas = buscarColecao(COL_DEPOIMENTOS, [
+      'fields' => 'nome,depoimento,curso,id_curso,satisfacao',
+      'filter' => json_encode(['id_curso' => ['_eq' => $idCurso]]),
+      'limit'  => 12,
+    ]);
+
+    // Coleção ausente ou fora do ar: usa o que já foi guardado, mesmo vencido.
+    if ($linhas === null) {
+      $lista = is_readable($cache) ? json_decode((string) file_get_contents($cache), true) : [];
+      if (!is_array($lista)) $lista = [];
+    } else {
+      $lista = [];
+      foreach ($linhas as $l) {
+        $texto = trim((string) ($l['depoimento'] ?? ''));
+        $nome  = trim((string) ($l['nome'] ?? ''));
+        if ($texto === '' || $nome === '') continue;
+        $lista[] = [
+          'nome'     => nomePublico($nome),
+          'iniciais' => iniciaisNome($nome),
+          'texto'    => $texto,
+          'curso'    => trim((string) ($l['curso'] ?? '')),
+          'estrelas' => estrelasDepoimento($l['satisfacao'] ?? ''),
+        ];
+      }
+      @file_put_contents($cache, json_encode($lista, JSON_UNESCAPED_UNICODE));
+    }
+  }
+
+  if (!$lista) return [];
+
+  $giro = (int) floor(time() / 86400) % count($lista);
+  return array_slice(array_merge($lista, $lista), $giro, min($limite, count($lista)));
+}
+
+/**
+ * Um depoimento por modalidade para a vitrine da home, sempre de curso que o
+ * site está exibindo. O curso escolhido gira a cada dia; se o sorteado não tem
+ * depoimento cadastrado, tenta os seguintes daquela modalidade.
+ */
+function depoimentosDestaque(array $cursos, int $tentativas = 6): array {
+  $dia   = (int) floor(time() / 86400);
+  $saida = [];
+
+  foreach (['eja', 'tecnico', 'livre'] as $slug) {
+    $daModalidade = array_values(array_filter($cursos, fn($c) => ($c['categoria'] ?? '') === $slug));
+    if (!$daModalidade) continue;
+
+    for ($i = 0; $i < min($tentativas, count($daModalidade)); $i++) {
+      $curso   = $daModalidade[($dia + $i) % count($daModalidade)];
+      $achados = depoimentosDoCurso((string) $curso['id'], 1);
+      if ($achados) {
+        $achados[0]['curso'] = $achados[0]['curso'] !== '' ? $achados[0]['curso'] : $curso['nome'];
+        $saida[] = $achados[0];
+        break;
+      }
+    }
+  }
+  return $saida;
 }
 
 // ---------------------------------------------------------------- grade curricular
