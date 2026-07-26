@@ -670,6 +670,29 @@ ul { list-style: none; }
   padding: 36px;
   box-shadow: var(--shadow-md);
 }
+
+/* Faixa no topo do formulário: diz o que é e para qual curso. */
+.form-topo {
+  margin: -36px -36px 26px;
+  padding: 24px 36px 22px;
+  background: var(--grad-brand);
+  border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+  color: #fff;
+}
+.form-topo__selo {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 100px;
+  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28);
+}
+.form-topo__selo i { font-size: 15px; }
+.form-topo h3 {
+  font-size: 20px; font-weight: 600; line-height: 1.35;
+  margin: 14px 0 8px; color: #fff;
+}
+.form-topo h3 strong { font-weight: 800; }
+.form-topo p { font-size: 13.5px; line-height: 1.5; margin: 0; color: rgba(255,255,255,.82); }
+
 .field { margin-bottom: 18px; }
 .field label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 7px; }
 .field input, .field select, .field textarea {

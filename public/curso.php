@@ -315,6 +315,13 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
       </div>
 
       <form class="contact-form" id="form-matricula" data-curso="<?= e($curso['id']) ?>" novalidate>
+        <!-- Deixa claro, antes do primeiro campo, que aqui a matrícula é feita de verdade. -->
+        <div class="form-topo">
+          <span class="form-topo__selo"><i class="ri-file-list-3-line"></i> Ficha de matrícula</span>
+          <h3>Você está se matriculando em <strong><?= e($curso['nome']) ?></strong></h3>
+          <p>Preencha com atenção: estes dados vão para a secretaria e valem para o certificado.</p>
+        </div>
+
         <?php if ($polo): ?>
         <!-- Veio pelo link de divulgação de um polo: a matrícula fica com ele. -->
         <div class="form-polo">
