@@ -305,7 +305,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
   <section class="section section--soft" id="matricula">
     <div class="container contact-grid">
       <div class="contact-info">
-        <span class="eyebrow" style="display:inline-block;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--blue-500);background:#fff;padding:6px 16px;border-radius:100px;margin-bottom:16px">Matrícula</span>
+        <span class="eyebrow" style="display:inline-block;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--green-600);background:#fff;padding:6px 16px;border-radius:100px;margin-bottom:16px">Matrícula</span>
         <h2>Comece <span class="gradient-text">hoje</span> — a vaga é sua</h2>
         <p>Preencha seus dados e conclua a matrícula em <strong><?= e($curso['nome']) ?></strong> agora, na condição de <strong>R$ <?= e($curso['preco']) ?><?= $curso['parcelas'] ? ' em ' . (int) $curso['parcelas'] . 'x' : '' ?></strong>. Ao final você já recebe o número da matrícula e os dados de acesso à plataforma.</p>
 

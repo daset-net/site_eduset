@@ -296,7 +296,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <section class="section" id="contato">
     <div class="container contact-grid">
       <div class="contact-info" data-reveal>
-        <span class="eyebrow" style="display:inline-block;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--blue-500);background:var(--bg-softer);padding:6px 16px;border-radius:100px;margin-bottom:16px">Fale conosco</span>
+        <span class="eyebrow" style="display:inline-block;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--green-600);background:var(--bg-softer);padding:6px 16px;border-radius:100px;margin-bottom:16px">Fale conosco</span>
         <h2>Pronto para começar? <span class="gradient-text">Vamos conversar</span></h2>
         <p>Preencha o formulário e um de nossos consultores entrará em contato para tirar todas as suas dúvidas e ajudar na sua matrícula.</p>
 

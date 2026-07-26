@@ -23,11 +23,11 @@ const COL_UNIDADES   = 'tabela_unidades';     // polos, para o link de divulgaç
 const CACHE_TTL    = 600; // segundos
 const HTTP_TIMEOUT = 8;
 
-// As três cores que revezam nos cartões: duas verdes e uma que fecha no azul da
-// logo — a mesma proporção que as duas cores têm na marca.
+// As três cores que revezam nos cartões, todas do mesmo verde da logo: uma
+// média, uma escura e uma clara. O contraste vem do tom, não de outra cor.
 const COR_VERDE = 'linear-gradient(140deg,#044928,#17a45f)';
 const COR_MATA  = 'linear-gradient(140deg,#02150c,#0a6538)';
-const COR_AZUL  = 'linear-gradient(140deg,#0a6538,#004aad)';
+const COR_FOLHA = 'linear-gradient(140deg,#0c7a44,#3fc47f)';
 
 // Emoji por palavra-chave, usado só quando o curso não tem emoji nem capa definidos.
 $EMOJIS = [
@@ -398,7 +398,7 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
     return $oa <=> $ob ?: strcmp((string) $a['id_curso'], (string) $b['id_curso']);
   });
 
-  $cores  = [COR_VERDE, COR_MATA, COR_AZUL];
+  $cores  = [COR_VERDE, COR_MATA, COR_FOLHA];
   $cursos = [];
   $i = 0;
 

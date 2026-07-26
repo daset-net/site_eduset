@@ -2,10 +2,10 @@
    EDUSET — Folha de estilo principal
 
    Paleta tirada da logo, que tem exatamente duas cores: o verde do capelo
-   (#044928) e o azul do lettering (#004aad). Aqui quem manda é o verde — ele
-   sustenta fundo, texto forte, botão e ícone. O azul entra de propósito, em
-   poucos lugares, como contraponto: o realce do título do hero, o fecho do
-   gradiente de fundo e um dos três cartões do catálogo.
+   (#044928) e o azul do lettering (#004aad). Aqui o verde manda sozinho — ele
+   sustenta fundo, texto forte, botão, ícone e realce, do topo ao rodapé. O
+   azul fica reservado à própria logo: dentro do site ele não pinta nada, para
+   a marca não ser confundida com a paleta azul das escolas irmãs.
    ========================================================================== */
 
 :root {
@@ -19,22 +19,19 @@
   --green-300: #3fc47f;
   --green-200: #a8e9c6;
 
-  /* Azul da logo — contraponto */
-  --blue-600: #003c8e;
-  --blue-500: #004aad;   /* azul da logo */
-  --blue-400: #1266d6;
-  --blue-300: #93c4fa;  /* azul claro, para o realce sobre o hero escuro */
+  /* Azul da logo — só existe na própria logo; o site não pinta nada com ele. */
+  --blue-500: #004aad;
 
   --ink: #0b1f16;
   --muted: #5a7268;
-  --line: #dfeee6;
+  --line: #dbeee4;
   --bg: #ffffff;
-  --bg-soft: #f2faf5;
-  --bg-softer: #e7f6ee;
+  --bg-soft: #eef9f3;
+  --bg-softer: #ddf2e7;
 
   --grad-brand: linear-gradient(135deg, var(--green-700) 0%, var(--green-500) 55%, var(--green-400) 100%);
-  --grad-hero: linear-gradient(140deg, #02150c 0%, #04351e 36%, #0a6538 72%, #004aad 100%);
-  --grad-text: linear-gradient(90deg, var(--green-600), var(--blue-500));
+  --grad-hero: linear-gradient(140deg, #02150c 0%, #04351e 34%, #0a6538 68%, #0c7a44 100%);
+  --grad-text: linear-gradient(90deg, var(--green-600), var(--green-400));
 
   --shadow-sm: 0 2px 8px rgba(4, 73, 40, .08);
   --shadow-md: 0 10px 30px rgba(4, 73, 40, .12);
@@ -233,9 +230,11 @@ ul { list-style: none; }
    ========================================================================== */
 .hero {
   position: relative;
+  /* Verde do capelo por baixo de tudo: escuro embaixo à esquerda, abrindo no
+     verde da marca atrás da logo. Nenhum azul entra aqui. */
   background:
-    radial-gradient(1200px 600px at 78% 18%, rgba(10,101,56,.55), transparent 60%),
-    linear-gradient(160deg, #02150c 0%, #04351e 45%, #0a6538 100%);
+    radial-gradient(1100px 620px at 76% 20%, rgba(23,164,95,.42), transparent 62%),
+    linear-gradient(160deg, #02150c 0%, #04351e 42%, #0a6538 78%, #0c7a44 100%);
   color: #fff;
   padding: 150px 0 110px;
   overflow: hidden;
@@ -245,8 +244,8 @@ ul { list-style: none; }
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 12% 22%, rgba(63,196,127,.18), transparent 42%),
-    radial-gradient(circle at 88% 78%, rgba(18,102,214,.28), transparent 48%);
+    radial-gradient(circle at 12% 22%, rgba(63,196,127,.20), transparent 42%),
+    radial-gradient(circle at 88% 78%, rgba(12,122,68,.34), transparent 48%);
   pointer-events: none;
 }
 .hero__grid {
@@ -276,7 +275,8 @@ ul { list-style: none; }
   letter-spacing: -1px;
 }
 .hero h1 .hl {
-  background: linear-gradient(90deg, var(--green-300), var(--blue-300));
+  /* "diploma." em verde-claro luminoso — era aqui que o azul chamava atenção. */
+  background: linear-gradient(90deg, var(--green-300), #7ff0b4);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 .hero p.lead {
