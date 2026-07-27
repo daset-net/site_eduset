@@ -534,6 +534,23 @@ function contarCidades(array $lista): int {
   return count($cidades);
 }
 
+/**
+ * URL de um arquivo estático com a data da última alteração no fim
+ * (`assets/css/style.css?v=1753654321`).
+ *
+ * O LiteSpeed guarda a resposta de CSS e JS por sete dias e manda o navegador
+ * guardar pelo mesmo tempo. Sem isso, uma correção de estilo só chega ao
+ * visitante uma semana depois — foi o que aconteceu quando a lista de unidades
+ * ganhou estilo novo e o site continuou servindo o CSS da véspera.
+ *
+ * $arquivo é o caminho a partir do docroot; $prefixo é o que a página precisa
+ * pôr na frente para chegar lá ('../' nas telas do painel).
+ */
+function versao(string $arquivo, string $prefixo = ''): string {
+  $mtime = @filemtime(__DIR__ . '/../' . $arquivo);
+  return $prefixo . $arquivo . ($mtime ? '?v=' . $mtime : '');
+}
+
 /** URL da imagem de capa (servida pelo proxy, para não expor o token). */
 function urlImagem(?string $uuid): string {
   if (!$uuid || !preg_match('/^[0-9a-f-]{36}$/i', $uuid)) return '';

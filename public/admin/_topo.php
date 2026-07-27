@@ -16,8 +16,8 @@ $abaAtiva = $abaAtiva ?? '';
   <link rel="icon" href="../assets/img/favicon.ico" sizes="any">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="<?= versao('assets/css/style.css', '../') ?>">
+  <link rel="stylesheet" href="<?= versao('admin/admin.css', '../') ?>">
 </head>
 <body class="admin">
 

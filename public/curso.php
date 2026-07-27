@@ -78,7 +78,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
 </head>
 <body class="page-curso">
 
@@ -605,8 +605,8 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
     <a href="#matricula" class="btn btn-primary">Matricular <i class="ri-arrow-right-line"></i></a>
   </div>
 
-<script src="assets/js/curso.js"></script>
-<script src="assets/js/matricula.js"></script>
-<script src="assets/js/avisos.js"></script>
+<script src="<?= versao('assets/js/curso.js') ?>"></script>
+<script src="<?= versao('assets/js/matricula.js') ?>"></script>
+<script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>
 </html>
