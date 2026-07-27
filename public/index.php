@@ -76,6 +76,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <a href="#home">Início</a>
         <a href="#categorias">Modalidades</a>
         <a href="#cursos">Cursos</a>
+        <a href="unidades.php">Unidades</a>
         <a href="#diferenciais">Diferenciais</a>
         <a href="#contato">Contato</a>
       </nav>
@@ -388,6 +389,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
           <h5>Institucional</h5>
           <ul>
             <li><a href="#categorias">Sobre nós</a></li>
+            <li><a href="unidades.php">Unidades</a></li>
             <li><a href="#diferenciais">Diferenciais</a></li>
             <li><a href="#contato">Contato</a></li>
           </ul>

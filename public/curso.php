@@ -93,6 +93,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
         <a href="index.php">Início</a>
         <?php if ($materias): ?><a href="#grade">Matérias</a><?php endif; ?>
         <a href="index.php#cursos">Cursos</a>
+        <a href="unidades.php">Unidades</a>
         <a href="index.php#diferenciais">Diferenciais</a>
         <a href="index.php#contato">Contato</a>
       </nav>
@@ -570,6 +571,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
           <h5>Institucional</h5>
           <ul>
             <li><a href="index.php#categorias">Sobre nós</a></li>
+            <li><a href="unidades.php">Unidades</a></li>
             <li><a href="index.php#diferenciais">Diferenciais</a></li>
             <li><a href="index.php#contato">Contato</a></li>
           </ul>

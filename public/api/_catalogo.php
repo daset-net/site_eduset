@@ -132,7 +132,7 @@ function caminhoCache(string $nome = 'catalogo'): string {
 
 /** Invalida o cache para que uma edição no Directus apareça no site na hora. */
 function limparCache(): void {
-  foreach (['catalogo', 'config', 'avisos', 'materias'] as $nome) {
+  foreach (['catalogo', 'config', 'avisos', 'materias', 'unidades'] as $nome) {
     @unlink(caminhoCache($nome));
   }
 }
@@ -265,6 +265,226 @@ function poloUnidade(): ?array {
   @file_put_contents($cache, json_encode($dados, JSON_UNESCAPED_UNICODE));
 
   return $unidade = $dados['nome'] !== '' ? $dados : null;
+}
+
+// ---------------------------------------------------------------- unidades
+// A página de unidades (unidades.php e unidade.php) lê a mesma tabela_unidades
+// do link de divulgação. Só entra polo físico: a unidade EAD de cada estado é o
+// destino padrão da venda do site, não é lugar para o aluno procurar, e o
+// e-mail dela carrega o segmento "ead" — é por aí que as duas se distinguem.
+//
+// A tabela é operacional (tem senha, chave de API, CNPJ, repasse). O site lê só
+// nome, cidade e estado: endereço e telefone da unidade NÃO são publicados, e
+// nem chegam a ser consultados. Todo contato do site é pelo canal da escola.
+
+const UNIDADE_CAMPOS = 'unidade_nome,unidade_email,cidade,estado,situacao';
+
+const UF_NOMES = [
+  'AC' => 'Acre', 'AL' => 'Alagoas', 'AP' => 'Amapá', 'AM' => 'Amazonas',
+  'BA' => 'Bahia', 'CE' => 'Ceará', 'DF' => 'Distrito Federal',
+  'ES' => 'Espírito Santo', 'GO' => 'Goiás', 'MA' => 'Maranhão',
+  'MT' => 'Mato Grosso', 'MS' => 'Mato Grosso do Sul', 'MG' => 'Minas Gerais',
+  'PA' => 'Pará', 'PB' => 'Paraíba', 'PR' => 'Paraná', 'PE' => 'Pernambuco',
+  'PI' => 'Piauí', 'RJ' => 'Rio de Janeiro', 'RN' => 'Rio Grande do Norte',
+  'RS' => 'Rio Grande do Sul', 'RO' => 'Rondônia', 'RR' => 'Roraima',
+  'SC' => 'Santa Catarina', 'SP' => 'São Paulo', 'SE' => 'Sergipe',
+  'TO' => 'Tocantins',
+];
+
+/** Texto sem acento e em minúsculas, para comparar cadastro escrito de vários jeitos. */
+function semAcento(string $texto): string {
+  return strtr(mb_strtolower(trim($texto), 'UTF-8'), [
+    'á'=>'a','à'=>'a','ã'=>'a','â'=>'a','ä'=>'a','é'=>'e','ê'=>'e','è'=>'e',
+    'í'=>'i','ì'=>'i','î'=>'i','ó'=>'o','ô'=>'o','õ'=>'o','ò'=>'o','ö'=>'o',
+    'ú'=>'u','ù'=>'u','û'=>'u','ü'=>'u','ç'=>'c',
+  ]);
+}
+
+/** Sigla do estado. O cadastro grava ora "BA", ora "Bahia", ora nada. */
+function siglaEstado(string $bruto): string {
+  $texto = trim($bruto);
+  if ($texto === '') return '';
+
+  if (preg_match('/^[A-Za-z]{2}$/', $texto)) {
+    $uf = strtoupper($texto);
+    return isset(UF_NOMES[$uf]) ? $uf : '';
+  }
+
+  static $porNome = null;
+  if ($porNome === null) {
+    $porNome = [];
+    foreach (UF_NOMES as $uf => $nome) $porNome[semAcento($nome)] = $uf;
+  }
+  return $porNome[semAcento($texto)] ?? '';
+}
+
+/** Nome do estado por extenso, para o título da página. */
+function nomeEstado(string $uf): string {
+  return UF_NOMES[strtoupper(trim($uf))] ?? $uf;
+}
+
+/**
+ * "na Bahia", "em São Paulo", "no Ceará" — a preposição muda com o estado e
+ * texto de site com "no Bahia" cheira a formulário mal preenchido.
+ */
+function estadoComPreposicao(string $uf): string {
+  $nome = nomeEstado($uf);
+  if ($nome === '' || $nome === $uf) return $nome;
+
+  $preposicao = [
+    'BA' => 'na', 'PB' => 'na',
+    'AL' => 'em', 'GO' => 'em', 'MG' => 'em', 'PE' => 'em', 'RO' => 'em',
+    'RR' => 'em', 'SC' => 'em', 'SP' => 'em', 'SE' => 'em',
+  ][strtoupper($uf)] ?? 'no';
+
+  return $preposicao . ' ' . $nome;
+}
+
+/**
+ * Cadastro em caixa alta ("CAMACAN") vira nome próprio na página.
+ * Quem já foi digitado direito passa intocado.
+ */
+function nomeProprio(string $texto): string {
+  $texto = trim($texto);
+  if ($texto === '' || $texto !== mb_strtoupper($texto, 'UTF-8')) return $texto;
+
+  $titulo = mb_convert_case(mb_strtolower($texto, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
+  return preg_replace_callback(
+    '/\b(De|Do|Da|Dos|Das|E)\b/u',
+    fn($m) => mb_strtolower($m[1], 'UTF-8'),
+    $titulo
+  );
+}
+
+/** Código da unidade no link de divulgação: o e-mail sem o domínio. */
+function codigoUnidade(string $email): string {
+  $codigo = strtolower(trim(explode('@', $email)[0] ?? ''));
+  return preg_match('/^[a-z0-9._-]{2,80}$/', $codigo) ? $codigo : '';
+}
+
+/**
+ * A unidade EAD do estado — atende a distância e não entra na lista de polos.
+ *
+ * Não existe coluna de flag: é a mesma regra do GESET. O e-mail gerado na
+ * criação carrega o segmento "ead" (ead.cidade.uf@ ou cidade.uf.ead@, conforme
+ * a época do cadastro) e o nome sempre termina em EAD — e o nome é o que se
+ * mantém correto quando a unidade é editada, porque o e-mail nunca é regerado.
+ */
+function ehUnidadeEad(string $email, string $nome = ''): bool {
+  $local = strtolower(explode('@', $email)[0] ?? '');
+  if (in_array('ead', explode('.', $local), true)) return true;
+  return (bool) preg_match('/\bEAD$/i', trim($nome));
+}
+
+/**
+ * Uma linha da tabela_unidades no formato que a página publica: onde a unidade
+ * fica, e só.
+ *
+ * Cadastro antigo deixou cidade e estado em branco, mas o nome da unidade segue
+ * o padrão "Estado - Cidade - Referência" — quando o campo falta, o nome
+ * completa. O que sobra depois da cidade (bairro, distrito, shopping) vira a
+ * referência que diferencia dois polos da mesma cidade.
+ */
+function unidadePublica(array $linha): array {
+  $email  = strtolower(trim((string) ($linha['unidade_email'] ?? '')));
+  $nome   = preg_replace('/\s+/u', ' ', trim((string) ($linha['unidade_nome'] ?? '')));
+  $cidade = nomeProprio((string) ($linha['cidade'] ?? ''));
+  $uf     = siglaEstado((string) ($linha['estado'] ?? ''));
+
+  $partes = array_values(array_filter(array_map('trim', explode(' - ', $nome)), fn($p) => $p !== ''));
+  $ufNome = count($partes) > 1 ? siglaEstado($partes[0]) : '';
+  $refs   = [];
+  if ($ufNome !== '') {
+    if ($uf === '')     $uf = $ufNome;
+    if ($cidade === '') $cidade = nomeProprio($partes[1] ?? '');
+    $refs = array_slice($partes, 2);
+  }
+
+  return [
+    'codigo'     => codigoUnidade($email),
+    'nome'       => $nome,
+    'cidade'     => $cidade,
+    'uf'         => $uf,
+    'estado'     => $uf !== '' ? nomeEstado($uf) : '',
+    'referencia' => implode(' · ', $refs),
+    'ead'        => ehUnidadeEad($email, $nome),
+  ];
+}
+
+/** Todas as unidades ativas no formato público, com cache em disco. */
+function unidadesCadastradas(): array {
+  static $lista = null;
+  if ($lista !== null) return $lista;
+
+  $cache = caminhoCache('unidades');
+  if (is_readable($cache) && (time() - filemtime($cache) < CACHE_TTL)) {
+    $guardado = json_decode((string) file_get_contents($cache), true);
+    if (is_array($guardado)) return $lista = $guardado;
+  }
+
+  $linhas = buscarColecao(COL_UNIDADES, [
+    'fields' => UNIDADE_CAMPOS,
+    'filter' => json_encode(['situacao' => ['_eq' => 'ativo']]),
+    'sort'   => 'unidade_nome',
+  ]);
+
+  // Directus fora do ar: serve a última lista conhecida, mesmo vencida.
+  if ($linhas === null) {
+    $guardado = is_readable($cache) ? json_decode((string) file_get_contents($cache), true) : null;
+    return $lista = is_array($guardado) ? $guardado : [];
+  }
+
+  $lista = [];
+  foreach ($linhas as $l) {
+    $u = unidadePublica($l);
+    if ($u['codigo'] !== '' && $u['nome'] !== '') $lista[] = $u;
+  }
+
+  @file_put_contents($cache, json_encode($lista, JSON_UNESCAPED_UNICODE));
+  return $lista;
+}
+
+/** Polos, na ordem em que a página lista: estado, cidade, nome. */
+function unidadesPolo(): array {
+  $polos = array_values(array_filter(unidadesCadastradas(), fn($u) => !$u['ead']));
+
+  usort($polos, function ($a, $b) {
+    return [$a['uf'], semAcento($a['cidade']), semAcento($a['nome'])]
+       <=> [$b['uf'], semAcento($b['cidade']), semAcento($b['nome'])];
+  });
+  return $polos;
+}
+
+/** Polos agrupados por estado: ['CE' => [...], 'SP' => [...]]. */
+function polosPorEstado(): array {
+  $mapa = [];
+  foreach (unidadesPolo() as $u) {
+    $mapa[$u['uf'] !== '' ? $u['uf'] : '--'][] = $u;
+  }
+  return $mapa;
+}
+
+/** Um polo pelo código do link de divulgação (ex.: centro.aracaju.se). */
+function unidadePorCodigo(string $codigo): ?array {
+  $codigo = strtolower(trim($codigo));
+  foreach (unidadesPolo() as $u) {
+    if ($u['codigo'] === $codigo) return $u;
+  }
+  return null;
+}
+
+/**
+ * Siglas dos estados atendidos, contando também a EAD.
+ * É o que a página mostra quando a escola ainda não tem polo: o aluno continua
+ * sendo atendido, só que a distância.
+ */
+function estadosAtendidos(): array {
+  $ufs = [];
+  foreach (unidadesCadastradas() as $u) {
+    if ($u['uf'] !== '' && !in_array($u['uf'], $ufs, true)) $ufs[] = $u['uf'];
+  }
+  sort($ufs);
+  return $ufs;
 }
 
 /** URL da imagem de capa (servida pelo proxy, para não expor o token). */
