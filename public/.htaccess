@@ -1,0 +1,31 @@
+# .htaccess — URL que não existe volta para a home.
+#
+# O site saiu do WordPress e as URLs antigas continuam indexadas e sendo
+# clicadas (/sao-paulo-sao-paulo/, por exemplo). Em vez da tela "404 Not Found"
+# do LiteSpeed, o visitante cai na página inicial e segue navegando — que é o
+# que interessa com tráfego pago entrando pelo domínio.
+#
+# O redirecionamento é 302 (temporário) de propósito: se um dia uma dessas URLs
+# virar página de verdade, um 301 já estaria gravado no navegador de quem passou
+# por aqui e a página nova não abriria.
+
+RewriteEngine On
+
+# 1. Arquivo ou pasta que existe de verdade é servido normalmente.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 2. A API responde JSON. Devolver a home no lugar de um erro deixaria o cliente
+#    tentando ler HTML como se fosse JSON — o 404 dela continua 404.
+RewriteRule ^api/ - [L]
+
+# 3. Imagem, CSS, JS e afins que sumiram também continuam 404: mandar a home no
+#    lugar de um .png não conserta nada e ainda esconde o arquivo faltando.
+RewriteRule \.(?:css|js|mjs|map|json|xml|txt|png|jpe?g|gif|webp|avif|svg|ico|woff2?|ttf|eot|otf|pdf|zip|mp4|webm)$ - [L]
+
+# 4. O resto — URL velha, link digitado errado, varredura de robô — vai para a
+#    home. A query string é preservada, então um link de divulgação com o caminho
+#    torto (/qualquer-coisa?polo=centro.aracaju.se) não perde o código do polo.
+RewriteCond %{REQUEST_URI} !^/$
+RewriteRule ^ / [R=302,L]
