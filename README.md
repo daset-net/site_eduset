@@ -357,20 +357,32 @@ As capas são servidas por `public/api/imagem.php`, que busca o arquivo no
 Directus pelo servidor e devolve só os bytes — assim o token **não** vai para o
 navegador. Aceita `?w=` em 400, 600, 800, 1200 ou 1600.
 
-## 📍 Unidades (polos e atendimento a distância)
+## 📍 Unidades
 
 O site tem duas páginas alimentadas pela `tabela_unidades` do Directus — a mesma
 tabela em que o GESET cadastra polo:
 
 | Página | O que mostra |
 |---|---|
-| `/unidades.php` | Todas as unidades ativas — polo físico e unidade a distância —, agrupadas por estado, com busca por cidade/estado, filtro por UF e filtro por tipo (tudo no navegador: a lista já vem pronta do PHP). |
-| `/unidade.php?id=<código>` | A ficha da unidade: cidade, estado, referência, se é polo ou atendimento a distância, e o botão de matrícula por ela. Código inexistente volta para a lista. |
+| `/unidades.php` | Todas as unidades ativas, agrupadas por estado, com busca por cidade/estado e filtro por UF (tudo no navegador: a lista já vem pronta do PHP). |
+| `/unidade.php?id=<código>` | A ficha da unidade: cidade, estado e referência. Código inexistente volta para a lista. |
 
 O **código** é o e-mail da unidade sem o domínio (`centro.aracaju.se`) — o mesmo
-usado no link de divulgação `?polo=`. Por isso o botão "Ver cursos e matricular"
-da ficha aponta para `index.php?polo=<código>#cursos`: o cookie da visita é
-gravado ali e a matrícula feita na sequência fica **com aquela unidade**.
+usado no link de divulgação `?polo=`, mas as duas coisas param aí.
+
+> ### ⚠️ A página de unidade NÃO atribui a venda
+>
+> Nenhum link do site sai com `?polo=`. Quem chega pelo domínio (busca, anúncio
+> da escola, menu) e passa pela página de uma unidade **não** fica preso a ela:
+> segue sem cookie e o AVASET registra a matrícula na unidade EAD do estado do
+> aluno, como em qualquer visita orgânica.
+>
+> Atribuir venda é papel exclusivo do link de divulgação do polo,
+> `eduset.com.br/?polo=<código>` — é ele que grava o cookie de 30 dias.
+> Isso mantém o tráfego pago da escola separado do tráfego pago do polo.
+>
+> Se a ficha da unidade voltar a apontar para `index.php?polo=...`, o problema
+> volta junto: basta o visitante clicar numa unidade para a venda sair dela.
 
 > **A página não publica endereço nem telefone de unidade.** Ela diz em que cidade
 > e estado a unidade fica, e o contato oferecido é sempre o canal oficial da
@@ -380,14 +392,11 @@ gravado ali e a matrícula feita na sequência fica **com aquela unidade**.
 
 Outras regras que a página aplica sozinha:
 
-- **Polo e unidade a distância aparecem juntos.** Cada cartão diz qual é qual
-  ("Polo na cidade" ou "Atendimento a distância") e, quando existem os dois, uma
-  régua acima da lista filtra por tipo. A unidade a distância é identificada como
-  no GESET, sem coluna de flag: o e-mail tem o segmento `ead` (`ead.cidade.uf@`
-  ou `cidade.uf.ead@`) **ou** o nome termina em "EAD" — e esse "EAD" sai do nome
-  da cidade e da referência, já que o rótulo do cartão diz a mesma coisa.
-- **Na mesma cidade, o polo vem antes.** Quem tem onde receber o aluno aparece
-  primeiro; a unidade a distância vem logo abaixo.
+- **Polo e unidade a distância aparecem iguais.** A página não separa as duas:
+  para quem procura a escola na sua cidade, é tudo "unidade". A regra do GESET
+  que reconhece a unidade a distância (segmento `ead` no e-mail — `ead.cidade.uf@`
+  ou `cidade.uf.ead@` — **ou** nome terminando em "EAD") sobrou só para tirar
+  esse "EAD" do fim do nome da cidade e da referência.
 - **Só unidade com `situacao = ativo`.**
 - **Cadastro incompleto não quebra a página.** Sem cidade/estado nos campos, o
   nome da unidade completa (o padrão é "Estado - Cidade - Referência"); estado

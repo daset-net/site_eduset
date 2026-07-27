@@ -1,14 +1,12 @@
 <?php
 // unidades.php — onde a EDUSET atende.
-// A lista sai da tabela_unidades do Directus e traz toda unidade ativa: o polo
-// físico, que recebe o aluno na cidade, e a unidade a distância, que atende pelos
-// canais da escola. O cartão diz qual é qual e a régua de tipo separa as duas.
+// A lista sai da tabela_unidades do Directus e traz toda unidade ativa, sem
+// distinguir polo físico de unidade a distância: para quem procura a escola na
+// sua cidade, as duas são a mesma coisa.
 
 require __DIR__ . '/api/_catalogo.php';
 
-$unidades = unidadesListadas();   // polo físico e unidade a distância, juntos
-$polos    = unidadesPolo();
-$adistanc = unidadesEad();
+$unidades = unidadesListadas();
 $porUf    = unidadesPorEstado();
 $estados  = estadosAtendidos();
 $ano      = date('Y');
@@ -23,10 +21,6 @@ $cidades = contarCidades($unidades);
 
 $ufsNaLista = array_values(array_filter(array_keys($porUf), fn($uf) => $uf !== '--'));
 sort($ufsNaLista);
-
-// A régua de tipo só aparece quando existem os dois — em escola só a distância
-// (ou só com polo) ela não teria o que separar.
-$temOsDoisTipos = $polos && $adistanc;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -111,14 +105,6 @@ $temOsDoisTipos = $polos && $adistanc;
         </div>
       </div>
 
-      <?php if ($temOsDoisTipos): ?>
-      <div class="unid-tipos" id="unid-tipos">
-        <button type="button" class="ativo" data-tipo="todos"><i class="ri-apps-2-line"></i> Todas as unidades</button>
-        <button type="button" data-tipo="polo"><i class="ri-map-pin-2-line"></i> Com polo na cidade <span><?= count($polos) ?></span></button>
-        <button type="button" data-tipo="ead"><i class="ri-computer-line"></i> Atendimento a distância <span><?= count($adistanc) ?></span></button>
-      </div>
-      <?php endif; ?>
-
       <p class="unid-vazio" id="unid-vazio" hidden>
         Nenhuma unidade encontrada com esse termo. Fale com a gente no WhatsApp que indicamos a mais próxima.
       </p>
@@ -132,22 +118,14 @@ $temOsDoisTipos = $polos && $adistanc;
 
         <div class="unid-grid">
           <?php foreach ($lista as $u): ?>
-          <a class="unid-card<?= $u['ead'] ? ' unid-card--ead' : '' ?>" href="unidade.php?id=<?= e($u['codigo']) ?>"
+          <a class="unid-card" href="unidade.php?id=<?= e($u['codigo']) ?>"
              data-uf="<?= e($u['uf']) ?>"
-             data-tipo="<?= $u['ead'] ? 'ead' : 'polo' ?>"
-             data-busca="<?= e(semAcento($u['nome'] . ' ' . $u['cidade'] . ' ' . $u['uf'] . ' ' . $u['estado'] . ' ' . $u['referencia'] . ($u['ead'] ? ' ead online a distancia virtual' : ' polo presencial'))) ?>">
+             data-busca="<?= e(semAcento($u['nome'] . ' ' . $u['cidade'] . ' ' . $u['uf'] . ' ' . $u['estado'] . ' ' . $u['referencia'])) ?>">
             <span class="unid-card__uf"><?= e($u['uf'] !== '' ? $u['uf'] : '·') ?></span>
             <h3><?= e($u['cidade'] !== '' ? $u['cidade'] : $u['nome']) ?></h3>
             <?php if ($u['referencia'] !== ''): ?>
               <p class="unid-card__ref"><?= e($u['referencia']) ?></p>
             <?php endif; ?>
-            <span class="unid-card__tipo">
-              <?php if ($u['ead']): ?>
-                <i class="ri-computer-line"></i> Atendimento a distância
-              <?php else: ?>
-                <i class="ri-map-pin-2-line"></i> Polo na cidade
-              <?php endif; ?>
-            </span>
             <span class="unid-card__ver">Ver unidade <i class="ri-arrow-right-line"></i></span>
           </a>
           <?php endforeach; ?>

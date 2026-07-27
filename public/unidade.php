@@ -1,5 +1,5 @@
 <?php
-// unidade.php — ficha de uma unidade da EDUSET, polo físico ou a distância.
+// unidade.php — ficha de uma unidade da EDUSET.
 // Uso: /unidade.php?id=centro.aracaju.se  (o código é o e-mail da unidade sem o
 // domínio — o mesmo do link de divulgação ?polo=).
 //
@@ -21,7 +21,6 @@ $ano = date('Y');
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 
-$ead    = $unidade['ead'];
 $local  = trim($unidade['cidade'] . ($unidade['uf'] !== '' ? ' · ' . $unidade['uf'] : ''), ' ·');
 $titulo = $unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome'];
 if ($unidade['referencia'] !== '') $titulo .= ' — ' . $unidade['referencia'];
@@ -29,9 +28,11 @@ if ($unidade['referencia'] !== '') $titulo .= ' — ' . $unidade['referencia'];
 $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
   . rawurlencode('Olá! Quero falar sobre a unidade ' . $unidade['nome'] . '.');
 
-// Matricular por esta unidade: o link com ?polo= é o mesmo mecanismo da
-// divulgação — grava o cookie da visita e a venda fica com o polo.
-$linkMatricula = 'index.php?polo=' . rawurlencode($unidade['codigo']) . '#cursos';
+// A página é institucional: diz onde a unidade fica, e só. O link do catálogo
+// vai limpo, SEM ?polo=, para quem chegou pelo site (busca, anúncio da escola,
+// menu) não sair atribuído a uma unidade que apenas visitou. Atribuição é papel
+// exclusivo do link de divulgação do polo, eduset.com.br/?polo=<código>.
+$linkCursos = 'index.php#cursos';
 
 // Outras unidades do mesmo estado, para quem abriu a cidade errada.
 $vizinhas = array_slice(array_values(array_filter(
@@ -44,7 +45,7 @@ $vizinhas = array_slice(array_values(array_filter(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<?= e(($ead ? 'Atendimento EDUSET a distância em ' : 'Unidade EDUSET em ') . ($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) . ($unidade['uf'] !== '' ? ' (' . $unidade['uf'] . ')' : '') . '. Cursos 100% online com matrícula por esta unidade.') ?>">
+  <meta name="description" content="<?= e('Unidade EDUSET em ' . ($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) . ($unidade['uf'] !== '' ? ' (' . $unidade['uf'] . ')' : '') . '. Cursos 100% online com matrícula por esta unidade.') ?>">
   <meta name="theme-color" content="#044928">
   <title><?= e($titulo . ' · Unidades EDUSET') ?></title>
 
@@ -78,7 +79,7 @@ $vizinhas = array_slice(array_values(array_filter(
         <a href="index.php#contato">Contato</a>
       </nav>
       <div class="header__cta">
-        <a href="<?= e($linkMatricula) ?>" class="btn btn-primary">Matricular nesta unidade <i class="ri-arrow-right-line"></i></a>
+        <a href="<?= e($linkCursos) ?>" class="btn btn-primary">Ver cursos <i class="ri-arrow-right-line"></i></a>
       </div>
     </div>
   </header>
@@ -93,26 +94,22 @@ $vizinhas = array_slice(array_values(array_filter(
           <span><?= e($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) ?></span>
         </nav>
 
-        <span class="curso-hero__badge"><span class="dot"></span> <?= $ead ? 'Atendimento a distância' : 'Polo credenciado' ?> · Matrículas abertas <?= $ano ?></span>
+        <span class="curso-hero__badge"><span class="dot"></span> Unidade credenciada · Matrículas abertas <?= $ano ?></span>
         <h1><?= e($titulo) ?></h1>
         <p class="unid-hero__nome"><?= e($unidade['nome']) ?></p>
         <p class="lead">
           Esta é a unidade que atende <?= e($unidade['cidade'] !== '' ? $unidade['cidade'] : 'a sua região') ?><?= $unidade['uf'] !== '' ? ' e região, ' . e(estadoComPreposicao($unidade['uf'])) : '' ?>.
-          <?php if ($ead): ?>
-            O atendimento é a distância, pelos canais da escola, e a matrícula feita por aqui fica registrada nesta unidade.
-          <?php else: ?>
-            Você estuda 100% online, no seu ritmo, e a matrícula feita por aqui fica registrada nesta unidade.
-          <?php endif; ?>
+          Os cursos são 100% online: você estuda no seu ritmo, de onde estiver.
         </p>
 
         <ul class="unid-hero__marcas">
           <?php if ($local !== ''): ?><li><i class="ri-map-pin-2-line"></i> <?= e($local) ?></li><?php endif; ?>
-          <li><i class="<?= $ead ? 'ri-computer-line' : 'ri-store-2-line' ?>"></i> <?= $ead ? 'Atendimento a distância' : 'Polo na cidade' ?></li>
+          <li><i class="ri-computer-line"></i> Cursos 100% online</li>
           <li><i class="ri-time-line"></i> <?= e(config('horario_atendimento', 'Segunda a sexta, das 8h às 18h')) ?></li>
         </ul>
 
         <div class="unid-hero__actions">
-          <a href="<?= e($linkMatricula) ?>" class="btn btn-light">Ver cursos e matricular <i class="ri-arrow-right-line"></i></a>
+          <a href="<?= e($linkCursos) ?>" class="btn btn-light">Ver cursos e matricular <i class="ri-arrow-right-line"></i></a>
         </div>
       </div>
     </div>
@@ -140,13 +137,7 @@ $vizinhas = array_slice(array_values(array_filter(
           </div>
           <?php endif; ?>
           <div class="ficha-linha">
-            <div class="ic"><i class="<?= $ead ? 'ri-computer-line' : 'ri-store-2-line' ?>"></i></div>
-            <div><strong>Tipo de unidade</strong><span><?= $ead
-              ? 'Unidade a distância — atende a cidade pelos canais da escola'
-              : 'Polo com atendimento na própria cidade' ?></span></div>
-          </div>
-          <div class="ficha-linha">
-            <div class="ic"><i class="ri-graduation-cap-line"></i></div>
+            <div class="ic"><i class="ri-computer-line"></i></div>
             <div><strong>Como funciona</strong><span>Aulas, material e provas 100% online, com tutoria durante todo o curso</span></div>
           </div>
 
@@ -159,15 +150,15 @@ $vizinhas = array_slice(array_values(array_filter(
 
       <aside>
         <div class="ficha-box ficha-box--matricula">
-          <h2><i class="ri-graduation-cap-line"></i> Matrícula por esta unidade</h2>
-          <p>Ao continuar por aqui, sua matrícula fica registrada nesta unidade — é ela que acompanha o seu curso do começo ao fim.</p>
+          <h2><i class="ri-graduation-cap-line"></i> Como estudar aqui</h2>
+          <p>A matrícula é feita aqui pelo site, em poucos minutos, e o curso começa assim que o pagamento é confirmado.</p>
           <ul class="lista-check">
             <li><i class="ri-check-line"></i> Todos os cursos do catálogo, 100% online</li>
             <li><i class="ri-check-line"></i> Sem taxa de matrícula</li>
             <li><i class="ri-check-line"></i> Acesso liberado após a confirmação do pagamento</li>
           </ul>
-          <a href="<?= e($linkMatricula) ?>" class="btn btn-primary" style="width:100%;justify-content:center">
-            Ver cursos desta unidade <i class="ri-arrow-right-line"></i>
+          <a href="<?= e($linkCursos) ?>" class="btn btn-primary" style="width:100%;justify-content:center">
+            Ver cursos e matricular <i class="ri-arrow-right-line"></i>
           </a>
         </div>
 
@@ -205,17 +196,10 @@ $vizinhas = array_slice(array_values(array_filter(
       </div>
       <div class="unid-grid">
         <?php foreach ($vizinhas as $v): ?>
-        <a class="unid-card<?= $v['ead'] ? ' unid-card--ead' : '' ?>" href="unidade.php?id=<?= e($v['codigo']) ?>">
+        <a class="unid-card" href="unidade.php?id=<?= e($v['codigo']) ?>">
           <span class="unid-card__uf"><?= e($v['uf'] !== '' ? $v['uf'] : '·') ?></span>
           <h3><?= e($v['cidade'] !== '' ? $v['cidade'] : $v['nome']) ?></h3>
           <?php if ($v['referencia'] !== ''): ?><p class="unid-card__ref"><?= e($v['referencia']) ?></p><?php endif; ?>
-          <span class="unid-card__tipo">
-            <?php if ($v['ead']): ?>
-              <i class="ri-computer-line"></i> Atendimento a distância
-            <?php else: ?>
-              <i class="ri-map-pin-2-line"></i> Polo na cidade
-            <?php endif; ?>
-          </span>
           <span class="unid-card__ver">Ver unidade <i class="ri-arrow-right-line"></i></span>
         </a>
         <?php endforeach; ?>
@@ -258,7 +242,7 @@ $vizinhas = array_slice(array_values(array_filter(
         <div>
           <h5>Atendimento</h5>
           <ul>
-            <li><a href="<?= e($linkMatricula) ?>">Matrícula</a></li>
+            <li><a href="<?= e($linkCursos) ?>">Matrícula</a></li>
             <li><a href="index.php#contato">Fale conosco</a></li>
             <li><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener">WhatsApp</a></li>
           </ul>

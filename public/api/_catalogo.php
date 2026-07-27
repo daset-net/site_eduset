@@ -374,8 +374,8 @@ function codigoUnidade(string $email): string {
  * a época do cadastro) e o nome sempre termina em EAD — e o nome é o que se
  * mantém correto quando a unidade é editada, porque o e-mail nunca é regerado.
  *
- * Ela é listada no site junto com os polos: muda o rótulo do cartão e o texto
- * da ficha, não a existência da unidade. Em cidade sem polo, é ela quem atende.
+ * O site não separa mais as duas na tela: toda unidade ativa é só "unidade".
+ * A regra sobrou para tirar o "EAD" do fim do nome da cidade e da referência.
  */
 function ehUnidadeEad(string $email, string $nome = ''): bool {
   $local = strtolower(explode('@', $email)[0] ?? '');
@@ -468,31 +468,18 @@ function unidadesCadastradas(): array {
   return $lista;
 }
 
-/**
- * A ordem em que a página lista: estado, cidade e, na mesma cidade, o polo antes
- * da unidade a distância — quem tem onde ser recebido aparece primeiro.
- */
+/** A ordem em que a página lista: estado, cidade, nome. */
 function ordenarUnidades(array $lista): array {
   usort($lista, function ($a, $b) {
-    return [$a['uf'], semAcento($a['cidade']), $a['ead'] ? 1 : 0, semAcento($a['nome'])]
-       <=> [$b['uf'], semAcento($b['cidade']), $b['ead'] ? 1 : 0, semAcento($b['nome'])];
+    return [$a['uf'], semAcento($a['cidade']), semAcento($a['nome'])]
+       <=> [$b['uf'], semAcento($b['cidade']), semAcento($b['nome'])];
   });
   return $lista;
 }
 
-/** Tudo que a página de unidades mostra: polo físico e unidade a distância. */
+/** Toda unidade ativa, na ordem da página. */
 function unidadesListadas(): array {
   return ordenarUnidades(unidadesCadastradas());
-}
-
-/** Só os polos físicos — os que têm balcão na cidade. */
-function unidadesPolo(): array {
-  return ordenarUnidades(array_values(array_filter(unidadesCadastradas(), fn($u) => !$u['ead'])));
-}
-
-/** Só as unidades a distância. */
-function unidadesEad(): array {
-  return ordenarUnidades(array_values(array_filter(unidadesCadastradas(), fn($u) => $u['ead'])));
 }
 
 /** Unidades agrupadas por estado: ['CE' => [...], 'SP' => [...]]. */
