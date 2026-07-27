@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "site_eduset",
+      "runtimeExecutable": "php",
+      "runtimeArgs": ["-S", "localhost:8788", "-t", "public"],
+      "port": 8788
+    }
+  ]
+}
