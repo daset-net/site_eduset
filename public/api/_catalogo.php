@@ -132,7 +132,7 @@ function caminhoCache(string $nome = 'catalogo'): string {
 
 /** Invalida o cache para que uma edição no Directus apareça no site na hora. */
 function limparCache(): void {
-  foreach (['catalogo', 'config', 'avisos', 'materias', 'unidades'] as $nome) {
+  foreach (['catalogo', 'config', 'avisos', 'materias', 'unidades', CACHE_UNIDADES] as $nome) {
     @unlink(caminhoCache($nome));
   }
 }
@@ -279,6 +279,10 @@ function poloUnidade(): ?array {
 
 const UNIDADE_CAMPOS = 'unidade_nome,unidade_email,cidade,estado,situacao';
 
+// Versão do cache: o formato da unidade publicada mudou quando a EAD entrou na
+// lista, e o arquivo antigo não deve ser reaproveitado.
+const CACHE_UNIDADES = 'unidades_v2';
+
 const UF_NOMES = [
   'AC' => 'Acre', 'AL' => 'Alagoas', 'AP' => 'Amapá', 'AM' => 'Amazonas',
   'BA' => 'Bahia', 'CE' => 'Ceará', 'DF' => 'Distrito Federal',
@@ -363,17 +367,29 @@ function codigoUnidade(string $email): string {
 }
 
 /**
- * A unidade EAD do estado — atende a distância e não entra na lista de polos.
+ * A unidade EAD do estado — a que atende a distância, sem endereço de balcão.
  *
  * Não existe coluna de flag: é a mesma regra do GESET. O e-mail gerado na
  * criação carrega o segmento "ead" (ead.cidade.uf@ ou cidade.uf.ead@, conforme
  * a época do cadastro) e o nome sempre termina em EAD — e o nome é o que se
  * mantém correto quando a unidade é editada, porque o e-mail nunca é regerado.
+ *
+ * Ela é listada no site junto com os polos: muda o rótulo do cartão e o texto
+ * da ficha, não a existência da unidade. Em cidade sem polo, é ela quem atende.
  */
 function ehUnidadeEad(string $email, string $nome = ''): bool {
   $local = strtolower(explode('@', $email)[0] ?? '');
   if (in_array('ead', explode('.', $local), true)) return true;
   return (bool) preg_match('/\bEAD$/i', trim($nome));
+}
+
+/**
+ * Tira o "EAD" que fecha o cadastro da unidade a distância ("Curitiba EAD",
+ * "SP - Santos - EAD"). O cartão já diz que o atendimento é a distância; repetir
+ * a sigla no nome da cidade só polui.
+ */
+function semSufixoEad(string $texto): string {
+  return trim(preg_replace('/[\s·\-–]*\bEAD\b\s*$/iu', '', trim($texto)));
 }
 
 /**
@@ -390,6 +406,7 @@ function unidadePublica(array $linha): array {
   $nome   = preg_replace('/\s+/u', ' ', trim((string) ($linha['unidade_nome'] ?? '')));
   $cidade = nomeProprio((string) ($linha['cidade'] ?? ''));
   $uf     = siglaEstado((string) ($linha['estado'] ?? ''));
+  $ead    = ehUnidadeEad($email, $nome);
 
   $partes = array_values(array_filter(array_map('trim', explode(' - ', $nome)), fn($p) => $p !== ''));
   $ufNome = count($partes) > 1 ? siglaEstado($partes[0]) : '';
@@ -400,6 +417,13 @@ function unidadePublica(array $linha): array {
     $refs = array_slice($partes, 2);
   }
 
+  // "EAD" é o tipo da unidade, não bairro nem cidade: sai da referência e do
+  // nome da cidade, e volta como rótulo próprio no cartão.
+  if ($ead) {
+    $refs   = array_values(array_filter($refs, fn($r) => semSufixoEad($r) !== ''));
+    $cidade = semSufixoEad($cidade);
+  }
+
   return [
     'codigo'     => codigoUnidade($email),
     'nome'       => $nome,
@@ -407,7 +431,7 @@ function unidadePublica(array $linha): array {
     'uf'         => $uf,
     'estado'     => $uf !== '' ? nomeEstado($uf) : '',
     'referencia' => implode(' · ', $refs),
-    'ead'        => ehUnidadeEad($email, $nome),
+    'ead'        => $ead,
   ];
 }
 
@@ -416,7 +440,7 @@ function unidadesCadastradas(): array {
   static $lista = null;
   if ($lista !== null) return $lista;
 
-  $cache = caminhoCache('unidades');
+  $cache = caminhoCache(CACHE_UNIDADES);
   if (is_readable($cache) && (time() - filemtime($cache) < CACHE_TTL)) {
     $guardado = json_decode((string) file_get_contents($cache), true);
     if (is_array($guardado)) return $lista = $guardado;
@@ -444,40 +468,52 @@ function unidadesCadastradas(): array {
   return $lista;
 }
 
-/** Polos, na ordem em que a página lista: estado, cidade, nome. */
-function unidadesPolo(): array {
-  $polos = array_values(array_filter(unidadesCadastradas(), fn($u) => !$u['ead']));
-
-  usort($polos, function ($a, $b) {
-    return [$a['uf'], semAcento($a['cidade']), semAcento($a['nome'])]
-       <=> [$b['uf'], semAcento($b['cidade']), semAcento($b['nome'])];
+/**
+ * A ordem em que a página lista: estado, cidade e, na mesma cidade, o polo antes
+ * da unidade a distância — quem tem onde ser recebido aparece primeiro.
+ */
+function ordenarUnidades(array $lista): array {
+  usort($lista, function ($a, $b) {
+    return [$a['uf'], semAcento($a['cidade']), $a['ead'] ? 1 : 0, semAcento($a['nome'])]
+       <=> [$b['uf'], semAcento($b['cidade']), $b['ead'] ? 1 : 0, semAcento($b['nome'])];
   });
-  return $polos;
+  return $lista;
 }
 
-/** Polos agrupados por estado: ['CE' => [...], 'SP' => [...]]. */
-function polosPorEstado(): array {
+/** Tudo que a página de unidades mostra: polo físico e unidade a distância. */
+function unidadesListadas(): array {
+  return ordenarUnidades(unidadesCadastradas());
+}
+
+/** Só os polos físicos — os que têm balcão na cidade. */
+function unidadesPolo(): array {
+  return ordenarUnidades(array_values(array_filter(unidadesCadastradas(), fn($u) => !$u['ead'])));
+}
+
+/** Só as unidades a distância. */
+function unidadesEad(): array {
+  return ordenarUnidades(array_values(array_filter(unidadesCadastradas(), fn($u) => $u['ead'])));
+}
+
+/** Unidades agrupadas por estado: ['CE' => [...], 'SP' => [...]]. */
+function unidadesPorEstado(): array {
   $mapa = [];
-  foreach (unidadesPolo() as $u) {
+  foreach (unidadesListadas() as $u) {
     $mapa[$u['uf'] !== '' ? $u['uf'] : '--'][] = $u;
   }
   return $mapa;
 }
 
-/** Um polo pelo código do link de divulgação (ex.: centro.aracaju.se). */
+/** Uma unidade pelo código do link de divulgação (ex.: centro.aracaju.se). */
 function unidadePorCodigo(string $codigo): ?array {
   $codigo = strtolower(trim($codigo));
-  foreach (unidadesPolo() as $u) {
+  foreach (unidadesCadastradas() as $u) {
     if ($u['codigo'] === $codigo) return $u;
   }
   return null;
 }
 
-/**
- * Siglas dos estados atendidos, contando também a EAD.
- * É o que a página mostra quando a escola ainda não tem polo: o aluno continua
- * sendo atendido, só que a distância.
- */
+/** Siglas dos estados atendidos, por polo ou a distância. */
 function estadosAtendidos(): array {
   $ufs = [];
   foreach (unidadesCadastradas() as $u) {
@@ -485,6 +521,17 @@ function estadosAtendidos(): array {
   }
   sort($ufs);
   return $ufs;
+}
+
+/** Quantas cidades diferentes a lista cobre. */
+function contarCidades(array $lista): int {
+  $cidades = [];
+  foreach ($lista as $u) {
+    if ($u['cidade'] === '') continue;
+    $chave = semAcento($u['cidade']) . '/' . $u['uf'];
+    if (!in_array($chave, $cidades, true)) $cidades[] = $chave;
+  }
+  return count($cidades);
 }
 
 /** URL da imagem de capa (servida pelo proxy, para não expor o token). */

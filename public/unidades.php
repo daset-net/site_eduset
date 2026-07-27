@@ -1,29 +1,32 @@
 <?php
-// unidades.php — onde ficam os polos da EDUSET.
-// A lista sai da tabela_unidades do Directus: entra o polo físico ativo, fica de
-// fora a unidade EAD de cada estado (que atende a distância e não recebe aluno).
+// unidades.php — onde a EDUSET atende.
+// A lista sai da tabela_unidades do Directus e traz toda unidade ativa: o polo
+// físico, que recebe o aluno na cidade, e a unidade a distância, que atende pelos
+// canais da escola. O cartão diz qual é qual e a régua de tipo separa as duas.
 
 require __DIR__ . '/api/_catalogo.php';
 
-$polos   = unidadesPolo();
-$porUf   = polosPorEstado();
-$estados = estadosAtendidos();
-$ano     = date('Y');
+$unidades = unidadesListadas();   // polo físico e unidade a distância, juntos
+$polos    = unidadesPolo();
+$adistanc = unidadesEad();
+$porUf    = unidadesPorEstado();
+$estados  = estadosAtendidos();
+$ano      = date('Y');
 
 $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
   . rawurlencode('Olá! Quero saber qual é a unidade EDUSET mais perto de mim.');
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 
-// Quantas cidades diferentes têm polo — é o número que o visitante procura.
-$cidades = [];
-foreach ($polos as $u) {
-  $chave = semAcento($u['cidade']) . '/' . $u['uf'];
-  if ($u['cidade'] !== '' && !in_array($chave, $cidades, true)) $cidades[] = $chave;
-}
+// Quantas cidades diferentes são atendidas — é o número que o visitante procura.
+$cidades = contarCidades($unidades);
 
-$ufsComPolo = array_values(array_filter(array_keys($porUf), fn($uf) => $uf !== '--'));
-sort($ufsComPolo);
+$ufsNaLista = array_values(array_filter(array_keys($porUf), fn($uf) => $uf !== '--'));
+sort($ufsNaLista);
+
+// A régua de tipo só aparece quando existem os dois — em escola só a distância
+// (ou só com polo) ela não teria o que separar.
+$temOsDoisTipos = $polos && $adistanc;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -79,18 +82,18 @@ sort($ufsComPolo);
           <?= e(config('unidades_subtitulo', 'O curso é 100% online, mas quem faz a matrícula, tira dúvida e acompanha o aluno é gente de carne e osso. Veja abaixo em que cidades a EDUSET já tem unidade.')) ?>
         </p>
 
-        <?php if ($polos): ?>
+        <?php if ($unidades): ?>
         <ul class="unid-hero__marcas">
-          <li><i class="ri-map-pin-2-line"></i> <?= count($polos) ?> unidade<?= count($polos) > 1 ? 's' : '' ?></li>
-          <?php if ($cidades): ?><li><i class="ri-building-line"></i> <?= count($cidades) ?> cidade<?= count($cidades) > 1 ? 's' : '' ?></li><?php endif; ?>
-          <?php if ($ufsComPolo): ?><li><i class="ri-flag-line"></i> <?= count($ufsComPolo) ?> estado<?= count($ufsComPolo) > 1 ? 's' : '' ?></li><?php endif; ?>
+          <li><i class="ri-community-line"></i> <?= count($unidades) ?> unidade<?= count($unidades) > 1 ? 's' : '' ?></li>
+          <?php if ($cidades): ?><li><i class="ri-building-line"></i> <?= $cidades ?> cidade<?= $cidades > 1 ? 's' : '' ?></li><?php endif; ?>
+          <?php if ($ufsNaLista): ?><li><i class="ri-flag-line"></i> <?= count($ufsNaLista) ?> estado<?= count($ufsNaLista) > 1 ? 's' : '' ?></li><?php endif; ?>
         </ul>
         <?php endif; ?>
       </div>
     </div>
   </section>
 
-  <?php if ($polos): ?>
+  <?php if ($unidades): ?>
   <!-- ===================== BUSCA + LISTA ===================== -->
   <section class="section" id="lista">
     <div class="container">
@@ -102,11 +105,19 @@ sort($ufsComPolo);
         </div>
         <div class="uf-chips" id="unid-ufs">
           <button type="button" class="ativo" data-uf="todos">Todos</button>
-          <?php foreach ($ufsComPolo as $uf): ?>
+          <?php foreach ($ufsNaLista as $uf): ?>
             <button type="button" data-uf="<?= e($uf) ?>" title="<?= e(nomeEstado($uf)) ?>"><?= e($uf) ?></button>
           <?php endforeach; ?>
         </div>
       </div>
+
+      <?php if ($temOsDoisTipos): ?>
+      <div class="unid-tipos" id="unid-tipos">
+        <button type="button" class="ativo" data-tipo="todos"><i class="ri-apps-2-line"></i> Todas as unidades</button>
+        <button type="button" data-tipo="polo"><i class="ri-map-pin-2-line"></i> Com polo na cidade <span><?= count($polos) ?></span></button>
+        <button type="button" data-tipo="ead"><i class="ri-computer-line"></i> Atendimento a distância <span><?= count($adistanc) ?></span></button>
+      </div>
+      <?php endif; ?>
 
       <p class="unid-vazio" id="unid-vazio" hidden>
         Nenhuma unidade encontrada com esse termo. Fale com a gente no WhatsApp que indicamos a mais próxima.
@@ -121,14 +132,22 @@ sort($ufsComPolo);
 
         <div class="unid-grid">
           <?php foreach ($lista as $u): ?>
-          <a class="unid-card" href="unidade.php?id=<?= e($u['codigo']) ?>"
+          <a class="unid-card<?= $u['ead'] ? ' unid-card--ead' : '' ?>" href="unidade.php?id=<?= e($u['codigo']) ?>"
              data-uf="<?= e($u['uf']) ?>"
-             data-busca="<?= e(semAcento($u['nome'] . ' ' . $u['cidade'] . ' ' . $u['uf'] . ' ' . $u['estado'] . ' ' . $u['referencia'])) ?>">
+             data-tipo="<?= $u['ead'] ? 'ead' : 'polo' ?>"
+             data-busca="<?= e(semAcento($u['nome'] . ' ' . $u['cidade'] . ' ' . $u['uf'] . ' ' . $u['estado'] . ' ' . $u['referencia'] . ($u['ead'] ? ' ead online a distancia virtual' : ' polo presencial'))) ?>">
             <span class="unid-card__uf"><?= e($u['uf'] !== '' ? $u['uf'] : '·') ?></span>
             <h3><?= e($u['cidade'] !== '' ? $u['cidade'] : $u['nome']) ?></h3>
             <?php if ($u['referencia'] !== ''): ?>
               <p class="unid-card__ref"><?= e($u['referencia']) ?></p>
             <?php endif; ?>
+            <span class="unid-card__tipo">
+              <?php if ($u['ead']): ?>
+                <i class="ri-computer-line"></i> Atendimento a distância
+              <?php else: ?>
+                <i class="ri-map-pin-2-line"></i> Polo na cidade
+              <?php endif; ?>
+            </span>
             <span class="unid-card__ver">Ver unidade <i class="ri-arrow-right-line"></i></span>
           </a>
           <?php endforeach; ?>

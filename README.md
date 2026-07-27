@@ -38,7 +38,7 @@ site_eduset/
 ├── public/                 # docroot servido pelo OpenLiteSpeed
 │   ├── index.php           # página principal (Vue 3)
 │   ├── curso.php           # página de conversão de um curso (?id=CT005)
-│   ├── unidades.php        # lista de polos, agrupada por estado
+│   ├── unidades.php        # lista de unidades, agrupada por estado
 │   ├── unidade.php         # ficha de uma unidade (?id=centro.aracaju.se)
 │   ├── robots.txt          # bloqueia /admin e /api nos buscadores
 │   ├── admin/              # painel: login do ead + capas e textos
@@ -54,7 +54,7 @@ site_eduset/
 │   │   ├── js/app.js       # Vue da home
 │   │   ├── js/avisos.js    # balões de "fulano se matriculou"
 │   │   ├── js/curso.js     # formulário e header da página do curso
-│   │   ├── js/unidades.js  # busca e filtro por estado na lista de unidades
+│   │   ├── js/unidades.js  # busca e filtros (estado e tipo) na lista de unidades
 │   │   └── img/
 │   │       ├── eduset.png            # logo colorida (fundos claros)
 │   │       ├── eduset-negativo.png   # logo branca (fundos escuros)
@@ -357,15 +357,15 @@ As capas são servidas por `public/api/imagem.php`, que busca o arquivo no
 Directus pelo servidor e devolve só os bytes — assim o token **não** vai para o
 navegador. Aceita `?w=` em 400, 600, 800, 1200 ou 1600.
 
-## 📍 Unidades (polos)
+## 📍 Unidades (polos e atendimento a distância)
 
 O site tem duas páginas alimentadas pela `tabela_unidades` do Directus — a mesma
 tabela em que o GESET cadastra polo:
 
 | Página | O que mostra |
 |---|---|
-| `/unidades.php` | Todas as unidades, agrupadas por estado, com busca por cidade/estado e filtro por UF (tudo no navegador: a lista já vem pronta do PHP). |
-| `/unidade.php?id=<código>` | A ficha da unidade: cidade, estado, referência e o botão de matrícula por ela. Código inexistente volta para a lista. |
+| `/unidades.php` | Todas as unidades ativas — polo físico e unidade a distância —, agrupadas por estado, com busca por cidade/estado, filtro por UF e filtro por tipo (tudo no navegador: a lista já vem pronta do PHP). |
+| `/unidade.php?id=<código>` | A ficha da unidade: cidade, estado, referência, se é polo ou atendimento a distância, e o botão de matrícula por ela. Código inexistente volta para a lista. |
 
 O **código** é o e-mail da unidade sem o domínio (`centro.aracaju.se`) — o mesmo
 usado no link de divulgação `?polo=`. Por isso o botão "Ver cursos e matricular"
@@ -380,10 +380,14 @@ gravado ali e a matrícula feita na sequência fica **com aquela unidade**.
 
 Outras regras que a página aplica sozinha:
 
-- **Só polo aparece.** A unidade EAD de cada estado é o destino padrão das vendas
-  do site e não é lugar para o aluno procurar. Ela é identificada como no GESET,
-  sem coluna de flag: o e-mail tem o segmento `ead` (`ead.cidade.uf@` ou
-  `cidade.uf.ead@`) **ou** o nome termina em "EAD".
+- **Polo e unidade a distância aparecem juntos.** Cada cartão diz qual é qual
+  ("Polo na cidade" ou "Atendimento a distância") e, quando existem os dois, uma
+  régua acima da lista filtra por tipo. A unidade a distância é identificada como
+  no GESET, sem coluna de flag: o e-mail tem o segmento `ead` (`ead.cidade.uf@`
+  ou `cidade.uf.ead@`) **ou** o nome termina em "EAD" — e esse "EAD" sai do nome
+  da cidade e da referência, já que o rótulo do cartão diz a mesma coisa.
+- **Na mesma cidade, o polo vem antes.** Quem tem onde receber o aluno aparece
+  primeiro; a unidade a distância vem logo abaixo.
 - **Só unidade com `situacao = ativo`.**
 - **Cadastro incompleto não quebra a página.** Sem cidade/estado nos campos, o
   nome da unidade completa (o padrão é "Estado - Cidade - Referência"); estado
@@ -393,8 +397,8 @@ Outras regras que a página aplica sozinha:
 A lista fica em cache por 10 minutos, como o resto do site, e o `/api/purgar.php`
 já limpa esse cache junto com os outros.
 
-> Escola sem polo (só EAD) não vê uma página vazia: `/unidades.php` passa a
-> mostrar o bloco de atendimento a distância com as siglas dos estados atendidos.
+> Sem nenhuma unidade ativa a página não fica vazia: `/unidades.php` cai no bloco
+> de atendimento a distância com as siglas dos estados atendidos.
 
 Textos editáveis na `site_configuracoes`: `unidades_titulo`, `unidades_subtitulo`,
 `unidades_seo_titulo` e `unidades_seo_descricao`.

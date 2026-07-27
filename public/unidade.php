@@ -1,5 +1,5 @@
 <?php
-// unidade.php — ficha de uma unidade da EDUSET.
+// unidade.php — ficha de uma unidade da EDUSET, polo físico ou a distância.
 // Uso: /unidade.php?id=centro.aracaju.se  (o código é o e-mail da unidade sem o
 // domínio — o mesmo do link de divulgação ?polo=).
 //
@@ -21,6 +21,7 @@ $ano = date('Y');
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 
+$ead    = $unidade['ead'];
 $local  = trim($unidade['cidade'] . ($unidade['uf'] !== '' ? ' · ' . $unidade['uf'] : ''), ' ·');
 $titulo = $unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome'];
 if ($unidade['referencia'] !== '') $titulo .= ' — ' . $unidade['referencia'];
@@ -34,7 +35,7 @@ $linkMatricula = 'index.php?polo=' . rawurlencode($unidade['codigo']) . '#cursos
 
 // Outras unidades do mesmo estado, para quem abriu a cidade errada.
 $vizinhas = array_slice(array_values(array_filter(
-  unidadesPolo(),
+  unidadesListadas(),
   fn($u) => $u['uf'] === $unidade['uf'] && $u['codigo'] !== $unidade['codigo']
 )), 0, 6);
 ?>
@@ -43,7 +44,7 @@ $vizinhas = array_slice(array_values(array_filter(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<?= e('Unidade EDUSET em ' . ($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) . ($unidade['uf'] !== '' ? ' (' . $unidade['uf'] . ')' : '') . '. Cursos 100% online com matrícula por esta unidade.') ?>">
+  <meta name="description" content="<?= e(($ead ? 'Atendimento EDUSET a distância em ' : 'Unidade EDUSET em ') . ($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) . ($unidade['uf'] !== '' ? ' (' . $unidade['uf'] . ')' : '') . '. Cursos 100% online com matrícula por esta unidade.') ?>">
   <meta name="theme-color" content="#044928">
   <title><?= e($titulo . ' · Unidades EDUSET') ?></title>
 
@@ -92,17 +93,21 @@ $vizinhas = array_slice(array_values(array_filter(
           <span><?= e($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) ?></span>
         </nav>
 
-        <span class="curso-hero__badge"><span class="dot"></span> Unidade credenciada · Matrículas abertas <?= $ano ?></span>
+        <span class="curso-hero__badge"><span class="dot"></span> <?= $ead ? 'Atendimento a distância' : 'Polo credenciado' ?> · Matrículas abertas <?= $ano ?></span>
         <h1><?= e($titulo) ?></h1>
         <p class="unid-hero__nome"><?= e($unidade['nome']) ?></p>
         <p class="lead">
           Esta é a unidade que atende <?= e($unidade['cidade'] !== '' ? $unidade['cidade'] : 'a sua região') ?><?= $unidade['uf'] !== '' ? ' e região, ' . e(estadoComPreposicao($unidade['uf'])) : '' ?>.
-          Você estuda 100% online, no seu ritmo, e a matrícula feita por aqui fica registrada nesta unidade.
+          <?php if ($ead): ?>
+            O atendimento é a distância, pelos canais da escola, e a matrícula feita por aqui fica registrada nesta unidade.
+          <?php else: ?>
+            Você estuda 100% online, no seu ritmo, e a matrícula feita por aqui fica registrada nesta unidade.
+          <?php endif; ?>
         </p>
 
         <ul class="unid-hero__marcas">
           <?php if ($local !== ''): ?><li><i class="ri-map-pin-2-line"></i> <?= e($local) ?></li><?php endif; ?>
-          <li><i class="ri-computer-line"></i> Cursos 100% online</li>
+          <li><i class="<?= $ead ? 'ri-computer-line' : 'ri-store-2-line' ?>"></i> <?= $ead ? 'Atendimento a distância' : 'Polo na cidade' ?></li>
           <li><i class="ri-time-line"></i> <?= e(config('horario_atendimento', 'Segunda a sexta, das 8h às 18h')) ?></li>
         </ul>
 
@@ -135,7 +140,13 @@ $vizinhas = array_slice(array_values(array_filter(
           </div>
           <?php endif; ?>
           <div class="ficha-linha">
-            <div class="ic"><i class="ri-computer-line"></i></div>
+            <div class="ic"><i class="<?= $ead ? 'ri-computer-line' : 'ri-store-2-line' ?>"></i></div>
+            <div><strong>Tipo de unidade</strong><span><?= $ead
+              ? 'Unidade a distância — atende a cidade pelos canais da escola'
+              : 'Polo com atendimento na própria cidade' ?></span></div>
+          </div>
+          <div class="ficha-linha">
+            <div class="ic"><i class="ri-graduation-cap-line"></i></div>
             <div><strong>Como funciona</strong><span>Aulas, material e provas 100% online, com tutoria durante todo o curso</span></div>
           </div>
 
@@ -194,10 +205,17 @@ $vizinhas = array_slice(array_values(array_filter(
       </div>
       <div class="unid-grid">
         <?php foreach ($vizinhas as $v): ?>
-        <a class="unid-card" href="unidade.php?id=<?= e($v['codigo']) ?>">
+        <a class="unid-card<?= $v['ead'] ? ' unid-card--ead' : '' ?>" href="unidade.php?id=<?= e($v['codigo']) ?>">
           <span class="unid-card__uf"><?= e($v['uf'] !== '' ? $v['uf'] : '·') ?></span>
           <h3><?= e($v['cidade'] !== '' ? $v['cidade'] : $v['nome']) ?></h3>
           <?php if ($v['referencia'] !== ''): ?><p class="unid-card__ref"><?= e($v['referencia']) ?></p><?php endif; ?>
+          <span class="unid-card__tipo">
+            <?php if ($v['ead']): ?>
+              <i class="ri-computer-line"></i> Atendimento a distância
+            <?php else: ?>
+              <i class="ri-map-pin-2-line"></i> Polo na cidade
+            <?php endif; ?>
+          </span>
           <span class="unid-card__ver">Ver unidade <i class="ri-arrow-right-line"></i></span>
         </a>
         <?php endforeach; ?>
