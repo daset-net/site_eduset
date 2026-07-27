@@ -1,41 +1,42 @@
 /* ==========================================================================
    EDUSET — Folha de estilo principal
 
-   Paleta tirada da logo, que tem exatamente duas cores: o verde do capelo
-   (#044928) e o azul do lettering (#004aad). Aqui o verde manda sozinho — ele
-   sustenta fundo, texto forte, botão, ícone e realce, do topo ao rodapé. O
-   azul fica reservado à própria logo: dentro do site ele não pinta nada, para
-   a marca não ser confundida com a paleta azul das escolas irmãs.
+   Paleta tirada da logo, que tem exatamente duas cores: o azul do lettering
+   (#004aad) e o verde do capelo (#044928). Aqui o azul manda — ele sustenta
+   fundo, texto forte, botão e rodapé, do topo ao fim da página. O verde é o
+   acento: aparece nos ícones e realces sobre o fundo escuro, que é onde ele
+   tem contraste de sobra e lembra o capelo da marca.
    ========================================================================== */
 
 :root {
-  /* Verde da logo — cor dominante */
-  --green-900: #02150c;
-  --green-800: #032a18;
-  --green-700: #044928;  /* verde da logo */
-  --green-600: #0a6538;
-  --green-500: #0c7a44;
-  --green-400: #17a45f;
-  --green-300: #3fc47f;
-  --green-200: #a8e9c6;
+  /* Azul do lettering — a cor que manda no site */
+  --azul-900: #00112b;
+  --azul-800: #002454;
+  --azul-700: #004aad;  /* azul da logo */
+  --azul-600: #0a5cc4;
+  --azul-500: #1263d2;
+  --azul-400: #2f7fe8;
 
-  /* Azul da logo — só existe na própria logo; o site não pinta nada com ele. */
-  --blue-500: #004aad;
+  /* Verde do capelo — o acento. Os tons claros são para fundo escuro; o
+     --verde-600 é escuro o bastante para virar texto sobre branco. */
+  --verde-600: #0a6538;
+  --verde-400: #3fc47f;
+  --verde-200: #a8e9c6;
 
-  --ink: #0b1f16;
-  --muted: #5a7268;
-  --line: #dbeee4;
+  --ink: #0b182b;
+  --muted: #5a6b85;
+  --line: #dde7f5;
   --bg: #ffffff;
-  --bg-soft: #eef9f3;
-  --bg-softer: #ddf2e7;
+  --bg-soft: #eef4fd;
+  --bg-softer: #dee9fa;
 
-  --grad-brand: linear-gradient(135deg, var(--green-700) 0%, var(--green-500) 55%, var(--green-400) 100%);
-  --grad-hero: linear-gradient(140deg, #02150c 0%, #04351e 34%, #0a6538 68%, #0c7a44 100%);
-  --grad-text: linear-gradient(90deg, var(--green-600), var(--green-400));
+  --grad-brand: linear-gradient(135deg, var(--azul-700) 0%, var(--azul-600) 55%, #1a6fdb 100%);
+  --grad-hero: linear-gradient(140deg, #00112b 0%, #002454 34%, #004aad 72%, #0a5cc4 100%);
+  --grad-text: linear-gradient(90deg, var(--azul-700), #1263d2);
 
-  --shadow-sm: 0 2px 8px rgba(4, 73, 40, .08);
-  --shadow-md: 0 10px 30px rgba(4, 73, 40, .12);
-  --shadow-lg: 0 24px 60px rgba(2, 42, 24, .20);
+  --shadow-sm: 0 2px 8px rgba(0, 36, 84, .08);
+  --shadow-md: 0 10px 30px rgba(0, 36, 84, .12);
+  --shadow-lg: 0 24px 60px rgba(0, 17, 43, .20);
 
   --radius: 16px;
   --radius-lg: 24px;
@@ -91,7 +92,7 @@ ul { list-style: none; }
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--green-600);
+  color: var(--azul-600);
   background: var(--bg-softer);
   padding: 6px 16px;
   border-radius: 100px;
@@ -132,15 +133,15 @@ ul { list-style: none; }
 .btn-primary:hover { box-shadow: 0 14px 30px rgba(4, 73, 40, .48); }
 .btn-light {
   background: #fff;
-  color: var(--green-700);
+  color: var(--azul-700);
   box-shadow: var(--shadow-sm);
 }
 .btn-outline {
   background: transparent;
-  border-color: var(--green-600);
-  color: var(--green-600);
+  border-color: var(--azul-600);
+  color: var(--azul-600);
 }
-.btn-outline:hover { background: var(--green-600); color: #fff; }
+.btn-outline:hover { background: var(--azul-600); color: #fff; }
 .btn-ghost-light {
   background: rgba(255,255,255,.12);
   color: #fff;
@@ -204,7 +205,7 @@ ul { list-style: none; }
 }
 .header.scrolled .nav a { color: var(--ink); }
 .nav a:hover { background: rgba(255,255,255,.15); }
-.header.scrolled .nav a:hover { background: var(--bg-softer); color: var(--green-600); }
+.header.scrolled .nav a:hover { background: var(--bg-softer); color: var(--azul-600); }
 
 .header__cta { display: flex; align-items: center; gap: 12px; }
 
@@ -230,11 +231,11 @@ ul { list-style: none; }
    ========================================================================== */
 .hero {
   position: relative;
-  /* Verde do capelo por baixo de tudo: escuro embaixo à esquerda, abrindo no
-     verde da marca atrás da logo. Nenhum azul entra aqui. */
+  /* Azul do lettering por baixo de tudo: escuro embaixo à esquerda, abrindo no
+     azul da marca atrás da logo. O verde entra só como brilho, no ::before. */
   background:
-    radial-gradient(1100px 620px at 76% 20%, rgba(23,164,95,.42), transparent 62%),
-    linear-gradient(160deg, #02150c 0%, #04351e 42%, #0a6538 78%, #0c7a44 100%);
+    radial-gradient(1100px 620px at 76% 20%, rgba(18,99,210,.45), transparent 62%),
+    linear-gradient(160deg, #00112b 0%, #002454 42%, #004aad 78%, #0a5cc4 100%);
   color: #fff;
   padding: 150px 0 110px;
   overflow: hidden;
@@ -245,7 +246,7 @@ ul { list-style: none; }
   inset: 0;
   background:
     radial-gradient(circle at 12% 22%, rgba(63,196,127,.20), transparent 42%),
-    radial-gradient(circle at 88% 78%, rgba(12,122,68,.34), transparent 48%);
+    radial-gradient(circle at 88% 78%, rgba(10,101,56,.30), transparent 48%);
   pointer-events: none;
 }
 .hero__grid {
@@ -267,7 +268,7 @@ ul { list-style: none; }
   font-weight: 500;
   margin-bottom: 24px;
 }
-.hero__badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-300); box-shadow: 0 0 12px var(--green-300); }
+.hero__badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--verde-400); box-shadow: 0 0 12px var(--verde-400); }
 .hero h1 {
   font-size: clamp(36px, 5.2vw, 60px);
   line-height: 1.08;
@@ -276,7 +277,7 @@ ul { list-style: none; }
 }
 .hero h1 .hl {
   /* "diploma." em verde-claro luminoso — era aqui que o azul chamava atenção. */
-  background: linear-gradient(90deg, var(--green-300), #7ff0b4);
+  background: linear-gradient(90deg, var(--verde-400), #7ff0b4);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
 .hero p.lead {
@@ -302,7 +303,7 @@ ul { list-style: none; }
 }
 .hero__feats li { display: flex; align-items: center; gap: 10px; }
 .hero__feats i {
-  font-size: 22px; color: var(--green-300);
+  font-size: 22px; color: var(--verde-400);
   flex-shrink: 0;
 }
 .hero__feats strong { display: block; font-size: 14px; font-weight: 600; line-height: 1.25; }
@@ -325,7 +326,7 @@ ul { list-style: none; }
   backdrop-filter: blur(6px);
 }
 .hero__stats .stat > i {
-  font-size: 26px; color: var(--green-300);
+  font-size: 26px; color: var(--verde-400);
   width: 52px; height: 52px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: rgba(63,196,127,.12);
@@ -395,7 +396,7 @@ ul { list-style: none; }
   gap: 9px;
   white-space: nowrap;
 }
-.hero__chip i { font-size: 18px; color: var(--green-300); }
+.hero__chip i { font-size: 18px; color: var(--verde-400); }
 .hero__chip--1 { top: 10%; left: -7%; animation: float 5s ease-in-out infinite; }
 .hero__chip--2 { top: 44%; right: -8%; animation: float 6.5s ease-in-out infinite .4s; }
 .hero__chip--3 { bottom: 9%; left: -4%; animation: float 7s ease-in-out infinite .8s; }
@@ -416,7 +417,7 @@ ul { list-style: none; }
 .frase-band p {
   font-size: clamp(18px, 2.4vw, 26px);
   font-weight: 700;
-  color: var(--green-700);
+  color: var(--azul-700);
 }
 
 /* ==========================================================================
@@ -452,7 +453,7 @@ ul { list-style: none; }
   display: flex; align-items: center; justify-content: center;
   font-size: 30px;
   margin-bottom: 22px;
-  color: var(--green-600);
+  color: var(--azul-600);
 }
 .cat-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
 .cat-card p { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
@@ -460,12 +461,12 @@ ul { list-style: none; }
 .cat-card .tags span {
   font-size: 12px; font-weight: 500;
   background: var(--bg-soft);
-  color: var(--green-700);
+  color: var(--azul-700);
   padding: 5px 12px; border-radius: 100px;
 }
 .cat-card .more {
   display: inline-flex; align-items: center; gap: 6px;
-  font-weight: 600; color: var(--green-600);
+  font-weight: 600; color: var(--azul-600);
 }
 .cat-card .more:hover { gap: 10px; }
 
@@ -491,7 +492,7 @@ ul { list-style: none; }
   cursor: pointer;
   transition: all .2s;
 }
-.filter-bar button:hover { border-color: var(--green-400); color: var(--green-600); }
+.filter-bar button:hover { border-color: var(--azul-400); color: var(--azul-600); }
 .filter-bar button.active {
   background: var(--grad-brand);
   color: #fff;
@@ -526,7 +527,7 @@ ul { list-style: none; }
 .course-card__badge {
   position: absolute; top: 14px; left: 14px;
   background: rgba(255,255,255,.95);
-  color: var(--green-700);
+  color: var(--azul-700);
   font-size: 12px; font-weight: 600;
   padding: 5px 12px; border-radius: 100px;
 }
@@ -546,7 +547,7 @@ ul { list-style: none; }
 }
 .course-card__price small { display: block; font-size: 12px; color: var(--muted); }
 .course-card__price small s { opacity: .8; }
-.course-card__price strong { font-size: 22px; color: var(--green-700); }
+.course-card__price strong { font-size: 22px; color: var(--azul-700); }
 .course-card__price strong em { font-size: 14px; font-style: normal; font-weight: 600; color: var(--muted); }
 .course-card__price strong span { font-size: 13px; font-weight: 500; color: var(--muted); }
 .course-card__off {
@@ -656,7 +657,7 @@ ul { list-style: none; }
 }
 .contact-info .line .ic {
   width: 48px; height: 48px; border-radius: 14px;
-  background: var(--bg-softer); color: var(--green-600);
+  background: var(--bg-softer); color: var(--azul-600);
   display: flex; align-items: center; justify-content: center; font-size: 20px;
   flex-shrink: 0;
 }
@@ -707,7 +708,7 @@ ul { list-style: none; }
 }
 .field input:focus, .field select:focus, .field textarea:focus {
   outline: none;
-  border-color: var(--green-400);
+  border-color: var(--azul-400);
   box-shadow: 0 0 0 4px rgba(23,164,95,.14);
   background: #fff;
 }
@@ -722,8 +723,8 @@ ul { list-style: none; }
 .form-polo {
   display: flex; align-items: center; gap: 10px;
   padding: 12px 16px; margin-bottom: 18px;
-  border-radius: 12px; border: 1px solid var(--green-200);
-  background: #f2fbf6; color: var(--green-700);
+  border-radius: 12px; border: 1px solid var(--verde-200);
+  background: #f2fbf6; color: var(--azul-700);
   font-size: 14px; line-height: 1.35;
 }
 .form-polo i { font-size: 18px; flex-shrink: 0; }
@@ -736,7 +737,7 @@ ul { list-style: none; }
 }
 .contador__titulo {
   font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px;
-  color: var(--green-600); margin-bottom: 12px;
+  color: var(--azul-600); margin-bottom: 12px;
 }
 .contador__relogio { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .contador__relogio span {
@@ -765,7 +766,7 @@ ul { list-style: none; }
 /* ---- formulário de matrícula (página do curso) ---- */
 .form-etapa {
   font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-  color: var(--green-600); margin: 4px 0 16px;
+  color: var(--azul-600); margin: 4px 0 16px;
 }
 .form-etapa + .field, .form-etapa + .form-linha { margin-top: 0; }
 .form-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
@@ -777,7 +778,7 @@ ul { list-style: none; }
   background: var(--bg-soft); border: 1px solid var(--line); border-radius: 12px;
   padding: 14px 16px; margin-bottom: 18px; font-size: 14px;
 }
-.resumo-matricula strong { font-size: 16px; color: var(--green-600); white-space: nowrap; }
+.resumo-matricula strong { font-size: 16px; color: var(--azul-600); white-space: nowrap; }
 
 .matricula-sucesso {
   background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg);
@@ -805,7 +806,7 @@ ul { list-style: none; }
    FOOTER
    ========================================================================== */
 .footer {
-  background: var(--green-900);
+  background: var(--azul-900);
   color: rgba(255,255,255,.75);
   padding: 72px 0 30px;
 }
@@ -820,7 +821,7 @@ ul { list-style: none; }
 .footer h5 { color: #fff; font-size: 16px; margin-bottom: 18px; }
 .footer ul li { margin-bottom: 10px; }
 .footer ul li a { font-size: 14px; transition: color .2s; }
-.footer ul li a:hover { color: var(--green-300); }
+.footer ul li a:hover { color: var(--verde-400); }
 .footer__social { display: flex; gap: 12px; margin-top: 20px; }
 .footer__social a {
   width: 40px; height: 40px; border-radius: 50%;
@@ -829,7 +830,7 @@ ul { list-style: none; }
   font-size: 18px; color: #fff;
   transition: background .2s, transform .2s;
 }
-.footer__social a:hover { background: var(--green-600); transform: translateY(-3px); }
+.footer__social a:hover { background: var(--azul-600); transform: translateY(-3px); }
 .footer__bottom {
   border-top: 1px solid rgba(255,255,255,.1);
   padding-top: 26px;
@@ -857,7 +858,7 @@ ul { list-style: none; }
   position: absolute;
   right: calc(100% + 12px);
   top: 50%; transform: translateY(-50%);
-  background: var(--green-900); color: #fff;
+  background: var(--azul-900); color: #fff;
   font-size: 13px; font-weight: 600;
   padding: 8px 14px; border-radius: 100px;
   white-space: nowrap;
@@ -932,7 +933,7 @@ ul { list-style: none; }
 }
 .curso-hero__badge .dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: var(--green-300); box-shadow: 0 0 12px var(--green-300);
+  background: var(--verde-400); box-shadow: 0 0 12px var(--verde-400);
 }
 .curso-hero h1 {
   font-size: clamp(30px, 4vw, 48px);
@@ -941,7 +942,7 @@ ul { list-style: none; }
 }
 .curso-hero__nome {
   font-size: 15px; font-weight: 600;
-  color: var(--green-200);
+  color: var(--verde-200);
   margin-bottom: 18px;
 }
 .curso-hero .lead {
@@ -961,7 +962,7 @@ ul { list-style: none; }
   padding: 8px 14px; border-radius: 100px;
   font-size: 14px;
 }
-.curso-hero__marcas i { color: var(--green-300); }
+.curso-hero__marcas i { color: var(--verde-400); }
 .curso-hero__actions { display: flex; flex-wrap: wrap; gap: 14px; }
 
 /* --- Cartão de oferta ---------------------------------------------------- */
@@ -988,14 +989,14 @@ ul { list-style: none; }
 .oferta__cat {
   display: inline-block;
   font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-  color: var(--green-600); background: var(--bg-softer);
+  color: var(--azul-600); background: var(--bg-softer);
   padding: 5px 12px; border-radius: 100px; margin-bottom: 12px;
 }
 .oferta__corpo h2 { font-size: 21px; font-weight: 700; margin-bottom: 16px; }
 .oferta__de { font-size: 14px; color: var(--muted); }
 .oferta__por { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
 .oferta__por em { font-style: normal; font-size: 15px; font-weight: 600; color: var(--muted); }
-.oferta__por strong { font-size: 34px; font-weight: 700; color: var(--green-700); line-height: 1.1; }
+.oferta__por strong { font-size: 34px; font-weight: 700; color: var(--azul-700); line-height: 1.1; }
 .oferta__total { font-size: 13px; color: var(--muted); }
 .oferta__economia {
   display: flex; align-items: center; gap: 6px;
@@ -1004,7 +1005,7 @@ ul { list-style: none; }
 }
 .oferta__btn { width: 100%; justify-content: center; margin: 18px 0 16px; }
 .oferta__lista { display: grid; gap: 8px; font-size: 14px; color: var(--muted); }
-.oferta__lista i { color: var(--green-600); margin-right: 6px; }
+.oferta__lista i { color: var(--azul-600); margin-right: 6px; }
 .oferta__nota { margin-top: 14px; font-size: 12px; color: var(--muted); line-height: 1.5; }
 
 /* --- Conteúdo ------------------------------------------------------------ */
@@ -1025,13 +1026,13 @@ ul { list-style: none; }
   display: flex; align-items: center; gap: 10px;
   font-size: 19px; font-weight: 700; margin-bottom: 18px;
 }
-.curso-box h3 i { color: var(--green-600); }
+.curso-box h3 i { color: var(--azul-600); }
 .lista-check { display: grid; gap: 12px; }
 .lista-check li {
   display: flex; gap: 10px;
   font-size: 15px; color: var(--muted); line-height: 1.55;
 }
-.lista-check i { color: var(--green-600); flex-shrink: 0; margin-top: 3px; }
+.lista-check i { color: var(--azul-600); flex-shrink: 0; margin-top: 3px; }
 
 .inclui-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .inclui {
@@ -1061,7 +1062,7 @@ ul { list-style: none; }
 .curso-prova h2 { font-size: clamp(24px, 3vw, 34px); font-weight: 700; margin: 10px 0 14px; }
 .curso-prova > div > p { color: var(--muted); margin-bottom: 24px; }
 .curso-prova__stats { display: flex; flex-wrap: wrap; gap: 32px; }
-.curso-prova__stats strong { display: block; font-size: 26px; font-weight: 700; color: var(--green-700); }
+.curso-prova__stats strong { display: block; font-size: 26px; font-weight: 700; color: var(--azul-700); }
 .curso-prova__stats span { font-size: 13px; color: var(--muted); }
 
 /* --- FAQ ----------------------------------------------------------------- */
@@ -1082,7 +1083,7 @@ ul { list-style: none; }
 .faq summary::after {
   content: '\ea4e'; /* ri-arrow-down-s-line */
   font-family: 'remixicon'; font-weight: 400;
-  color: var(--green-600); transition: transform .25s ease;
+  color: var(--azul-600); transition: transform .25s ease;
 }
 .faq details[open] summary::after { transform: rotate(180deg); }
 .faq details p { margin-top: 12px; color: var(--muted); font-size: 15px; }
@@ -1111,7 +1112,7 @@ ul { list-style: none; }
   padding: 12px 18px;
 }
 .barra-matricula small { display: block; font-size: 12px; color: var(--muted); }
-.barra-matricula strong { font-size: 21px; color: var(--green-700); }
+.barra-matricula strong { font-size: 21px; color: var(--azul-700); }
 
 /* --- Grade curricular (matérias do pacote) -------------------------------- */
 .grade-lista {
@@ -1134,7 +1135,7 @@ ul { list-style: none; }
   display: flex; align-items: center; justify-content: center;
   border-radius: 9px;
   background: var(--bg-softer);
-  color: var(--green-600);
+  color: var(--azul-600);
   font-size: 13px; font-weight: 700;
 }
 .grade-lista li strong { display: block; font-size: 15px; font-weight: 600; line-height: 1.35; }
@@ -1179,7 +1180,7 @@ ul { list-style: none; }
   line-height: 1.45;
   color: var(--ink);
 }
-.aviso-pop__texto strong { color: var(--green-700); font-weight: 600; }
+.aviso-pop__texto strong { color: var(--azul-700); font-weight: 600; }
 .aviso-pop__texto small {
   display: block;
   margin-top: 3px;

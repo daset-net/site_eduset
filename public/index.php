@@ -48,7 +48,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= e(config('seo_descricao', 'EDUSET — Educação que transforma. Supletivo EJA, Cursos Técnicos e Cursos Livres com certificação reconhecida, 100% online e no seu ritmo.')) ?>">
-  <meta name="theme-color" content="#044928">
+  <meta name="theme-color" content="#002454">
   <title><?= e(config('seo_titulo', 'EDUSET · Educação que transforma vidas')) ?></title>
 
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">

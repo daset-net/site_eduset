@@ -24,11 +24,12 @@ const COL_DEPOIMENTOS = 'site_alunos_depoimentos'; // depoimentos de alunos, por
 const CACHE_TTL    = 600; // segundos
 const HTTP_TIMEOUT = 8;
 
-// As três cores que revezam nos cartões, todas do mesmo verde da logo: uma
-// média, uma escura e uma clara. O contraste vem do tom, não de outra cor.
-const COR_VERDE = 'linear-gradient(140deg,#044928,#17a45f)';
-const COR_MATA  = 'linear-gradient(140deg,#02150c,#0a6538)';
-const COR_FOLHA = 'linear-gradient(140deg,#0c7a44,#3fc47f)';
+// As três cores que revezam nos cartões: duas do azul da logo (uma escura, uma
+// média) e uma do verde do capelo, na mesma proporção em que as duas aparecem
+// na marca.
+const COR_MAR   = 'linear-gradient(140deg,#00112b,#004aad)';
+const COR_AZUL  = 'linear-gradient(140deg,#004aad,#1263d2)';
+const COR_VERDE = 'linear-gradient(140deg,#044928,#0f7a44)';
 
 // Emoji por palavra-chave, usado só quando o curso não tem emoji nem capa definidos.
 $EMOJIS = [
@@ -670,7 +671,7 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
     return $oa <=> $ob ?: strcmp((string) $a['id_curso'], (string) $b['id_curso']);
   });
 
-  $cores  = [COR_VERDE, COR_MATA, COR_FOLHA];
+  $cores  = [COR_MAR, COR_AZUL, COR_VERDE];
   $cursos = [];
   $i = 0;
 

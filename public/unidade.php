@@ -46,7 +46,7 @@ $vizinhas = array_slice(array_values(array_filter(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= e('Unidade EDUSET em ' . ($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) . ($unidade['uf'] !== '' ? ' (' . $unidade['uf'] . ')' : '') . '. Cursos 100% online com matrícula por esta unidade.') ?>">
-  <meta name="theme-color" content="#044928">
+  <meta name="theme-color" content="#002454">
   <title><?= e($titulo . ' · Unidades EDUSET') ?></title>
 
   <meta property="og:title" content="<?= e('Unidade EDUSET · ' . $titulo) ?>">

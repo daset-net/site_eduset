@@ -28,7 +28,7 @@ sort($ufsNaLista);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= e(config('unidades_seo_descricao', 'Veja em que cidades a EDUSET tem unidade e matricule-se pela unidade da sua região.')) ?>">
-  <meta name="theme-color" content="#044928">
+  <meta name="theme-color" content="#002454">
   <title><?= e(config('unidades_seo_titulo', 'Unidades · EDUSET')) ?></title>
 
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
