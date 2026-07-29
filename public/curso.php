@@ -2,6 +2,7 @@
 // curso.php — página de conversão de um curso.
 // Preço vem do ava_catalogo_curso; textos e imagem, da site_catalogo_cursos.
 // Uso: /curso.php?id=CT005  ou  /curso.php?id=tecnico-em-administracao
+// Acrescente &ir=matricula ao link para a página abrir direto no formulário.
 
 require __DIR__ . '/api/_catalogo.php';
 require __DIR__ . '/api/_conteudo.php';
@@ -22,6 +23,10 @@ $ano = date('Y');
 // Link de divulgação de um polo (?polo=codigo): precisa ser lido antes de
 // qualquer saída, porque é aqui que o cookie da visita é gravado.
 $polo = poloUnidade();
+
+// ?ir=matricula (link de campanha) segue nos links internos, para o visitante
+// não perder o atalho se trocar de curso pelo caminho.
+$sufixoIr = (($_GET['ir'] ?? '') === 'matricula') ? '&ir=matricula' : '';
 
 // Até 3 cursos da mesma modalidade para o rodapé da página.
 $relacionados = array_values(array_filter(
@@ -503,7 +508,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
       <div class="course-grid">
         <?php foreach ($relacionados as $r): ?>
           <article class="course-card">
-            <a class="course-card__link" href="curso.php?id=<?= e($r['slug'] !== '' ? $r['slug'] : $r['id']) ?>">
+            <a class="course-card__link" href="curso.php?id=<?= e($r['slug'] !== '' ? $r['slug'] : $r['id']) . $sufixoIr ?>">
               <div class="course-card__media" style="background: <?= e($r['cor']) ?>">
                 <?php if ($r['imagem'] !== ''): ?>
                   <img class="course-card__capa" src="<?= e($r['imagem']) ?>" alt="<?= e($r['nome']) ?>" loading="lazy">

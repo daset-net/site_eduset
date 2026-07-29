@@ -202,7 +202,8 @@ function selosModalidade(array $tags, int $limite = 3): string {
       <div class="section-head" data-reveal>
         <span class="eyebrow">Catálogo</span>
         <h2>Encontre o curso <span class="gradient-text">perfeito para você</span></h2>
-        <p>Filtre por modalidade e comece a estudar hoje mesmo.</p>
+        <p v-if="irMatricula">Escolha o seu curso para abrir o formulário de matrícula.</p>
+        <p v-else>Filtre por modalidade e comece a estudar hoje mesmo.</p>
       </div>
 
       <div class="filter-bar">
@@ -217,7 +218,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <div v-else-if="cursosFiltrados.length === 0" class="empty">Nenhum curso encontrado nesta modalidade.</div>
 
         <article class="course-card" v-for="c in cursosFiltrados" :key="c.id">
-          <a class="course-card__link" :href="'curso.php?id=' + (c.slug || c.id)">
+          <a class="course-card__link" :href="linkCurso(c)">
           <div class="course-card__media" :style="{ background: c.cor }">
             <img v-if="c.imagem" class="course-card__capa" :src="c.imagem" :alt="c.nome" loading="lazy">
             <span v-else class="emoji">{{ c.emoji }}</span>

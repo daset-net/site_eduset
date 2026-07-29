@@ -39,6 +39,32 @@
     return /^[a-z0-9._-]{2,80}$/.test(valor) ? valor : '';
   }
 
+  // ------------------------------------------------------- foco na matrícula
+  // Link de campanha com ?ir=matricula abre a página já no formulário: o lead
+  // não precisa rolar nem procurar. O header é fixo, então descontamos a altura
+  // dele para a seção não ficar escondida atrás da barra.
+  function focarMatricula() {
+    if (new URLSearchParams(location.search).get('ir') !== 'matricula') return;
+
+    var secao = document.getElementById('matricula');
+    if (!secao || window.pageYOffset > 200) return; // já rolou: não puxamos de volta
+
+    var topo = document.querySelector('.header');
+    var folga = (topo ? topo.offsetHeight : 0) + 16;
+    window.scrollTo({
+      top: secao.getBoundingClientRect().top + window.pageYOffset - folga,
+      behavior: 'smooth'
+    });
+
+    // No celular não damos foco: abrir o teclado sozinho atrapalha a leitura.
+    if (window.innerWidth > 720) {
+      setTimeout(function () { form.nome.focus({ preventScroll: true }); }, 800);
+    }
+  }
+
+  // 'load' e não DOMContentLoaded: com as imagens no lugar a conta do topo fecha.
+  window.addEventListener('load', focarMatricula);
+
   // ---------------------------------------------------------------- máscaras
   function mascarar(campo, formatar) {
     if (!campo) return;

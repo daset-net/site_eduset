@@ -11,7 +11,9 @@ createApp({
       cursos: [],
       enviando: false,
       feedback: { tipo: '', msg: '' },
-      form: { nome: '', email: '', telefone: '', interesse: '', mensagem: '' }
+      form: { nome: '', email: '', telefone: '', interesse: '', mensagem: '' },
+      // Link de campanha com ?ir=matricula: leva o visitante direto à matrícula.
+      irMatricula: new URLSearchParams(location.search).get('ir') === 'matricula'
     };
   },
 
@@ -27,6 +29,11 @@ createApp({
       this.filtro = cat;
       const el = document.getElementById('cursos');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
+    },
+
+    // Com ?ir=matricula, o curso escolhido já abre na seção do formulário.
+    linkCurso(c) {
+      return 'curso.php?id=' + (c.slug || c.id) + (this.irMatricula ? '&ir=matricula' : '');
     },
 
     async carregarCursos() {
@@ -77,6 +84,15 @@ createApp({
     onScroll();
 
     this.carregarCursos();
+
+    // A home não tem formulário de matrícula (ele vive na página do curso), então
+    // o link de campanha desce até o catálogo: o clique no curso abre a matrícula.
+    if (this.irMatricula) {
+      this.$nextTick(() => {
+        const el = document.getElementById('cursos');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
 
     // Animações de revelação ao rolar
     this.$nextTick(() => {
