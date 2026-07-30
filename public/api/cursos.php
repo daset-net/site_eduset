@@ -81,8 +81,30 @@ function dominioDoSite(): string {
   return preg_match('/^[a-z0-9.-]+\.[a-z]{2,}$/i', $host) ? $host : 'eduset.com.br';
 }
 
-/** O curso como o atendimento precisa dele: preço, prazo e o link para mandar. */
-function cursoParaAtendimento(array $c): array {
+/**
+ * O curso como o atendimento precisa dele: preço, prazo e o link para mandar.
+ *
+ * Com $comGrade, vai junto a grade curricular (ava_pacote_curso) e a carga
+ * horária somada — a mesma que a página do curso publica. Só o resultado
+ * principal leva a grade: repetir a lista de matérias de três cursos estoura o
+ * espaço que a resposta tem no prompt.
+ */
+function cursoParaAtendimento(array $c, bool $comGrade = false): array {
+  $dados = cursoResumo($c);
+  if (!$comGrade) return $dados;
+
+  $materias = materiasDoCurso($c);
+  if ($materias) {
+    $dados['carga_horaria'] = array_sum(array_column($materias, 'horas')) . ' horas';
+    $dados['materias'] = array_map(
+      fn($m) => $m['nome'] . ' (' . (int) $m['horas'] . 'h)',
+      $materias
+    );
+  }
+  return $dados;
+}
+
+function cursoResumo(array $c): array {
   return [
     'curso'         => $c['nome'],
     'modalidade'    => $c['categoriaLabel'],
@@ -179,18 +201,23 @@ $limite = max(1, min(BUSCA_LIMITE_MAXIMO, $limite ?: BUSCA_LIMITE_PADRAO));
 
 $palavras = palavrasBusca($termo);
 
+// Casar só na descrição não basta: "reconhecido pelo MEC" aparece no texto de
+// quase todo curso e devolvia um curso qualquer para quem nem perguntou de
+// curso nenhum. Tem que bater no nome — que é o que vale 10 pontos.
 $achados = [];
 foreach ($cursos as $c) {
   $pontos = pontuarCurso($c, $palavras);
-  if ($pontos > 0) $achados[] = ['pontos' => $pontos, 'curso' => $c];
+  if ($pontos >= 10) $achados[] = ['pontos' => $pontos, 'curso' => $c];
 }
 
 // Mais aderente primeiro; empate mantém a ordem do catálogo (EJA, técnico, livre)
 usort($achados, fn($a, $b) => $b['pontos'] <=> $a['pontos']);
 
+// A grade curricular vai só no primeiro: ela é a lista inteira de matérias, e
+// repetir isso para três cursos não caberia na resposta do atendimento
 $lista = [];
-foreach (array_slice($achados, 0, $limite) as $a) {
-  $lista[] = cursoParaAtendimento($a['curso']);
+foreach (array_slice($achados, 0, $limite) as $i => $a) {
+  $lista[] = cursoParaAtendimento($a['curso'], $i === 0);
 }
 
 // Curso que a escola não tem: em vez de devolver o vazio, diz o que existe na
