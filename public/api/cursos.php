@@ -37,6 +37,19 @@ function palavrasBusca(string $termo): array {
 }
 
 /**
+ * Todas as palavras da busca, inclusive as genéricas. Elas não escolhem o
+ * curso — "técnico" sozinho não diz nada —, mas desempatam: quem pediu
+ * "técnico em informática" quer o técnico, não a "Informática Básica".
+ */
+function palavrasDesempate(string $termo): array {
+  $limpo = preg_replace('/[^a-z0-9\s]/', ' ', semAcento($termo));
+  return array_values(array_filter(
+    preg_split('/\s+/', trim($limpo)) ?: [],
+    fn($p) => strlen($p) >= 3
+  ));
+}
+
+/**
  * A palavra buscada aparece no texto?
  *
  * A comparação é palavra a palavra, nunca pedaço solto: procurar "ser" dentro
@@ -210,8 +223,22 @@ foreach ($cursos as $c) {
   if ($pontos >= 10) $achados[] = ['pontos' => $pontos, 'curso' => $c];
 }
 
-// Mais aderente primeiro; empate mantém a ordem do catálogo (EJA, técnico, livre)
-usort($achados, fn($a, $b) => $b['pontos'] <=> $a['pontos']);
+// Mais aderente primeiro. Empatou, valem as palavras genéricas que a busca
+// tinha descartado; empatou de novo, ganha o nome mais direto — quem pediu
+// "técnico em eletromecânica" quer o curso, e não o combo "EJA + Técnico em
+// Eletromecânica", que casa com as mesmas palavras e traz outras por cima.
+$desempate = palavrasDesempate($termo);
+
+usort($achados, function ($a, $b) use ($desempate) {
+  if ($a['pontos'] !== $b['pontos']) return $b['pontos'] <=> $a['pontos'];
+
+  $amploA = pontuarCurso($a['curso'], $desempate);
+  $amploB = pontuarCurso($b['curso'], $desempate);
+  if ($amploA !== $amploB) return $amploB <=> $amploA;
+
+  return count(preg_split('/\s+/', trim($a['curso']['nome'])))
+     <=> count(preg_split('/\s+/', trim($b['curso']['nome'])));
+});
 
 // A grade curricular vai só no primeiro: ela é a lista inteira de matérias, e
 // repetir isso para três cursos não caberia na resposta do atendimento
