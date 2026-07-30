@@ -35,6 +35,9 @@ $abaAtiva = $abaAtiva ?? '';
       <a href="cursos.php" class="<?= $abaAtiva === 'cursos' ? 'ativa' : '' ?>">
         <i class="ri-book-open-line"></i> Cursos e capas
       </a>
+      <a href="campanhas.php" class="<?= $abaAtiva === 'campanhas' ? 'ativa' : '' ?>">
+        <i class="ri-price-tag-3-line"></i> Campanhas
+      </a>
     </nav>
 
     <div class="admin-usuario">

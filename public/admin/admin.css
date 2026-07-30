@@ -30,7 +30,8 @@
 .login-voltar:hover { color: var(--green-600); }
 
 /* --- Campos (compartilhado) ---------------------------------------------- */
-.admin input[type=text], .admin input[type=number], .admin textarea,
+.admin input[type=text], .admin input[type=number], .admin input[type=date],
+.admin select, .admin textarea,
 .admin-login input[type=text], .admin-login input[type=password] {
   width: 100%;
   font-family: var(--font); font-size: 15px; color: var(--ink);
@@ -199,6 +200,64 @@
   border-top: 1px solid var(--line);
 }
 
+/* --- Campanhas de desconto ----------------------------------------------- */
+.campanha-agora {
+  display: flex; gap: 16px; align-items: flex-start;
+  background: #fff; border: 1px solid var(--line); border-radius: 14px;
+  padding: 20px 22px; margin-bottom: 24px;
+}
+.campanha-agora--ativa { border-color: var(--green-400); background: #f2fbf6; }
+.campanha-agora__selo {
+  width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-softer); color: var(--muted); font-size: 22px;
+}
+.campanha-agora--ativa .campanha-agora__selo { background: #dcf5e7; color: var(--green-600); }
+.campanha-agora strong { display: block; font-size: 16px; }
+.campanha-agora p { font-size: 14px; color: var(--muted); margin-top: 4px; line-height: 1.55; }
+
+.campanha-bloco {
+  background: #fff; border: 1px solid var(--line); border-radius: 14px;
+  padding: 24px; margin-bottom: 24px;
+}
+.campanha-bloco h2 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.campanha-bloco__ajuda { font-size: 14px; color: var(--muted); margin: 8px 0 18px; max-width: 720px; line-height: 1.6; }
+
+.campanha-form { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+.campanha-form label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+.campanha-form label small { font-weight: 400; color: var(--muted); }
+.campanha-form select, .campanha-form input[type=date] { min-width: 170px; }
+.campanha-form input[type=text] { min-width: 220px; }
+.campanha-form button { white-space: nowrap; }
+.campanha-form :disabled { opacity: .55; cursor: not-allowed; }
+
+.campanha-trava {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff8e6; color: #8a6100; border: 1px solid #ffe2a6;
+  border-radius: 10px; padding: 12px 14px; font-size: 14px; margin-bottom: 18px;
+}
+.campanha-vazio { font-size: 14px; color: var(--muted); margin-top: 18px; }
+
+.campanha-tabela { width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 14px; }
+.campanha-tabela th {
+  text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted); padding: 0 12px 10px; border-bottom: 1px solid var(--line);
+}
+.campanha-tabela td { padding: 13px 12px; border-bottom: 1px solid var(--line); }
+.campanha-linha--passada { opacity: .55; }
+.campanha-situacao {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+}
+.campanha-situacao--agora   { background: #dcf5e7; color: #0f7a44; }
+.campanha-situacao--futura  { background: #e7efff; color: #1d4ed8; }
+.campanha-situacao--passada { background: var(--bg-softer); color: var(--muted); }
+.campanha-remover {
+  background: none; border: 0; cursor: pointer; color: var(--muted);
+  font-size: 18px; padding: 4px; border-radius: 6px;
+}
+.campanha-remover:hover { color: #c0392b; background: #fdecec; }
+
 /* --- Responsivo ---------------------------------------------------------- */
 @media (max-width: 860px) {
   .admin-topo__inner { flex-wrap: wrap; gap: 12px; }
@@ -208,4 +267,7 @@
   .campos { grid-template-columns: 1fr; padding: 20px; }
   .cursos-grade { grid-template-columns: 1fr; }
   .hero-editor { grid-template-columns: 1fr; }
+  .campanha-form label, .campanha-form select,
+  .campanha-form input[type=date], .campanha-form input[type=text] { width: 100%; min-width: 0; }
+  .campanha-tabela { display: block; overflow-x: auto; }
 }

@@ -31,6 +31,145 @@ function salvarItem(string $colecao, $id, array $campos): array {
   return [false, $erro];
 }
 
+/** POST de um item novo. Devolve [ok, mensagem]. */
+function criarItem(string $colecao, array $campos): array {
+  $base  = directusBase();
+  $token = conexao('DIRECTUS_TOKEN');
+  if ($base === '' || $token === '') return [false, 'Configuração do Directus ausente.'];
+
+  $ch = curl_init($base . '/items/' . $colecao);
+  curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST           => true,
+    CURLOPT_POSTFIELDS     => json_encode($campos, JSON_UNESCAPED_UNICODE),
+    CURLOPT_TIMEOUT        => 15,
+    CURLOPT_HTTPHEADER     => [
+      'Authorization: Bearer ' . $token,
+      'Content-Type: application/json; charset=utf-8',
+    ],
+  ]);
+  $corpo  = curl_exec($ch);
+  $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+  curl_close($ch);
+
+  if ($status >= 200 && $status < 300) return [true, ''];
+
+  $erro = json_decode((string) $corpo, true)['errors'][0]['message'] ?? 'Falha ao criar.';
+  return [false, $erro];
+}
+
+/**
+ * Grava uma chave da site_configuracoes, criando a linha se ela ainda não
+ * existir — assim uma chave nova (como a das campanhas) entra sozinha em cada
+ * escola, sem ninguém precisar mexer no Directus tenant por tenant.
+ *
+ * Texto longo vai para valor_extendido, que é o campo que a leitura prioriza.
+ */
+function salvarConfig(string $chave, string $valor, string $descricao = ''): array {
+  $campos = mb_strlen($valor) > 200
+    ? ['valor' => '', 'valor_extendido' => $valor]
+    : ['valor' => $valor, 'valor_extendido' => ''];
+
+  foreach (buscarColecao(COL_CONFIG, ['fields' => 'id,chave']) ?? [] as $r) {
+    if (($r['chave'] ?? '') === $chave) return salvarItem(COL_CONFIG, (int) $r['id'], $campos);
+  }
+
+  $campos['chave'] = $chave;
+  if ($descricao !== '') $campos['descricao'] = $descricao;
+  return criarItem(COL_CONFIG, $campos);
+}
+
+// ------------------------------------------------------- campanhas de desconto
+const CHAVE_CAMPANHAS = 'oferta_campanhas';
+
+/**
+ * Estado das campanhas lido direto do Directus, sem passar pelo cache da leitura
+ * pública: logo depois de salvar, o painel tem de mostrar o que acabou de gravar.
+ *
+ * Linhas com data inválida são descartadas na leitura — o painel nunca deve
+ * exibir uma campanha que o site não conseguiria aplicar.
+ */
+function campanhasAtuais(): array {
+  $vazio = ['permanente' => 0, 'programadas' => []];
+
+  foreach (buscarColecao(COL_CONFIG, ['fields' => 'chave,valor,valor_extendido']) ?? [] as $r) {
+    if (($r['chave'] ?? '') !== CHAVE_CAMPANHAS) continue;
+
+    $bruto = trim((string) ($r['valor_extendido'] ?? '')) !== ''
+      ? $r['valor_extendido']
+      : ($r['valor'] ?? '');
+    $dados = json_decode((string) $bruto, true);
+    if (!is_array($dados)) return $vazio;
+
+    $programadas = [];
+    foreach ($dados['programadas'] ?? [] as $c) {
+      if (janelaCampanha((array) $c)) $programadas[] = $c;
+    }
+
+    return [
+      'permanente'  => (int) ($dados['permanente'] ?? 0),
+      'programadas' => ordenarPorInicio($programadas),
+    ];
+  }
+
+  return $vazio;
+}
+
+function ordenarPorInicio(array $programadas): array {
+  usort($programadas, fn($a, $b) => strcmp((string) ($a['inicio'] ?? ''), (string) ($b['inicio'] ?? '')));
+  return array_values($programadas);
+}
+
+function gravarCampanhas(array $estado): array {
+  return salvarConfig(
+    CHAVE_CAMPANHAS,
+    json_encode($estado, JSON_UNESCAPED_UNICODE),
+    'Campanha de desconto do site: permanente ou programada por datas (painel > Campanhas).'
+  );
+}
+
+/**
+ * Campanha já programada que cruza com a nova, se houver.
+ *
+ * Dois períodos sobrepostos deixariam dois descontos válidos no mesmo dia, e a
+ * vitrine escolheria o primeiro da lista — resultado que ninguém adivinha
+ * olhando a tela. Melhor recusar na hora de salvar.
+ */
+function conflita(array $nova, array $existentes): ?array {
+  $janelaNova = janelaCampanha($nova);
+  if (!$janelaNova) return null;
+
+  foreach ($existentes as $c) {
+    $janela = janelaCampanha($c);
+    if (!$janela) continue;
+    if ($janelaNova[0] <= $janela[1] && $janela[0] <= $janelaNova[1]) return $c;
+  }
+  return null;
+}
+
+/**
+ * Faixas de desconto que a escola pode anunciar, da maior para a menor.
+ *
+ * Bolsa fica fora: é concessão da escola caso a caso, a matrícula externa
+ * recusa 60% ou mais, e anunciar isso seria prometer o que não se entrega
+ * (mesma régua de ehBolsa, usada na vitrine).
+ */
+function faixasDeDesconto(): array {
+  $linhas = buscarColecao(COL_PRECOS, ['fields' => 'ingresso,desconto,ativo']) ?? [];
+
+  $faixas = [];
+  foreach ($linhas as $l) {
+    if (($l['ativo'] ?? true) === false) continue;
+    if (ehBolsa($l)) continue;
+    $d = (int) ($l['desconto'] ?? 0);
+    if ($d > 0) $faixas[$d] = true;
+  }
+
+  $faixas = array_keys($faixas);
+  rsort($faixas);
+  return $faixas;
+}
+
 /**
  * Envia um arquivo enviado pelo formulário para o Directus.
  * @return array{0: bool, 1: string} [ok, uuid ou mensagem de erro]

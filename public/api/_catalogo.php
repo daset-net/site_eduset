@@ -79,7 +79,8 @@ function arquivosConexao(): array {
 
   $dados = [];
   foreach ([
-    __DIR__ . '/../../conexao_eduset/conexao_directus_avaset_unico_eduset.txt', // dev local
+    __DIR__ . '/../../conexao/conexao_directus_avaset_unico_eduset.txt',        // dev local
+    __DIR__ . '/../../conexao_eduset/conexao_directus_avaset_unico_eduset.txt', // dev local (nome antigo da pasta)
     __DIR__ . '/../../.env',                                                   // gravado pelo entrypoint
     __DIR__ . '/../.env',
     __DIR__ . '/.env',
@@ -579,6 +580,126 @@ function cicloOferta(): array {
   return ['indice' => $indice, 'fim' => $marco + ($indice + 1) * $periodo];
 }
 
+/** Fuso em que a escola pensa as datas de campanha. */
+const TZ_CAMPANHA = 'America/Fortaleza';
+
+/**
+ * Campanha de desconto definida pela escola no painel do site (aba Campanhas),
+ * que MANDA sobre a rotação automática.
+ *
+ * Guardada na chave `oferta_campanhas` da site_configuracoes, em JSON:
+ *
+ *   {"permanente": 50,
+ *    "programadas": [{"nome":"Semana do Cliente","desconto":50,
+ *                     "inicio":"2026-09-01","fim":"2026-09-10"}]}
+ *
+ * Só uma coisa vale por vez, e é isso que o painel garante ao salvar: com um
+ * desconto permanente ligado não existe programação, e com programação não
+ * existe permanente. Datas são inclusivas, do primeiro instante do dia de
+ * início ao último do dia de fim.
+ *
+ * Sem campanha nenhuma, devolve null e o site volta a girar os descontos
+ * sozinho (ver ofertaDoCiclo) — que é o comportamento de sempre.
+ *
+ * @return array{desconto:int, fim:?int, permanente:bool}|null  fim em epoch
+ */
+function campanhaVigente(): ?array {
+  static $achada = false;
+  if ($achada !== false) return $achada;
+
+  $dados = json_decode(trim(config('oferta_campanhas', '')), true);
+  return $achada = is_array($dados) ? campanhaDe($dados) : null;
+}
+
+/**
+ * A mesma decisão, a partir de um estado já em mãos — é o que o painel usa para
+ * mostrar o que está no ar logo depois de salvar, sem esbarrar no cache da
+ * leitura pública. Uma implementação só, para painel e site nunca discordarem.
+ */
+function campanhaDe(array $dados): ?array {
+  // Permanente ganha de tudo: não tem prazo, então o contador nem aparece.
+  $permanente = (int) ($dados['permanente'] ?? 0);
+  if ($permanente > 0) {
+    return ['desconto' => $permanente, 'fim' => null, 'permanente' => true];
+  }
+
+  $tz    = new DateTimeZone(TZ_CAMPANHA);
+  $agora = (new DateTime('now', $tz))->getTimestamp();
+
+  foreach ($dados['programadas'] ?? [] as $c) {
+    $janela = janelaCampanha($c);
+    if (!$janela) continue;
+
+    if ($agora >= $janela[0] && $agora <= $janela[1]) {
+      return [
+        'desconto'   => (int) $c['desconto'],
+        'fim'        => $janela[1],
+        'permanente' => false,
+      ];
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Início e fim de uma campanha programada, em epoch. Datas são inclusivas: do
+ * primeiro instante do dia de início ao último do dia de fim.
+ *
+ * @return array{0:int, 1:int}|null null quando a linha está incompleta ou inválida
+ */
+function janelaCampanha(array $c): ?array {
+  $desconto = (int) ($c['desconto'] ?? 0);
+  $inicio   = trim((string) ($c['inicio'] ?? ''));
+  $fim      = trim((string) ($c['fim'] ?? ''));
+  if ($desconto <= 0 || $inicio === '' || $fim === '') return null;
+
+  $tz  = new DateTimeZone(TZ_CAMPANHA);
+  $de  = DateTime::createFromFormat('Y-m-d H:i:s', $inicio . ' 00:00:00', $tz);
+  $ate = DateTime::createFromFormat('Y-m-d H:i:s', $fim . ' 23:59:59', $tz);
+  if (!$de || !$ate || $ate->getTimestamp() < $de->getTimestamp()) return null;
+
+  return [$de->getTimestamp(), $ate->getTimestamp()];
+}
+
+/**
+ * Versão do curso mais próxima do desconto que a campanha pediu.
+ *
+ * Não todo curso tem todas as faixas. Com a campanha em 50% e um curso que só
+ * tem 30% e 40%, anunciamos 40%: o maior degrau que existe sem passar do
+ * pedido. Se o curso só tiver faixas ACIMA do pedido, vai a menor delas — é a
+ * mais perto do que a escola quis, e continua sendo uma linha real do catálogo.
+ *
+ * @param array $ativas versões não-bolsa, já ordenadas do maior desconto ao menor
+ */
+/**
+ * Quando a condição anunciada termina, para o contador da página do curso.
+ *
+ * Campanha permanente não tem fim: devolve vazio, e o contador se esconde
+ * sozinho (curso.js some com o bloco quando a data não é válida). Prazo só
+ * aparece quando existe prazo de verdade — o site não inventa urgência.
+ */
+function fimDaOferta(): string {
+  $campanha = campanhaVigente();
+  if ($campanha) {
+    return $campanha['permanente'] ? '' : date('c', $campanha['fim']);
+  }
+  return date('c', cicloOferta()['fim']);
+}
+
+function versaoParaCampanha(array $ativas, int $alvo): ?array {
+  if (!$ativas) return null;
+
+  foreach ($ativas as $v) {
+    if ((int) ($v['desconto'] ?? 0) === $alvo) return $v;
+  }
+  foreach ($ativas as $v) {
+    if ((float) ($v['desconto'] ?? 0) < $alvo) return $v;
+  }
+
+  return $ativas[count($ativas) - 1];
+}
+
 /**
  * Versão do curso que está em oferta neste ciclo.
  *
@@ -586,6 +707,9 @@ function cicloOferta(): array {
  * anunciar sempre o mesmo, o site gira a escada: um ciclo em 60%, outro em 50%,
  * outro em 40%. Todos os cursos giram juntos — é uma campanha só, mais fácil de
  * comunicar e de o aluno entender.
+ *
+ * Uma campanha definida no painel (campanhaVigente) tem prioridade sobre essa
+ * rotação: enquanto ela vale, o site anuncia o desconto que a escola escolheu.
  *
  * Configurações (site_configuracoes):
  *   oferta_modo       = rotativo (padrão) | fixo — fixo trava no maior desconto
@@ -610,6 +734,10 @@ function ofertaDoCiclo(array $versoes): ?array {
     if ($da !== $db) return $db <=> $da;
     return (float) $a['valor_parcela'] <=> (float) $b['valor_parcela'];
   });
+
+  // Campanha da escola manda: enquanto ela vale, não há rotação.
+  $campanha = campanhaVigente();
+  if ($campanha) return versaoParaCampanha($ativas, $campanha['desconto']);
 
   if (strtolower(config('oferta_modo', 'rotativo')) === 'fixo') return $ativas[0];
 
@@ -707,7 +835,7 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       'valorTotal'     => moeda($l['valor_total'] ?? 0),
       'codigo'         => $l['codigo_unico_especial'] ?? $id,
       'economia'       => moeda(max(0, (float) ($l['valor_parcela_normal'] ?? 0) - (float) ($l['valor_parcela'] ?? 0))),
-      'ofertaFim'      => date('c', cicloOferta()['fim']),
+      'ofertaFim'      => fimDaOferta(),
 
       // conteúdo da página de conversão
       'chamada'        => $s['chamada']  ?? '',
