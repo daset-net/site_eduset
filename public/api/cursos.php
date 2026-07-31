@@ -118,19 +118,28 @@ function cursoParaAtendimento(array $c, bool $comGrade = false): array {
 }
 
 function cursoResumo(array $c): array {
+  // A chave do link é o slug quando existe; o id só como reserva, porque há
+  // id repetido entre cursos diferentes no catálogo e o slug não tem isso.
+  $link = 'https://' . dominioDoSite()
+        . '/curso.php?id=' . rawurlencode($c['slug'] !== '' ? $c['slug'] : $c['id']);
+
   return [
-    'curso'         => $c['nome'],
-    'modalidade'    => $c['categoriaLabel'],
-    'formato'       => $c['modalidade'],
-    'duracao'       => $c['duracao'],
-    'parcelas'      => $c['parcelas'],
-    'valor_parcela' => 'R$ ' . $c['preco'],
-    'valor_de'      => 'R$ ' . $c['precoDe'],
-    'desconto'      => $c['desconto'] . '%',
-    'valor_total'   => 'R$ ' . $c['valorTotal'],
-    'oferta_ate'    => $c['ofertaFim'],
-    'link'          => 'https://' . dominioDoSite()
-                       . '/curso.php?id=' . rawurlencode($c['slug'] !== '' ? $c['slug'] : $c['id']),
+    'curso'          => $c['nome'],
+    'modalidade'     => $c['categoriaLabel'],
+    'formato'        => $c['modalidade'],
+    'duracao'        => $c['duracao'],
+    'parcelas'       => $c['parcelas'],
+    'valor_parcela'  => 'R$ ' . $c['preco'],
+    'valor_de'       => 'R$ ' . $c['precoDe'],
+    'desconto'       => $c['desconto'] . '%',
+    'valor_total'    => 'R$ ' . $c['valorTotal'],
+    'oferta_ate'     => $c['ofertaFim'],
+    'link'           => $link,
+    // Quem já decidiu se matricular não quer ler a página de novo: o ir=matricula
+    // abre direto no formulário, com o curso escolhido. O link vai pronto daqui
+    // porque quem monta endereço no meio da conversa erra — e o cliente é que
+    // acaba clicando num link que não existe.
+    'link_matricula' => $link . '&ir=matricula',
   ];
 }
 
