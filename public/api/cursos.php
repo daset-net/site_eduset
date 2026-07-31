@@ -124,6 +124,11 @@ function cursoResumo(array $c): array {
         . '/curso.php?id=' . rawurlencode($c['slug'] !== '' ? $c['slug'] : $c['id']);
 
   return [
+    // O código é a chave para pedir este mesmo curso de novo, sem depender de
+    // acertar o nome. É o slug, e não o id_curso, porque há id repetido entre
+    // cursos diferentes no catálogo — quem consulta por id repetido pode
+    // receber o curso errado, que é o erro que este campo existe para evitar.
+    'codigo'         => $c['slug'] !== '' ? $c['slug'] : $c['id'],
     'curso'          => $c['nome'],
     'modalidade'     => $c['categoriaLabel'],
     'formato'        => $c['modalidade'],
@@ -208,6 +213,23 @@ function cursosDaArea(array $cursos, string $area, int $limite): array {
 [$cursos, $origem] = catalogo();
 
 $termo = trim((string) ($_GET['q'] ?? ''));
+
+// Consulta exata pelo código. O atendimento usa isto quando a conversa já
+// tratou de um curso: em vez de tentar acertar o nome outra vez ("e o preço
+// dele?"), ele pede o curso que já foi identificado. Sempre com a grade, porque
+// aqui é um curso só e a pergunta seguinte costuma ser sobre as matérias.
+$codigo = trim((string) ($_GET['codigo'] ?? ''));
+if ($codigo !== '') {
+  $achado = cursoPorId($codigo);
+
+  echo json_encode($achado
+    ? ['ok' => true, 'origem' => $origem, 'busca' => $codigo, 'total' => 1,
+       'cursos' => [cursoParaAtendimento($achado, true)]]
+    : ['ok' => false, 'origem' => $origem, 'busca' => $codigo, 'total' => 0, 'cursos' => [],
+       'mensagem' => 'Nenhum curso com esse código no catálogo. Busque pelo nome.'],
+    JSON_UNESCAPED_UNICODE);
+  exit;
+}
 
 // Catálogo inteiro: o formato que a home sempre consumiu, intocado.
 if ($termo === '') {
