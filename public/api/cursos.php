@@ -159,41 +159,49 @@ function cursoResumo(array $c): array {
   // Registro da instituição parceira que certifica. Só entra quando existe:
   // curso livre não tem parceira, e mandar o campo vazio faria o atendimento
   // achar que a informação sumiu — em vez de entender que ali ela não se aplica.
+  //
+  // O nome do campo é o que diz ao atendimento o que o número é. Com
+  // "codigo_registro" ele tinha o SISTEC-57209 na mão e mesmo assim respondeu
+  // "não tenho o código da instituição" a quem perguntou do MEC — não ligou
+  // uma coisa à outra. Agora o nome liga.
   if (($c['codigoMec'] ?? '') !== '') {
-    $dados['codigo_registro'] = $c['codigoMec'];
+    $dados['codigo_mec'] = $c['codigoMec'];
 
-    // O código sozinho não resolve quem pede "o link do MEC": o atendimento
-    // não tem de onde tirar endereço nenhum e é proibido de inventar link, então
-    // ele só sabia dizer o número. A página de consulta vem daqui, pronta.
-    $consulta = linksDeRegistro($c['codigoMec']);
-    if ($consulta) $dados['link_registro'] = $consulta;
+    // O código sozinho não resolve quem pede "o link do MEC": o atendimento não
+    // tem de onde tirar endereço nenhum e é proibido de inventar link. Quando
+    // faltou, inventou o e-MEC — que é de faculdade, não de técnico. A página
+    // de consulta vem daqui, pronta, e é uma só: duas no WhatsApp é o cliente
+    // sem saber em qual clicar.
+    $consulta = ($c['linkMec'] ?? '') !== '' ? $c['linkMec'] : linkDeRegistro($c['codigoMec']);
+    if ($consulta !== '') $dados['link_consulta_mec'] = $consulta;
   }
 
   return $dados;
 }
 
-// Onde o cliente confere cada registro, por órgão. SISTEC certifica o técnico
-// e INEP o EJA; o combinado traz os dois, e aí vão os dois links.
+// Onde o cliente confere o registro, por órgão. SISTEC certifica o técnico e
+// INEP o EJA — e-MEC não entra aqui: é de faculdade, e foi justamente o que o
+// atendimento inventou quando não tinha endereço nenhum para dar.
 const CONSULTA_REGISTRO = [
   'SISTEC' => 'https://sistec.mec.gov.br/consultapublicaunidadeensino',
   'INEP'   => 'https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/inep-data/catalogo-de-escolas',
 ];
 
 /**
- * Página de consulta de cada código do registro: ['SISTEC-57209' => 'https://…'].
+ * O endereço de consulta que o código sugere — reserva de quando a ficha do
+ * curso ainda não traz o link_consulta_mec preenchido.
  *
- * O campo guarda o combinado separado por "_" (SISTEC-57209_INEP-2512979), e o
- * link é por órgão — o cliente que pergunta do EJA confere no INEP, e o do
- * técnico no SISTEC.
+ * O campo guarda o combinado separado por "_" (SISTEC-57209_INEP-2512979) e aí
+ * vale o SISTEC: quem faz o conjugado está atrás do diploma técnico.
  */
-function linksDeRegistro(string $codigo): array {
-  $links = [];
+function linkDeRegistro(string $codigo): string {
+  $achados = [];
   foreach (preg_split('/[_\s,;]+/', trim($codigo)) ?: [] as $parte) {
     if ($parte === '') continue;
     $orgao = strtoupper(explode('-', $parte)[0]);
-    if (isset(CONSULTA_REGISTRO[$orgao])) $links[$parte] = CONSULTA_REGISTRO[$orgao];
+    if (isset(CONSULTA_REGISTRO[$orgao])) $achados[$orgao] = CONSULTA_REGISTRO[$orgao];
   }
-  return $links;
+  return $achados['SISTEC'] ?? $achados['INEP'] ?? '';
 }
 
 /**

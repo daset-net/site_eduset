@@ -842,6 +842,11 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       'codigoMec'      => trim((string) ($s['codigo_mec_parceiro'] ?? '')) !== ''
                             ? trim((string) $s['codigo_mec_parceiro'])
                             : trim((string) ($l['codigo_mec_parceiro'] ?? '')),
+
+      // Onde o cliente confere esse registro. Vem da ficha, e não de uma regra
+      // no código, porque quem sabe qual órgão vale em cada curso é a secretaria
+      // — no conjugado ela aponta um só, o do SISTEC.
+      'linkMec'        => trim((string) ($s['link_consulta_mec'] ?? '')),
       'economia'       => moeda(max(0, (float) ($l['valor_parcela_normal'] ?? 0) - (float) ($l['valor_parcela'] ?? 0))),
       'ofertaFim'      => fimDaOferta(),
 
