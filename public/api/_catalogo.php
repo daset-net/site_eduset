@@ -834,6 +834,14 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       'desconto'       => (int) ($l['desconto'] ?? 0),
       'valorTotal'     => moeda($l['valor_total'] ?? 0),
       'codigo'         => $l['codigo_unico_especial'] ?? $id,
+
+      // Código da instituição parceira que certifica (SISTEC para técnico, INEP
+      // para EJA). A ficha do site manda, porque é ela que a secretaria edita;
+      // o catálogo do AVA é a reserva para o curso que ainda não tem ficha.
+      // Curso livre não tem parceira e fica com string vazia.
+      'codigoMec'      => trim((string) ($s['codigo_mec_parceiro'] ?? '')) !== ''
+                            ? trim((string) $s['codigo_mec_parceiro'])
+                            : trim((string) ($l['codigo_mec_parceiro'] ?? '')),
       'economia'       => moeda(max(0, (float) ($l['valor_parcela_normal'] ?? 0) - (float) ($l['valor_parcela'] ?? 0))),
       'ofertaFim'      => fimDaOferta(),
 
@@ -872,7 +880,7 @@ function catalogo(): array {
 
   $precos    = buscarColecao(COL_PRECOS, ['fields' =>
     'id_curso,categoria,curso,ingresso,desconto,qtd_parcela,valor_parcela,'
-    . 'valor_parcela_normal,valor_total,codigo_unico_especial,ativo']);
+    . 'valor_parcela_normal,valor_total,codigo_unico_especial,codigo_mec_parceiro,ativo']);
   $editorial = buscarColecao(COL_CURSOS, ['fields' => '*']);
 
   if ($precos !== null) {

@@ -472,6 +472,9 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
         <details>
           <summary>O certificado tem validade?</summary>
           <p>Sim. Ao concluir o curso você recebe o certificado emitido por instituição parceira credenciada, com validade nacional — o mesmo aceito por empresas, instituições de ensino e órgãos públicos.</p>
+          <?php if (($curso['codigoMec'] ?? '') !== ''): ?>
+            <p style="margin-top:10px;font-size:13px;opacity:.65">Registro da instituição parceira: <span style="font-variant-numeric:tabular-nums;letter-spacing:.3px"><?= e($curso['codigoMec']) ?></span></p>
+          <?php endif; ?>
         </details>
         <details>
           <summary>Preciso ir até algum lugar assistir aula?</summary>
