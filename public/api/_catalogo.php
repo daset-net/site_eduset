@@ -834,9 +834,16 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       'desconto'       => (int) ($l['desconto'] ?? 0),
       'valorTotal'     => moeda($l['valor_total'] ?? 0),
 
-      // À vista é o mesmo total, pago de uma vez no PIX ou no boleto — não tem
-      // desconto próprio. O campo do catálogo manda; sem ele, a conta é a
-      // parcela com desconto vezes a quantidade, que é o que a página anuncia.
+      // O que o cliente paga no fim: a parcela anunciada vezes a quantidade.
+      //
+      // Não é o valor_total do catálogo. Na ALFAPLENO ele está três centavos
+      // fora em nove cursos (arredondamento) e R$ 355 fora no Saúde Bucal, e
+      // total que não é a soma das próprias parcelas é total que ninguém paga.
+      'valorPago'      => moeda($parcelas * (float) ($l['valor_parcela'] ?? 0)),
+
+      // À vista é esse mesmo valor, pago de uma vez no PIX ou no boleto — não
+      // tem desconto próprio. A coluna do catálogo manda, para o dia em que a
+      // escola criar um desconto só do à vista; vazia, vale o que se paga.
       // Existir com esse nome é o que impede o atendimento de inventar um valor
       // à vista a partir de outro número qualquer da resposta.
       'valorAvista'    => trim((string) ($l['valor_final_avista'] ?? '')) !== ''

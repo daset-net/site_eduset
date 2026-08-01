@@ -146,7 +146,11 @@ function cursoResumo(array $c): array {
     'valor_de_cada_parcela'         => 'R$ ' . $c['preco'],
     'valor_de_cada_parcela_sem_desconto' => 'R$ ' . $c['precoDe'],
     'desconto'                      => $c['desconto'] . '%',
-    'valor_total_do_curso'          => 'R$ ' . $c['valorTotal'],
+    // O total é a soma das parcelas que acabaram de ser anunciadas, e não o
+    // valor_total do catálogo: onde os dois divergem, quem tem razão é a conta
+    // que o cliente faz. Dizer "12x de R$ 210,74, total R$ 2.528,85" é entregar
+    // ao cliente uma subtração que não fecha.
+    'valor_total_do_curso'          => 'R$ ' . $c['valorPago'],
     // À vista existe, no PIX e no boleto, e é o mesmo total — não tem desconto
     // além do que já está na parcela. Vem escrito porque, sem o campo, o
     // atendimento tinha de deduzir que existia e por qual número: o nome longo
