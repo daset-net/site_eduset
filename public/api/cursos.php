@@ -147,6 +147,11 @@ function cursoResumo(array $c): array {
     'valor_de_cada_parcela_sem_desconto' => 'R$ ' . $c['precoDe'],
     'desconto'                      => $c['desconto'] . '%',
     'valor_total_do_curso'          => 'R$ ' . $c['valorTotal'],
+    // À vista existe, no PIX e no boleto, e é o mesmo total — não tem desconto
+    // além do que já está na parcela. Vem escrito porque, sem o campo, o
+    // atendimento tinha de deduzir que existia e por qual número: o nome longo
+    // é o que fecha as duas dúvidas de uma vez.
+    'valor_a_vista_no_pix_ou_boleto' => 'R$ ' . $c['valorAvista'],
     'oferta_ate'     => $c['ofertaFim'],
     'link'           => $link,
     // Quem já decidiu se matricular não quer ler a página de novo: o ir=matricula

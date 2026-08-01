@@ -833,6 +833,15 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       'parcelas'       => $parcelas,
       'desconto'       => (int) ($l['desconto'] ?? 0),
       'valorTotal'     => moeda($l['valor_total'] ?? 0),
+
+      // À vista é o mesmo total, pago de uma vez no PIX ou no boleto — não tem
+      // desconto próprio. O campo do catálogo manda; sem ele, a conta é a
+      // parcela com desconto vezes a quantidade, que é o que a página anuncia.
+      // Existir com esse nome é o que impede o atendimento de inventar um valor
+      // à vista a partir de outro número qualquer da resposta.
+      'valorAvista'    => trim((string) ($l['valor_final_avista'] ?? '')) !== ''
+                            ? moeda($l['valor_final_avista'])
+                            : moeda($parcelas * (float) ($l['valor_parcela'] ?? 0)),
       'codigo'         => $l['codigo_unico_especial'] ?? $id,
 
       // Código da instituição parceira que certifica (SISTEC para técnico, INEP
@@ -885,7 +894,8 @@ function catalogo(): array {
 
   $precos    = buscarColecao(COL_PRECOS, ['fields' =>
     'id_curso,categoria,curso,ingresso,desconto,qtd_parcela,valor_parcela,'
-    . 'valor_parcela_normal,valor_total,codigo_unico_especial,codigo_mec_parceiro,ativo']);
+    . 'valor_parcela_normal,valor_total,valor_final_avista,codigo_unico_especial,'
+    . 'codigo_mec_parceiro,ativo']);
   $editorial = buscarColecao(COL_CURSOS, ['fields' => '*']);
 
   if ($precos !== null) {
