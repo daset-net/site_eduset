@@ -835,20 +835,18 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       'valorTotal'     => moeda($l['valor_total'] ?? 0),
 
       // O que o cliente paga no fim: a parcela anunciada vezes a quantidade.
+      // É também o valor à vista, no PIX ou no boleto — pagar de uma vez não
+      // tem desconto além do que já está na parcela.
       //
-      // Não é o valor_total do catálogo. Na ALFAPLENO ele está três centavos
-      // fora em nove cursos (arredondamento) e R$ 355 fora no Saúde Bucal, e
-      // total que não é a soma das próprias parcelas é total que ninguém paga.
+      // A conta é feita aqui, e não guardada numa coluna, porque o preço gira
+      // por ciclo de oferta: coluna gravada envelhece no dia em que a parcela
+      // muda, e aí o atendimento anuncia um total que a página já não pratica.
+      //
+      // Também não é o valor_total do catálogo. Na ALFAPLENO ele está três
+      // centavos fora em nove cursos (arredondamento) e R$ 355 fora no Saúde
+      // Bucal — total que não é a soma das próprias parcelas é total que
+      // ninguém paga.
       'valorPago'      => moeda($parcelas * (float) ($l['valor_parcela'] ?? 0)),
-
-      // À vista é esse mesmo valor, pago de uma vez no PIX ou no boleto — não
-      // tem desconto próprio. A coluna do catálogo manda, para o dia em que a
-      // escola criar um desconto só do à vista; vazia, vale o que se paga.
-      // Existir com esse nome é o que impede o atendimento de inventar um valor
-      // à vista a partir de outro número qualquer da resposta.
-      'valorAvista'    => trim((string) ($l['valor_final_avista'] ?? '')) !== ''
-                            ? moeda($l['valor_final_avista'])
-                            : moeda($parcelas * (float) ($l['valor_parcela'] ?? 0)),
       'codigo'         => $l['codigo_unico_especial'] ?? $id,
 
       // Código da instituição parceira que certifica (SISTEC para técnico, INEP
@@ -901,8 +899,7 @@ function catalogo(): array {
 
   $precos    = buscarColecao(COL_PRECOS, ['fields' =>
     'id_curso,categoria,curso,ingresso,desconto,qtd_parcela,valor_parcela,'
-    . 'valor_parcela_normal,valor_total,valor_final_avista,codigo_unico_especial,'
-    . 'codigo_mec_parceiro,ativo']);
+    . 'valor_parcela_normal,valor_total,codigo_unico_especial,codigo_mec_parceiro,ativo']);
   $editorial = buscarColecao(COL_CURSOS, ['fields' => '*']);
 
   if ($precos !== null) {

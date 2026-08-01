@@ -155,7 +155,7 @@ function cursoResumo(array $c): array {
     // além do que já está na parcela. Vem escrito porque, sem o campo, o
     // atendimento tinha de deduzir que existia e por qual número: o nome longo
     // é o que fecha as duas dúvidas de uma vez.
-    'valor_a_vista_no_pix_ou_boleto' => 'R$ ' . $c['valorAvista'],
+    'valor_a_vista_no_pix_ou_boleto' => 'R$ ' . $c['valorPago'],
     'oferta_ate'     => $c['ofertaFim'],
     'link'           => $link,
     // Quem já decidiu se matricular não quer ler a página de novo: o ir=matricula
