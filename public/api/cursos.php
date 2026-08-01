@@ -133,11 +133,20 @@ function cursoResumo(array $c): array {
     'modalidade'     => $c['categoriaLabel'],
     'formato'        => $c['modalidade'],
     'duracao'        => $c['duracao'],
-    'parcelas'       => $c['parcelas'],
-    'valor_parcela'  => 'R$ ' . $c['preco'],
-    'valor_de'       => 'R$ ' . $c['precoDe'],
-    'desconto'       => $c['desconto'] . '%',
-    'valor_total'    => 'R$ ' . $c['valorTotal'],
+
+    // Preço: cada campo diz no próprio nome de que ele é o valor.
+    //
+    // "valor_de" e "valor_total" não diziam, e o atendimento preencheu o
+    // buraco sozinho: anunciou "12x de R$ 155,54 ou R$ 311,08 à vista" quando
+    // R$ 311,08 é a parcela sem desconto, e à vista não existe aqui. Nome de
+    // campo é o que o modelo lê para saber o que o número significa — e campo
+    // de pagamento à vista não existir é o que impede a oferta de existir.
+    'parcelamento'                  => $c['parcelas'] . 'x de R$ ' . $c['preco'],
+    'parcelas'                      => $c['parcelas'],
+    'valor_de_cada_parcela'         => 'R$ ' . $c['preco'],
+    'valor_de_cada_parcela_sem_desconto' => 'R$ ' . $c['precoDe'],
+    'desconto'                      => $c['desconto'] . '%',
+    'valor_total_do_curso'          => 'R$ ' . $c['valorTotal'],
     'oferta_ate'     => $c['ofertaFim'],
     'link'           => $link,
     // Quem já decidiu se matricular não quer ler a página de novo: o ir=matricula
@@ -150,9 +159,41 @@ function cursoResumo(array $c): array {
   // Registro da instituição parceira que certifica. Só entra quando existe:
   // curso livre não tem parceira, e mandar o campo vazio faria o atendimento
   // achar que a informação sumiu — em vez de entender que ali ela não se aplica.
-  if (($c['codigoMec'] ?? '') !== '') $dados['codigo_registro'] = $c['codigoMec'];
+  if (($c['codigoMec'] ?? '') !== '') {
+    $dados['codigo_registro'] = $c['codigoMec'];
+
+    // O código sozinho não resolve quem pede "o link do MEC": o atendimento
+    // não tem de onde tirar endereço nenhum e é proibido de inventar link, então
+    // ele só sabia dizer o número. A página de consulta vem daqui, pronta.
+    $consulta = linksDeRegistro($c['codigoMec']);
+    if ($consulta) $dados['link_registro'] = $consulta;
+  }
 
   return $dados;
+}
+
+// Onde o cliente confere cada registro, por órgão. SISTEC certifica o técnico
+// e INEP o EJA; o combinado traz os dois, e aí vão os dois links.
+const CONSULTA_REGISTRO = [
+  'SISTEC' => 'https://sistec.mec.gov.br/consultapublicaunidadeensino',
+  'INEP'   => 'https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/inep-data/catalogo-de-escolas',
+];
+
+/**
+ * Página de consulta de cada código do registro: ['SISTEC-57209' => 'https://…'].
+ *
+ * O campo guarda o combinado separado por "_" (SISTEC-57209_INEP-2512979), e o
+ * link é por órgão — o cliente que pergunta do EJA confere no INEP, e o do
+ * técnico no SISTEC.
+ */
+function linksDeRegistro(string $codigo): array {
+  $links = [];
+  foreach (preg_split('/[_\s,;]+/', trim($codigo)) ?: [] as $parte) {
+    if ($parte === '') continue;
+    $orgao = strtoupper(explode('-', $parte)[0]);
+    if (isset(CONSULTA_REGISTRO[$orgao])) $links[$parte] = CONSULTA_REGISTRO[$orgao];
+  }
+  return $links;
 }
 
 /**
