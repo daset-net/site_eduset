@@ -374,6 +374,21 @@ ul { list-style: none; }
   object-fit: contain;
   filter: drop-shadow(0 24px 45px rgba(0,0,0,.35));
 }
+/* Efeito Retangular (Card com bordas esfumaçadas) */
+.hero__media--retangular img:not(.hero__media-logo) {
+  border-radius: 24px;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%),
+                      linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%),
+              linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Efeito Transparente (Sem máscara, mantém a imagem original como no Eduset) */
+.hero__media--transparente img:not(.hero__media-logo) {
+  /* Nenhuma máscara é aplicada, a imagem flutua naturalmente com o drop-shadow padrão */
+}
 .hero__media--vazio .hero__media-logo {
   width: 74%;
   animation: float 6s ease-in-out infinite;

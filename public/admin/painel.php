@@ -44,6 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $erros = [];
     $n = 0;
 
+    if (isset($_POST['valor_hero_formato'])) {
+      [$ok, $msg] = salvarConfig('hero_formato', $_POST['valor_hero_formato'], 'Formato da máscara da imagem do topo (retangular ou circular)');
+      if ($ok) $n++; else $erros[] = $msg;
+    }
+
     foreach ($valores as $id => $valor) {
       $valor = trim((string) $valor);
       // Textos longos vão para valor_extendido, que tem precedência na leitura.
@@ -68,10 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $configs = configuracoesDoPainel();
 
-// Separa a imagem do hero: ela tem uploader próprio, não vai no grid de texto.
+// Separa configurações especiais do hero
 $heroValor = '';
+$heroFormato = 'retangular';
 foreach ($configs as $c) {
   if (($c['chave'] ?? '') === 'hero_imagem') { $heroValor = (string) ($c['valor'] ?? ''); }
+  if (($c['chave'] ?? '') === 'hero_formato') { $heroFormato = (string) ($c['valor'] ?? 'retangular'); }
 }
 $heroUrl = preg_match('/^[0-9a-f-]{36}$/i', $heroValor) ? '../api/imagem.php?id=' . $heroValor . '&w=600' : '';
 
@@ -97,10 +104,11 @@ require __DIR__ . '/_topo.php';
   </div>
   <div class="hero-editor__acoes">
     <h2>Imagem do topo (hero)</h2>
-    <p>Aparece à direita no topo da home. O ideal é um <strong>PNG com fundo
-       transparente</strong> (um recorte, como a pessoa no notebook): ela flutua
-       sobre o azul do topo e se integra sozinha, sem cortes. Sem imagem, o topo
-       mostra a logo da EDUSET.</p>
+    <?php if ($heroFormato === 'retangular'): ?>
+      <p>Aparece à direita no topo da home. Atualmente configurada com <strong>Cantos Arredondados (estilo card)</strong>. Você pode enviar uma arte digital (JPG/PNG) ou foto e ela vai ganhar bordas suaves e sombra elegante para se destacar. Sem imagem, mostra a logo.</p>
+    <?php else: ?>
+      <p>Aparece à direita no topo da home. Atualmente configurada como <strong>Recorte Transparente</strong>. O ideal é enviar um PNG com fundo transparente (um recorte de pessoa ou objeto) para ele flutuar sobre o azul do topo. Sem imagem, mostra a logo.</p>
+    <?php endif; ?>
     <div class="hero-editor__botoes">
       <form method="post" enctype="multipart/form-data">
         <input type="hidden" name="csrf" value="<?= e(csrf()) ?>">
@@ -130,8 +138,23 @@ require __DIR__ . '/_topo.php';
   </p>
 
   <div class="campos">
+    <div class="campo">
+      <label>Formato da Imagem do Topo (Hero)</label>
+      <div class="radio-group" style="display: flex; gap: 2rem; margin-top: 0.5rem;">
+        <label style="font-weight: normal; cursor: pointer;">
+          <input type="radio" name="valor_hero_formato" value="retangular" <?= $heroFormato === 'retangular' ? 'checked' : '' ?>>
+          Retangular (Cantos arredondados e esfumaçados)
+        </label>
+        <label style="font-weight: normal; cursor: pointer;">
+          <input type="radio" name="valor_hero_formato" value="transparente" <?= $heroFormato === 'transparente' ? 'checked' : '' ?>>
+          Recorte Transparente (Sem máscara)
+        </label>
+      </div>
+      <small>Escolha o estilo visual para integrar a imagem ao fundo azul do site.</small>
+    </div>
+
     <?php foreach ($configs as $c):
-      if (($c['chave'] ?? '') === 'hero_imagem') continue; // tem uploader próprio acima
+      if (in_array($c['chave'] ?? '', ['hero_imagem', 'hero_formato'])) continue; // tem uploader e controle próprios
       $valor = trim((string) ($c['valor_extendido'] ?? '')) !== ''
         ? $c['valor_extendido'] : ($c['valor'] ?? '');
       $longo = mb_strlen((string) $valor) > 80 || in_array($c['chave'], ['hero_subtitulo', 'seo_descricao'], true);

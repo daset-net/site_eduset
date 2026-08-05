@@ -122,7 +122,8 @@ function selosModalidade(array $tags, int $limite = 3): string {
 
       <div class="hero__visual">
         <div class="glow"></div>
-        <div class="hero__media<?= $heroImg === '' ? ' hero__media--vazio' : '' ?>">
+        <?php $heroFormato = config('hero_formato', 'retangular'); ?>
+        <div class="hero__media hero__media--<?= e($heroFormato) ?><?= $heroImg === '' ? ' hero__media--vazio' : '' ?>">
           <?php if ($heroImg !== ''): ?>
             <img src="<?= e($heroImg) ?>&w=1200" alt="Estude na EDUSET">
           <?php else: ?>
