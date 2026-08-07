@@ -814,6 +814,13 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       'categoria'      => $slug,
       'categoriaLabel' => $rotulo,
       'nome'           => $nome,
+      // Nome só para procurar, nunca para mostrar. Vem do cadastro já
+      // normalizado e guarda a grafia do AVASET, que nem sempre é a que o site
+      // exibe: a ficha do site troca o nome por um mais comercial, e quem
+      // escreve no WhatsApp costuma usar o outro. Fica ao lado do 'nome' em vez
+      // de no lugar dele porque os dois são o mesmo curso escrito de dois
+      // jeitos, e a busca tem de achar pelos dois.
+      'nomeBusca'      => trim((string) ($l['curso_normalizado'] ?? '')),
       'slug'           => $s['slug'] ?? '',
       'emoji'          => trim($s['emoji'] ?? '') !== '' ? $s['emoji'] : emojiDe($nome, $EMOJIS),
       'imagem'         => urlImagem($s['imagem_capa'] ?? null),
@@ -897,8 +904,11 @@ function catalogo(): array {
     if (is_array($cursos) && $cursos !== []) return [$cursos, 'cache'];
   }
 
+  // O curso_normalizado vem junto do curso: é o nome do curso escrito do jeito
+  // que a busca precisa dele (minúsculo, sem acento, pontuação virada espaço),
+  // gravado no cadastro. Só a busca o lê — quem exibe usa o 'curso'.
   $precos    = buscarColecao(COL_PRECOS, ['fields' =>
-    'id_curso,categoria,curso,ingresso,desconto,qtd_parcela,valor_parcela,'
+    'id_curso,categoria,curso,curso_normalizado,ingresso,desconto,qtd_parcela,valor_parcela,'
     . 'valor_parcela_normal,valor_total,codigo_unico_especial,codigo_mec_parceiro,ativo']);
   $editorial = buscarColecao(COL_CURSOS, ['fields' => '*']);
 

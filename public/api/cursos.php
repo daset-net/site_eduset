@@ -68,11 +68,35 @@ function palavraCasa(string $palavra, string $texto): bool {
 }
 
 /**
+ * O texto onde se procura o nome do curso — o índice, não a vitrine.
+ *
+ * O nome de um curso existe em mais de uma grafia: a do cadastro (AVASET), a
+ * que o site exibe (nome_exibicao, muitas vezes mais comercial), o slug e o id.
+ * O cliente escreve qualquer uma delas, então a busca tem de conhecer todas —
+ * juntar não desempata nada, porque a pontuação é por palavra encontrada, e
+ * não por vez que ela aparece.
+ *
+ * A do cadastro entra já normalizada, pelo curso_normalizado: normalizar aqui,
+ * a cada consulta, deixava a regra do site livre para divergir da que gravou o
+ * campo, e busca que diverge da fonte erra em silêncio.
+ *
+ * Nada daqui chega ao cliente. O que ele lê é sempre o 'nome'.
+ */
+function textoDeBusca(array $curso): string {
+  // O ?? '' segura o catálogo em cache gravado antes deste campo existir: ele
+  // volta do disco sem a chave, e por dez minutos a busca seguiria pelo nome
+  // de exibição — que é o que ela sempre fez.
+  return semAcento(
+    ($curso['nomeBusca'] ?? '') . ' ' . $curso['nome'] . ' ' . $curso['slug'] . ' ' . $curso['id']
+  );
+}
+
+/**
  * Quanto o curso combina com as palavras buscadas. Nome vale mais que
  * categoria: quem pergunta "informática" quer o curso, não a modalidade.
  */
 function pontuarCurso(array $curso, array $palavras): int {
-  $nome = semAcento($curso['nome'] . ' ' . $curso['slug'] . ' ' . $curso['id']);
+  $nome = textoDeBusca($curso);
   $resto = semAcento($curso['categoriaLabel'] . ' ' . $curso['descricao']);
 
   $pontos = 0;
@@ -263,7 +287,9 @@ function cursosDaArea(array $cursos, string $area, int $limite): array {
 
   $lista = [];
   foreach ($cursos as $c) {
-    $nome = semAcento($c['nome']);
+    // Mesmo índice da busca: o que se oferece como parecido sai da mesma
+    // leitura de nome que decidiu que o curso pedido não existe
+    $nome = textoDeBusca($c);
     foreach ($termos as $t) {
       if (palavraCasa($t, $nome)) {
         $lista[] = cursoParaAtendimento($c);
@@ -284,6 +310,35 @@ $termo = trim((string) ($_GET['q'] ?? ''));
 // dele?"), ele pede o curso que já foi identificado. Sempre com a grade, porque
 // aqui é um curso só e a pergunta seguinte costuma ser sobre as matérias.
 $codigo = trim((string) ($_GET['codigo'] ?? ''));
+
+// Catálogo que não carregou não é catálogo sem o curso.
+//
+// Quando o Directus não responde e o cache já venceu, o catalogo() devolve
+// lista vazia com origem "indisponivel". A busca então não achava nada, caía no
+// ramo de não encontrado e respondia ao atendimento que a escola não tem o
+// curso — que é uma afirmação sobre o catálogo, feita por quem não conseguiu
+// abrir o catálogo. O atendimento acreditava e repassava ao cliente.
+//
+// O 503 diz o que aconteceu na própria linha de status, e é o que o ChatSET lê
+// primeiro. Só vale para a consulta do atendimento: a vitrine da home continua
+// recebendo a lista vazia de sempre, mais abaixo, porque quebrar a home por
+// causa disto seria trocar um problema por outro.
+if ($origem === 'indisponivel' && ($termo !== '' || $codigo !== '')) {
+  http_response_code(503);
+  echo json_encode([
+    'ok'       => false,
+    'erro'     => 'catalogo_indisponivel',
+    'origem'   => $origem,
+    'busca'    => $termo !== '' ? $termo : $codigo,
+    'total'    => 0,
+    'cursos'   => [],
+    'mensagem' => 'Não foi possível consultar o catálogo agora. Isto NÃO quer dizer que o curso '
+                . 'não exista: nada foi verificado. Não afirme que a escola não tem o curso e não '
+                . 'ofereça alternativa — diga que vai confirmar a informação.',
+  ], JSON_UNESCAPED_UNICODE);
+  exit;
+}
+
 if ($codigo !== '') {
   $achado = cursoPorId($codigo);
 
