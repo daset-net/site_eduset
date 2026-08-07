@@ -266,18 +266,49 @@ const AREAS = [
               'terminar', 'concluir', 'diploma'],
 ];
 
-/** A área que a busca sugere, ou '' quando nenhuma palavra combina. */
-function areaDaBusca(array $palavras): string {
-  foreach (AREAS as $area => $termos) {
-    foreach ($palavras as $p) {
-      if (strlen($p) < 4) continue;
-      foreach ($termos as $t) {
-        // "enfermagem" casa com "enfermagem"; "enfermeiro" casa pelo começo
-        if (palavraCasa($p, $t)) return $area;
-      }
+/**
+ * Quanto a busca puxa para uma área: [acertos exatos, acertos pelo começo].
+ *
+ * A distinção existe porque começo de palavra tem falso amigo. Quem procurou
+ * "análise e desenvolvimento de sistemas" batia em "analises" (as clínicas, da
+ * saúde) só pelo começo, e recebia estética e saúde bucal como sugestão — a
+ * primeira área da lista ganhava, mesmo com "sistemas" batendo inteiro em
+ * tecnologia. Palavra inteira agora vale mais do que qualquer começo.
+ */
+function pesoDaArea(array $palavras, array $termos): array {
+  $exatos = 0;
+  $parciais = 0;
+
+  foreach ($palavras as $p) {
+    if (strlen($p) < 4) continue;
+
+    if (in_array($p, $termos, true)) { $exatos++; continue; }
+
+    foreach ($termos as $t) {
+      // "enfermagem" casa com "enfermagem"; "eletricista" casa pelo começo
+      if (palavraCasa($p, $t)) { $parciais++; break; }
     }
   }
-  return '';
+  return [$exatos, $parciais];
+}
+
+/** A área que a busca sugere, ou '' quando nenhuma palavra combina. */
+function areaDaBusca(array $palavras): string {
+  $melhor = '';
+  $melhorPeso = [0, 0];
+
+  foreach (AREAS as $area => $termos) {
+    $peso = pesoDaArea($palavras, $termos);
+    if ($peso === [0, 0]) continue;
+
+    // Empate na conta inteira decide pela ordem da lista, como antes
+    if ($peso[0] > $melhorPeso[0]
+        || ($peso[0] === $melhorPeso[0] && $peso[1] > $melhorPeso[1])) {
+      $melhor = $area;
+      $melhorPeso = $peso;
+    }
+  }
+  return $melhor;
 }
 
 /** Cursos do catálogo que pertencem à área — o que existe para oferecer. */
