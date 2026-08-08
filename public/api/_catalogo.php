@@ -832,7 +832,7 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
                             : ($parcelas > 0 ? $parcelas . ' meses' : 'Flexível'),
       'modalidade'     => trim($s['modalidade'] ?? '') !== ''
                             ? $s['modalidade']
-                            : ($slug === 'tecnico' ? 'EAD com polo de apoio' : 'EAD'),
+                            : 'EAD com Polo Digital',
 
       // preço — sempre do ava_catalogo_curso
       'preco'          => moeda($l['valor_parcela']),
