@@ -26,7 +26,12 @@ Paleta visual baseada na logo da marca: azul-marinho, azul royal e ciano (a iden
   (sem cadastro nem senha separada), para trocar capas e editar textos.
 - **Balões de prova social**: avisos de quem acabou de se matricular, com o texto
   escrito no painel.
-- **Leads** salvos em CSV persistente (`data/leads.csv`).
+- **Leads** gravados na coleção `site_leads` do Directus, de onde saem a tela
+  *Leads do Site* do GESET e a chamada do agente de IA no WhatsApp. O CSV em
+  `data/leads.csv` continua sendo escrito como rede de segurança, para o caso de
+  o Directus estar fora do ar — mas ele só sobrevive ao deploy se o volume do
+  passo 6 estiver montado. Sem o mount, a pasta fica na camada gravável do
+  contêiner e é apagada a cada deploy.
 - Botão flutuante de WhatsApp.
 
 ## 📁 Estrutura
@@ -99,8 +104,10 @@ site_eduset/
 
    Localmente, sem essas variáveis, o `cursos.php` lê os valores de
    `conexao_eduset/conexao_directus_avaset_unico_eduset.txt`.
-6. (Opcional) Em **Mounts**, adicione um volume persistente montado em
-   `/var/www/vhosts/localhost/data` para preservar os leads (`leads.csv`).
+6. Em **Mounts**, adicione um volume persistente montado em
+   `/var/www/vhosts/localhost/data`. Sem ele o `leads.csv` fica na camada
+   gravável do contêiner e é apagado a cada deploy — e o arquivo existe
+   justamente para segurar o lead quando o Directus não responde.
 7. **Deploy**. O OpenLiteSpeed sobe automaticamente e serve o site na porta 80.
 
 > Painel admin do OpenLiteSpeed disponível na porta **7080** (exponha apenas se necessário).

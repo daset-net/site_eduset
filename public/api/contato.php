@@ -10,6 +10,12 @@
 // O CSV em /data continua sendo escrito, e por um motivo só: se o Directus
 // estiver fora do ar na hora, o lead não pode sumir. Ele é rastro bruto, não é
 // para ser lido — quem lê lead é o painel.
+//
+// ATENÇÃO: esse rastro só sobrevive ao deploy se houver um volume montado em
+// /var/www/vhosts/localhost/data. O Dockerfile não declara VOLUME e o README
+// trata o mount como opcional, então a pasta pode estar na camada gravável do
+// contêiner — e ali ela é apagada a cada deploy, sem aviso. Antes de contar com
+// este arquivo para recuperar alguma coisa, confira em EasyPanel → Mounts.
 require_once __DIR__ . '/_catalogo.php';
 
 header('Content-Type: application/json; charset=utf-8');
