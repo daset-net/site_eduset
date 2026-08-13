@@ -57,8 +57,8 @@ $metaDescricao = $curso['seoDescricao'] !== ''
 $materias = materiasDoCurso($curso);
 $horasGrade = array_sum(array_column($materias, 'horas'));
 
-$whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
-  . rawurlencode('Olá! Quero saber mais sobre o curso ' . $curso['nome'] . '.');
+// Sob o link de campanha de um polo, quem recebe a dúvida é o polo.
+$whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'] . '.');
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -98,7 +98,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
         <a href="index.php">Início</a>
         <?php if ($materias): ?><a href="#grade">Matérias</a><?php endif; ?>
         <a href="index.php#cursos">Cursos</a>
-        <a href="unidades.php">Unidades</a>
+        <?php if (!visitaDoPolo()): ?><a href="unidades.php">Unidades</a><?php endif; ?>
         <a href="index.php#diferenciais">Diferenciais</a>
         <a href="index.php#contato">Contato</a>
       </nav>
@@ -324,7 +324,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
         <h2>Comece <span class="gradient-text">hoje</span> — a vaga é sua</h2>
         <p>Preencha seus dados e conclua a matrícula em <strong><?= e($curso['nome']) ?></strong> agora, na condição de <strong>R$ <?= e($curso['preco']) ?><?= $curso['parcelas'] ? ' em ' . (int) $curso['parcelas'] . 'x' : '' ?></strong>. Ao final você já recebe o número da matrícula e os dados de acesso à plataforma.</p>
 
-        <div class="line"><div class="ic"><i class="ri-whatsapp-line"></i></div><div><strong>WhatsApp</strong><span><?= e(config('telefone_exibicao', '(00) 00000-0000')) ?></span></div></div>
+        <div class="line"><div class="ic"><i class="ri-whatsapp-line"></i></div><div><strong>WhatsApp</strong><span><?= e(whatsappExibicao()) ?></span></div></div>
         <div class="line"><div class="ic"><i class="ri-mail-line"></i></div><div><strong>E-mail</strong><span><?= e(config('email_contato', 'contato@eduset.com.br')) ?></span></div></div>
         <div class="line"><div class="ic"><i class="ri-map-pin-line"></i></div><div><strong>Atendimento</strong><span><?= e(config('horario_atendimento', 'Segunda a sexta, das 8h às 18h')) ?></span></div></div>
       </div>
@@ -579,7 +579,7 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
           <h5>Institucional</h5>
           <ul>
             <li><a href="index.php#categorias">Sobre nós</a></li>
-            <li><a href="unidades.php">Unidades</a></li>
+            <?php if (!visitaDoPolo()): ?><li><a href="unidades.php">Unidades</a></li><?php endif; ?>
             <li><a href="index.php#diferenciais">Diferenciais</a></li>
             <li><a href="index.php#contato">Contato</a></li>
           </ul>

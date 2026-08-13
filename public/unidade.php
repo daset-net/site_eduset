@@ -17,6 +17,12 @@ if (!$unidade) {
   exit;
 }
 
+// Sob link de campanha, a única ficha que abre é a do próprio polo.
+if (visitaDoPolo() && $codigo !== poloSlug()) {
+  header('Location: index.php', true, 302);
+  exit;
+}
+
 $ano = date('Y');
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
@@ -34,8 +40,9 @@ $whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
 // exclusivo do link de divulgação do polo, eduset.com.br/?polo=<código>.
 $linkCursos = 'index.php#cursos';
 
-// Outras unidades do mesmo estado, para quem abriu a cidade errada.
-$vizinhas = array_slice(array_values(array_filter(
+// Outras unidades do mesmo estado, para quem abriu a cidade errada. Vazio sob
+// link de campanha: ali não se oferece vizinho, nem o "ver todas" que vem junto.
+$vizinhas = visitaDoPolo() ? [] : array_slice(array_values(array_filter(
   unidadesListadas(),
   fn($u) => $u['uf'] === $unidade['uf'] && $u['codigo'] !== $unidade['codigo']
 )), 0, 6);
@@ -74,7 +81,7 @@ $vizinhas = array_slice(array_values(array_filter(
       <nav class="nav">
         <a href="index.php">Início</a>
         <a href="index.php#cursos">Cursos</a>
-        <a href="unidades.php" class="ativo">Unidades</a>
+        <?php if (!visitaDoPolo()): ?><a href="unidades.php" class="ativo">Unidades</a><?php endif; ?>
         <a href="index.php#diferenciais">Diferenciais</a>
         <a href="index.php#contato">Contato</a>
       </nav>
@@ -90,7 +97,7 @@ $vizinhas = array_slice(array_values(array_filter(
       <div class="unid-hero__inner">
         <nav class="crumbs">
           <a href="index.php">Início</a> <i class="ri-arrow-right-s-line"></i>
-          <a href="unidades.php">Unidades</a> <i class="ri-arrow-right-s-line"></i>
+          <?php if (!visitaDoPolo()): ?><a href="unidades.php">Unidades</a><?php endif; ?> <i class="ri-arrow-right-s-line"></i>
           <span><?= e($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) ?></span>
         </nav>
 
@@ -235,7 +242,7 @@ $vizinhas = array_slice(array_values(array_filter(
           <h5>Institucional</h5>
           <ul>
             <li><a href="index.php#categorias">Sobre nós</a></li>
-            <li><a href="unidades.php">Unidades</a></li>
+            <?php if (!visitaDoPolo()): ?><li><a href="unidades.php">Unidades</a></li><?php endif; ?>
             <li><a href="index.php#contato">Contato</a></li>
           </ul>
         </div>

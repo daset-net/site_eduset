@@ -228,10 +228,10 @@ function poloSlug(): string {
 }
 
 /**
- * Dados públicos do polo do link (nome/cidade/estado), só para o selo da página.
- * Devolve null se não houver link, se a unidade não existir ou estiver inativa —
- * e nesse caso a página não mostra selo nenhum, mas o código continua viajando
- * na matrícula: quem decide de verdade é o AVASET.
+ * Dados públicos do polo do link (nome/cidade/estado/telefone), para o selo da
+ * página e para o atendimento. Devolve null se não houver link, se a unidade não
+ * existir ou estiver inativa — e nesse caso a página não mostra selo nenhum, mas
+ * o código continua viajando na matrícula: quem decide de verdade é o AVASET.
  */
 function poloUnidade(): ?array {
   static $unidade = false;
@@ -240,14 +240,16 @@ function poloUnidade(): ?array {
   $slug = poloSlug();
   if ($slug === '') return $unidade = null;
 
-  $cache = caminhoCache('polo_' . $slug);
+  // O nome do cache muda junto com os campos guardados: o cache antigo não tem
+  // telefone, e sem isto o site atenderia mais 10 minutos pela central.
+  $cache = caminhoCache('polo_v2_' . $slug);
   if (is_readable($cache) && (time() - filemtime($cache) < CACHE_TTL)) {
     $guardado = json_decode((string) file_get_contents($cache), true);
     if (is_array($guardado)) return $unidade = ($guardado['nome'] ?? '') !== '' ? $guardado : null;
   }
 
   $linhas = buscarColecao(COL_UNIDADES, [
-    'fields' => 'unidade_nome,unidade_email,cidade,estado,situacao',
+    'fields' => 'unidade_nome,unidade_email,cidade,estado,situacao,celular',
     'filter' => json_encode([
       'unidade_email' => ['_starts_with' => $slug . '@'],
       'situacao'      => ['_eq' => 'ativo'],
@@ -260,13 +262,71 @@ function poloUnidade(): ?array {
 
   $achado = $linhas[0] ?? null;
   $dados  = [
-    'nome'   => (string) ($achado['unidade_nome'] ?? ''),
-    'cidade' => (string) ($achado['cidade'] ?? ''),
-    'estado' => (string) ($achado['estado'] ?? ''),
+    'nome'     => (string) ($achado['unidade_nome'] ?? ''),
+    'cidade'   => (string) ($achado['cidade'] ?? ''),
+    'estado'   => (string) ($achado['estado'] ?? ''),
+    'telefone' => (string) ($achado['celular'] ?? ''),
   ];
   @file_put_contents($cache, json_encode($dados, JSON_UNESCAPED_UNICODE));
 
   return $unidade = $dados['nome'] !== '' ? $dados : null;
+}
+
+// --------------------------------------------------------------- quem atende
+// Quem chega pelo link de campanha de um polo veio do polo, e é com o polo que
+// quer falar. Sob esse link o WhatsApp da página passa a ser o dele: a central
+// atendendo no lugar de quem divulgou só atrasa a resposta e tira do polo a
+// conversa que ele mesmo trouxe.
+//
+// Unidade sem celular no cadastro continua tudo na central — melhor a central
+// atender do que ninguém atender.
+
+/** WhatsApp do polo do link, em dígitos com DDI. '' quando não há. */
+function poloWhatsapp(): string {
+  $polo = poloUnidade();
+  $so   = preg_replace('/\D/', '', (string) ($polo['telefone'] ?? ''));
+
+  if (strlen($so) === 10 || strlen($so) === 11) return '55' . $so;   // (31) 99078-8256
+  if (strlen($so) === 12 || strlen($so) === 13) {                    // já cadastrado com o 55
+    return strpos($so, '55') === 0 ? $so : '';
+  }
+  return '';
+}
+
+/** true quando quem responde esta visita é o polo, e não a central. */
+function atendePolo(): bool {
+  return poloWhatsapp() !== '';
+}
+
+/** Número do link do WhatsApp: o do polo do link, ou o da escola. */
+function whatsappNumero(): string {
+  return poloWhatsapp() ?: preg_replace('/\D/', '', config('whatsapp', '5500000000000'));
+}
+
+/** Número escrito na tela, no formato em que foi cadastrado. */
+function whatsappExibicao(): string {
+  $polo = poloUnidade();
+  return atendePolo()
+    ? (string) $polo['telefone']
+    : config('telefone_exibicao', '(00) 00000-0000');
+}
+
+/** Link pronto do WhatsApp, com a mensagem de abertura opcional. */
+function whatsappLink(string $texto = ''): string {
+  return 'https://wa.me/' . whatsappNumero()
+       . ($texto !== '' ? '?text=' . rawurlencode($texto) : '');
+}
+
+/**
+ * true quando a visita chegou pelo link de campanha de um polo válido.
+ *
+ * Enquanto ela durar, o site é daquele polo: a vitrine de unidades e a ficha de
+ * qualquer outra unidade saem do caminho. Foi o polo que pagou o anúncio que
+ * trouxe esta pessoa — mandá-la escolher outra cidade no meio do caminho é gastar
+ * a verba dele para entregar o aluno ao vizinho.
+ */
+function visitaDoPolo(): bool {
+  return poloUnidade() !== null;
 }
 
 // ---------------------------------------------------------------- unidades

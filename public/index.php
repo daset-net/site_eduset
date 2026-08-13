@@ -4,7 +4,9 @@
 require __DIR__ . '/api/_catalogo.php';
 
 $ano = date('Y');
-$whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000');
+// Sob o link de campanha de um polo, todo botão de WhatsApp da página chama
+// o polo, e não a central (ver quem atende, em api/_catalogo.php).
+$whatsapp = whatsappLink();
 
 // Link de divulgação de um polo (?polo=codigo): guarda o cookie da visita antes
 // de qualquer saída e, se a unidade existir, anuncia por quem o visitante veio.
@@ -76,7 +78,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <a href="#home">Início</a>
         <a href="#categorias">Modalidades</a>
         <a href="#cursos">Cursos</a>
-        <a href="unidades.php">Unidades</a>
+        <?php if (!visitaDoPolo()): ?><a href="unidades.php">Unidades</a><?php endif; ?>
         <a href="#diferenciais">Diferenciais</a>
         <a href="#contato">Contato</a>
       </nav>
@@ -323,13 +325,39 @@ function selosModalidade(array $tags, int $limite = 3): string {
       <div class="contact-info" data-reveal>
         <span class="eyebrow" style="display:inline-block;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--green-600);background:var(--bg-softer);padding:6px 16px;border-radius:100px;margin-bottom:16px">Fale conosco</span>
         <h2>Pronto para começar? <span class="gradient-text">Vamos conversar</span></h2>
+        <?php if (atendePolo()): ?>
+        <p>Você chegou pelo convite da unidade <strong><?= e($polo['nome']) ?></strong>. É ela que atende, tira dúvidas e cuida da sua matrícula do começo ao fim.</p>
+        <?php else: ?>
         <p>Preencha o formulário e um de nossos consultores entrará em contato para tirar todas as suas dúvidas e ajudar na sua matrícula.</p>
+        <?php endif; ?>
 
-        <div class="line"><div class="ic"><i class="ri-whatsapp-line"></i></div><div><strong>WhatsApp</strong><span><?= e(config('telefone_exibicao', '(00) 00000-0000')) ?></span></div></div>
+        <div class="line"><div class="ic"><i class="ri-whatsapp-line"></i></div><div><strong>WhatsApp</strong><span><?= e(whatsappExibicao()) ?></span></div></div>
         <div class="line"><div class="ic"><i class="ri-mail-line"></i></div><div><strong>E-mail</strong><span><?= e(config('email_contato', 'contato@eduset.com.br')) ?></span></div></div>
         <div class="line"><div class="ic"><i class="ri-map-pin-line"></i></div><div><strong>Atendimento</strong><span><?= e(config('horario_atendimento', 'Segunda a sexta, das 8h às 18h')) ?></span></div></div>
       </div>
 
+      <?php if (atendePolo()): ?>
+      <!-- Link de campanha de um polo, com WhatsApp cadastrado: o formulário
+           sai de cena. Ele abre um lead na fila da CENTRAL, e quem tem de
+           responder quem veio por este link é o polo que o trouxe. Os dois na
+           mesma tela é a conversa acontecer duas vezes — ou nenhuma. -->
+      <div class="contact-form" data-reveal>
+        <div class="form-topo">
+          <span class="form-topo__selo"><i class="ri-map-pin-2-line"></i> Sua unidade</span>
+          <h3><?= e($polo['nome']) ?></h3>
+          <p>Chame no WhatsApp e fale com quem vai acompanhar você daqui em diante.</p>
+        </div>
+        <a href="<?= e(whatsappLink('Olá! Vim pelo site e quero falar sobre os cursos.')) ?>"
+           target="_blank" rel="noopener" class="btn btn-primary"
+           style="width:100%;justify-content:center">
+          <i class="ri-whatsapp-line"></i> Falar com a unidade no WhatsApp
+        </a>
+        <a href="#cursos" class="btn btn-ghost"
+           style="width:100%;justify-content:center;margin-top:12px">
+          Ver os cursos e me matricular
+        </a>
+      </div>
+      <?php else: ?>
       <form class="contact-form" data-reveal @submit.prevent="enviar">
         <div class="form-alert" :class="feedback.tipo" v-if="feedback.msg">{{ feedback.msg }}</div>
 
@@ -362,6 +390,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
           {{ enviando ? 'Enviando…' : 'Enviar mensagem' }} <i class="ri-send-plane-line"></i>
         </button>
       </form>
+      <?php endif; ?>
     </div>
   </section>
 
@@ -391,7 +420,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
           <h5>Institucional</h5>
           <ul>
             <li><a href="#categorias">Sobre nós</a></li>
-            <li><a href="unidades.php">Unidades</a></li>
+            <?php if (!visitaDoPolo()): ?><li><a href="unidades.php">Unidades</a></li><?php endif; ?>
             <li><a href="#diferenciais">Diferenciais</a></li>
             <li><a href="#contato">Contato</a></li>
           </ul>

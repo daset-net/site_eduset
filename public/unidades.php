@@ -6,6 +6,13 @@
 
 require __DIR__ . '/api/_catalogo.php';
 
+// Visita que chegou pelo link de campanha de um polo não vê a vitrine das
+// outras unidades: ela volta para a home, que já está toda no nome do polo.
+if (visitaDoPolo()) {
+  header('Location: index.php', true, 302);
+  exit;
+}
+
 $unidades = unidadesListadas();
 $porUf    = unidadesPorEstado();
 $estados  = estadosAtendidos();
@@ -52,7 +59,7 @@ sort($ufsNaLista);
       <nav class="nav">
         <a href="index.php">Início</a>
         <a href="index.php#cursos">Cursos</a>
-        <a href="unidades.php" class="ativo">Unidades</a>
+        <?php if (!visitaDoPolo()): ?><a href="unidades.php" class="ativo">Unidades</a><?php endif; ?>
         <a href="index.php#diferenciais">Diferenciais</a>
         <a href="index.php#contato">Contato</a>
       </nav>
@@ -202,7 +209,7 @@ sort($ufsNaLista);
           <h5>Institucional</h5>
           <ul>
             <li><a href="index.php#categorias">Sobre nós</a></li>
-            <li><a href="unidades.php">Unidades</a></li>
+            <?php if (!visitaDoPolo()): ?><li><a href="unidades.php">Unidades</a></li><?php endif; ?>
             <li><a href="index.php#contato">Contato</a></li>
           </ul>
         </div>
