@@ -31,8 +31,9 @@ $local  = trim($unidade['cidade'] . ($unidade['uf'] !== '' ? ' · ' . $unidade['
 $titulo = $unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome'];
 if ($unidade['referencia'] !== '') $titulo .= ' — ' . $unidade['referencia'];
 
-$whatsapp = 'https://wa.me/' . config('whatsapp', '5500000000000') . '?text='
-  . rawurlencode('Olá! Quero falar sobre a unidade ' . $unidade['nome'] . '.');
+// Visitante comum fala com a central, como sempre. Sob o link de campanha,
+// esta é a ficha do próprio polo — e aí quem atende é ele.
+$whatsapp = whatsappLink('Olá! Quero falar sobre a unidade ' . $unidade['nome'] . '.');
 
 // A página é institucional: diz onde a unidade fica, e só. O link do catálogo
 // vai limpo, SEM ?polo=, para quem chegou pelo site (busca, anúncio da escola,
