@@ -261,6 +261,16 @@ function poloUnidade(): ?array {
   if ($linhas === null) return $unidade = null;
 
   $achado = $linhas[0] ?? null;
+
+  // Link de unidade EAD não é link de polo: divulgar é trabalho de polo físico, e
+  // o AVASET recusa o mesmo código na matrícula (UnidadeAuto::porSlug). Se o site
+  // aceitasse, ele anunciaria "matrícula pela unidade X" enquanto a venda seguiria
+  // pela regra automática — exatamente a mentira que acabamos de corrigir.
+  if ($achado && ehUnidadeEad((string) ($achado['unidade_email'] ?? ''),
+                              (string) ($achado['unidade_nome'] ?? ''))) {
+    $achado = null;
+  }
+
   $dados  = [
     'nome'     => (string) ($achado['unidade_nome'] ?? ''),
     'cidade'   => (string) ($achado['cidade'] ?? ''),
