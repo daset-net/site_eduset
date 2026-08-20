@@ -191,7 +191,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <div class="cat-card" data-reveal @click="filtrar('tecnico-competencia')" style="cursor:pointer">
           <div class="ic"><i class="ri-file-list-3-line"></i></div>
           <h3>Técnico Competência</h3>
-          <p>Para quem atua na área há pelo menos dois anos e comprova a experiência profissional. No AVA, realiza somente as provas de cada módulo.</p>
+          <p>Para quem atua na área há mais de dois anos e comprova a experiência profissional. No AVA, realiza somente as provas de cada módulo.</p>
           <?= selosModalidade($tagsModalidade['tecnico-competencia']) ?>
           <span class="more">Ver cursos <i class="ri-arrow-right-line"></i></span>
         </div>

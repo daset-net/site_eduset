@@ -902,7 +902,7 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       'descricao'      => !$competencia && trim($s['descricao_card'] ?? '') !== ''
                             ? $s['descricao_card']
                             : ($competencia
-                                ? 'Para quem atua na área há pelo menos dois anos e consegue comprovar sua experiência profissional.'
+                                ? 'Para quem atua na área há mais de dois anos e consegue comprovar sua experiência profissional.'
                                 : 'Curso com certificação reconhecida e material 100% online.'),
       'duracao'        => trim($s['duracao'] ?? '') !== ''
                             ? $s['duracao']

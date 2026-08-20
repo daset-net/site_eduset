@@ -36,7 +36,7 @@ $CONTEUDO_PADRAO = [
   ],
   'tecnico-competencia' => [
     'chamada'  => 'Comprove sua experiência e conquiste sua certificação técnica',
-    'promessa' => 'Modalidade destinada a quem já atua na área há pelo menos dois anos e consegue comprovar sua experiência profissional.',
+    'promessa' => 'Modalidade destinada a quem já atua na área há mais de dois anos e consegue comprovar sua experiência profissional.',
     'aprender' => [
       'Prova online específica em cada módulo',
       'Avaliação objetiva dos conhecimentos da área',
@@ -44,7 +44,7 @@ $CONTEUDO_PADRAO = [
       'Progressão pelos módulos conforme o calendário do curso',
     ],
     'publico' => [
-      'Profissionais que trabalham na área há pelo menos dois anos',
+      'Profissionais que trabalham na área há mais de dois anos',
       'Trabalhadores com experiência comprovada por carteira assinada',
       'Empreendedores, empresários ou MEIs com atuação comprovável na área',
       'Autônomos ou profissionais com outro vínculo ou atividade que possam apresentar documentos comprobatórios',

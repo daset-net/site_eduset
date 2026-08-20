@@ -479,7 +479,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <?php if ($curso['categoria'] === 'tecnico-competencia'): ?>
         <details>
           <summary>Quem pode fazer o Técnico Competência?</summary>
-          <p>É destinado a quem já trabalha na área há pelo menos dois anos e consegue comprovar essa experiência. A comprovação pode ser feita por carteira assinada, atuação como empreendedor ou MEI, trabalho autônomo ou outro vínculo profissional documentado. Os documentos apresentados passam por análise.</p>
+          <p>É destinado a quem já trabalha na área há mais de dois anos e consegue comprovar essa experiência. A comprovação pode ser feita por carteira assinada, atuação como empreendedor ou MEI, trabalho autônomo ou outro vínculo profissional documentado. Os documentos apresentados passam por análise.</p>
         </details>
         <?php endif; ?>
         <details>
