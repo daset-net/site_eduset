@@ -34,6 +34,19 @@ $CONTEUDO_PADRAO = [
     'saidas'  => ['Vagas técnicas no mercado formal', 'Concursos de nível técnico', 'Trabalho autônomo na área'],
     'mercado' => 'Falta técnico qualificado em praticamente todos os setores produtivos do Brasil.',
   ],
+  'tecnico-competencia' => [
+    'chamada'  => 'Transforme sua experiência em uma certificação técnica',
+    'promessa' => 'Avance módulo a módulo realizando somente as provas que comprovam as competências que você já domina.',
+    'aprender' => [
+      'Prova online específica em cada módulo',
+      'Avaliação objetiva dos conhecimentos da área',
+      'Acompanhamento do resultado diretamente pelo AVA',
+      'Progressão pelos módulos conforme o calendário do curso',
+    ],
+    'publico' => ['Quem já possui experiência ou conhecimento na área', 'Quem busca comprovar competências profissionais'],
+    'saidas'  => ['Certificação técnica da área escolhida', 'Valorização da experiência profissional', 'Novas oportunidades no mercado'],
+    'mercado' => 'A certificação formal ajuda a transformar experiência prática em novas oportunidades profissionais.',
+  ],
   'livre' => [
     'chamada'  => 'Aprenda rápido, aplique amanhã e melhore o seu currículo',
     'promessa' => 'Curso livre é objetivo: conteúdo direto, certificado na conclusão e uma habilidade nova que você já leva para a próxima entrevista ou para o próprio negócio.',
@@ -56,6 +69,10 @@ $CONTEUDO_PADRAO = [
 function conteudoCurso(array $curso): array {
   global $CONTEUDO_PADRAO;
   $padrao = $CONTEUDO_PADRAO[$curso['categoria']] ?? $CONTEUDO_PADRAO['livre'];
+
+  // A ficha editorial é compartilhada pelo técnico comum e pela versão por
+  // competência. Nesta última, o texto próprio evita prometer aulas e materiais.
+  if (($curso['categoria'] ?? '') === 'tecnico-competencia') return $padrao;
 
   $texto = fn(string $campo) => trim((string) ($curso[$campo] ?? '')) !== ''
     ? $curso[$campo]

@@ -38,7 +38,7 @@ $relacionados = array_slice($relacionados, 0, 3);
 
 // Depoimento de quem fez este curso (site_alunos_depoimentos). Sem depoimento
 // cadastrado o bloco some: a página não empresta elogio de outro curso.
-$depoimento = depoimentosDoCurso($curso['id'], 1)[0] ?? null;
+$depoimento = depoimentosDoCurso($curso['idCatalogo'] ?? $curso['id'], 1)[0] ?? null;
 
 $economia = max(0, (float) str_replace(['.', ','], ['', '.'], $curso['precoDe'])
                  - (float) str_replace(['.', ','], ['', '.'], $curso['preco']));
@@ -478,7 +478,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         </details>
         <details>
           <summary>Preciso ir até algum lugar assistir aula?</summary>
-          <p>Não. O conteúdo é <?= e($curso['modalidade']) ?>: você estuda de onde estiver, pelo celular ou computador, no horário que der. <?= $curso['categoria'] === 'tecnico' ? 'Nos cursos técnicos, apenas atividades práticas e estágio, quando exigidos, acontecem com apoio de polo.' : '' ?></p>
+          <p><?php if ($curso['categoria'] === 'tecnico-competencia'): ?>Nesta modalidade, o AVA disponibiliza somente as provas de cada módulo. Não são exibidos videoaulas, exercícios, apostilas, jornada ou podcast.<?php else: ?>Não. O conteúdo é <?= e($curso['modalidade']) ?>: você estuda de onde estiver, pelo celular ou computador, no horário que der. <?= $curso['categoria'] === 'tecnico' ? 'Nos cursos técnicos, apenas atividades práticas e estágio, quando exigidos, acontecem com apoio de polo.' : '' ?><?php endif; ?></p>
         </details>
         <details>
           <summary>Quanto tempo leva para concluir?</summary>

@@ -17,7 +17,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
 // Os selos de cada modalidade saem do próprio catálogo: só entra curso que o
 // site está exibindo de verdade, para o cartão não prometer o que não existe.
 [$cursosDoSite] = catalogo();
-$tagsModalidade = ['eja' => [], 'tecnico' => [], 'livre' => []];
+$tagsModalidade = ['eja' => [], 'tecnico' => [], 'tecnico-competencia' => [], 'livre' => []];
 foreach ($cursosDoSite as $c) {
   $slug = $c['categoria'] ?? '';
   if (!isset($tagsModalidade[$slug])) continue;
@@ -168,7 +168,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
       <div class="section-head" data-reveal>
         <span class="eyebrow">Modalidades</span>
         <h2>Escolha o caminho ideal para <span class="gradient-text">o seu objetivo</span></h2>
-        <p>Três modalidades pensadas para diferentes momentos da sua vida acadêmica e profissional.</p>
+        <p>Quatro modalidades pensadas para diferentes momentos da sua vida acadêmica e profissional.</p>
       </div>
 
       <div class="cat-grid">
@@ -185,6 +185,14 @@ function selosModalidade(array $tags, int $limite = 3): string {
           <h3>Curso Técnico</h3>
           <p>Forme-se em uma profissão em alta no mercado com cursos técnicos práticos e reconhecidos nacionalmente.</p>
           <?= selosModalidade($tagsModalidade['tecnico']) ?>
+          <span class="more">Ver cursos <i class="ri-arrow-right-line"></i></span>
+        </div>
+
+        <div class="cat-card" data-reveal @click="filtrar('tecnico-competencia')" style="cursor:pointer">
+          <div class="ic"><i class="ri-file-list-3-line"></i></div>
+          <h3>Técnico Competência</h3>
+          <p>Comprove seus conhecimentos pelas provas de cada módulo, sem videoaulas, exercícios, apostilas, jornada ou podcast.</p>
+          <?= selosModalidade($tagsModalidade['tecnico-competencia']) ?>
           <span class="more">Ver cursos <i class="ri-arrow-right-line"></i></span>
         </div>
 
@@ -213,6 +221,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <button :class="{active: filtro==='todos'}" @click="filtro='todos'">Todos</button>
         <button :class="{active: filtro==='eja'}" @click="filtro='eja'">Supletivo EJA</button>
         <button :class="{active: filtro==='tecnico'}" @click="filtro='tecnico'">Curso Técnico</button>
+        <button :class="{active: filtro==='tecnico-competencia'}" @click="filtro='tecnico-competencia'">Técnico Competência</button>
         <button :class="{active: filtro==='livre'}" @click="filtro='livre'">Curso Livre</button>
       </div>
 

@@ -161,6 +161,9 @@ if ($polo === '') {
   if (!preg_match('/^[a-z0-9._-]{2,80}$/', $polo)) $polo = '';
 }
 
+$idUnico = trim((string) ($plano['codigo_unico_especial'] ?? ''));
+if ($idUnico === '') $idUnico = (string) ($plano['id_unico'] ?? '');
+
 $payload = [
   // aluno
   'nome'        => $nome,
@@ -181,7 +184,7 @@ $payload = [
   'curso_nome'           => (string) ($plano['curso'] ?? ''),
   'curso_categoria'      => (string) ($plano['categoria'] ?? ''),
   'id_curso'             => (string) ($plano['id_curso'] ?? ''),
-  'id_unico'             => (string) ($plano['id_unico'] ?? ''),
+  'id_unico'             => $idUnico,
   'parcelamento'         => 'boleto',
   'parcela_quantidade'   => $plano['qtd_parcela'] ?? '',
   'desconto'             => $plano['desconto'] ?? '',
