@@ -22,6 +22,7 @@ const COL_UNIDADES   = 'tabela_unidades';     // polos, para o link de divulgaç
 const COL_DEPOIMENTOS = 'site_alunos_depoimentos'; // depoimentos de alunos, por curso
 
 const CACHE_TTL    = 600; // segundos
+const CACHE_CATALOGO = 'catalogo_pagamento_competencia_v1';
 const HTTP_TIMEOUT = 8;
 
 // As três cores que revezam nos cartões: duas do azul da logo (uma escura, uma
@@ -135,7 +136,7 @@ function caminhoCache(string $nome = 'catalogo'): string {
 
 /** Invalida o cache para que uma edição no Directus apareça no site na hora. */
 function limparCache(): void {
-  foreach (['catalogo', 'config', 'avisos', 'materias', 'unidades', CACHE_UNIDADES] as $nome) {
+  foreach (['catalogo', CACHE_CATALOGO, 'config', 'avisos', 'materias', 'unidades', CACHE_UNIDADES] as $nome) {
     @unlink(caminhoCache($nome));
   }
 }
@@ -887,7 +888,18 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
     [$slug, $rotulo] = $categoriaDe($l['categoria'] ?? '');
     $competencia = $slug === 'tecnico-competencia';
     $s        = $site[$idEditorialDe($id, $slug)] ?? [];
-    $parcelas = (int) ($l['qtd_parcela'] ?? 0);
+    $duracaoMeses = (int) ($l['qtd_parcela'] ?? 0);
+    $parcelas = $competencia ? 1 : $duracaoMeses;
+    $valorParcelaOriginal = (float) ($l['valor_parcela'] ?? 0);
+    $valorParcelaNormalOriginal = (float) ($l['valor_parcela_normal'] ?? 0);
+    $valorTotalCatalogo = (float) ($l['valor_total'] ?? 0);
+    $valorTotalNormalCatalogo = (float) ($l['valor_total_normal'] ?? 0);
+    $valorParcela = $competencia
+      ? ($valorTotalCatalogo > 0 ? $valorTotalCatalogo : $duracaoMeses * $valorParcelaOriginal)
+      : $valorParcelaOriginal;
+    $valorParcelaNormal = $competencia
+      ? ($valorTotalNormalCatalogo > 0 ? $valorTotalNormalCatalogo : $duracaoMeses * $valorParcelaNormalOriginal)
+      : $valorParcelaNormalOriginal;
     $nome     = trim($s['nome_exibicao'] ?? '') !== '' ? $s['nome_exibicao'] : nomeCurso($l['curso'] ?? '');
 
     $cursos[] = [
@@ -911,19 +923,21 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
                             : ($competencia
                                 ? 'Para quem atua na área há mais de dois anos e consegue comprovar sua experiência profissional.'
                                 : 'Curso com certificação reconhecida e material 100% online.'),
-      'duracao'        => trim($s['duracao'] ?? '') !== ''
-                            ? $s['duracao']
-                            : ($parcelas > 0 ? $parcelas . ' meses' : 'Flexível'),
+      'duracao'        => $competencia
+                            ? '30 dias'
+                            : (trim($s['duracao'] ?? '') !== ''
+                                ? $s['duracao']
+                                : ($duracaoMeses > 0 ? $duracaoMeses . ' meses' : 'Flexível')),
       'modalidade'     => !$competencia && trim($s['modalidade'] ?? '') !== ''
                             ? $s['modalidade']
                             : ($competencia ? 'Avaliação por Competência' : 'EAD com Polo Digital'),
 
       // preço — sempre do ava_catalogo_curso
-      'preco'          => moeda($l['valor_parcela']),
-      'precoDe'        => moeda($l['valor_parcela_normal'] ?? 0),
+      'preco'          => moeda($valorParcela),
+      'precoDe'        => moeda($valorParcelaNormal),
       'parcelas'       => $parcelas,
       'desconto'       => (int) ($l['desconto'] ?? 0),
-      'valorTotal'     => moeda($l['valor_total'] ?? 0),
+      'valorTotal'     => moeda($competencia ? $valorParcela : $valorTotalCatalogo),
 
       // O que o cliente paga no fim: a parcela anunciada vezes a quantidade.
       // É também o valor à vista, no PIX ou no boleto — pagar de uma vez não
@@ -933,11 +947,10 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       // por ciclo de oferta: coluna gravada envelhece no dia em que a parcela
       // muda, e aí o atendimento anuncia um total que a página já não pratica.
       //
-      // Também não é o valor_total do catálogo. Na ALFAPLENO ele está três
-      // centavos fora em nove cursos (arredondamento) e R$ 355 fora no Saúde
-      // Bucal — total que não é a soma das próprias parcelas é total que
-      // ninguém paga.
-      'valorPago'      => moeda($parcelas * (float) ($l['valor_parcela'] ?? 0)),
+      // Nos cursos parcelados, o total continua sendo calculado pelas parcelas.
+      // Em Técnico por Competência, a regra comercial é diferente: pagamento
+      // único, usando o valor_total como a própria parcela à vista.
+      'valorPago'      => moeda($parcelas * $valorParcela),
       'codigo'         => $l['codigo_unico_especial'] ?? $id,
 
       // Código da instituição parceira que certifica (SISTEC para técnico, INEP
@@ -952,7 +965,7 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       // no código, porque quem sabe qual órgão vale em cada curso é a secretaria
       // — no conjugado ela aponta um só, o do SISTEC.
       'linkMec'        => trim((string) ($s['link_consulta_mec'] ?? '')),
-      'economia'       => moeda(max(0, (float) ($l['valor_parcela_normal'] ?? 0) - (float) ($l['valor_parcela'] ?? 0))),
+      'economia'       => moeda(max(0, $valorParcelaNormal - $valorParcela)),
       'ofertaFim'      => fimDaOferta(),
 
       // conteúdo da página de conversão
@@ -981,7 +994,9 @@ function catalogo(): array {
   global $EMOJIS, $CATEGORIAS;
   $ctx = compact('EMOJIS', 'CATEGORIAS');
 
-  $cache = caminhoCache();
+  // Chave versionada: uma publicação desta regra não reutiliza por até 10
+  // minutos um catálogo antigo que ainda anunciava Competência em 12x.
+  $cache = caminhoCache(CACHE_CATALOGO);
 
   if (is_readable($cache) && (time() - filemtime($cache) < CACHE_TTL)) {
     $cursos = json_decode((string) file_get_contents($cache), true);
@@ -993,7 +1008,7 @@ function catalogo(): array {
   // gravado no cadastro. Só a busca o lê — quem exibe usa o 'curso'.
   $precos    = buscarColecao(COL_PRECOS, ['fields' =>
     'id_curso,categoria,curso,curso_normalizado,ingresso,desconto,qtd_parcela,valor_parcela,'
-    . 'valor_parcela_normal,valor_total,codigo_unico_especial,codigo_mec_parceiro,ativo']);
+    . 'valor_parcela_normal,valor_total,valor_total_normal,codigo_unico_especial,codigo_mec_parceiro,ativo']);
   $editorial = buscarColecao(COL_CURSOS, ['fields' => '*']);
 
   if ($precos !== null) {
@@ -1042,7 +1057,23 @@ function planoVigente(string $idCurso): ?array {
   }));
   if (!$linhas) return null;
 
-  return ofertaDoCiclo($linhas);
+  $plano = ofertaDoCiclo($linhas);
+  if (!$plano || !$competencia) return $plano;
+
+  $quantidadeOriginal = max(1, (int) ($plano['qtd_parcela'] ?? 1));
+  $valorAVista = (float) ($plano['valor_total'] ?? 0);
+  if ($valorAVista <= 0) $valorAVista = $quantidadeOriginal * (float) ($plano['valor_parcela'] ?? 0);
+  $valorNormalAVista = (float) ($plano['valor_total_normal'] ?? 0);
+  if ($valorNormalAVista <= 0) $valorNormalAVista = $quantidadeOriginal * (float) ($plano['valor_parcela_normal'] ?? 0);
+
+  $plano['qtd_parcela'] = 1;
+  $plano['valor_parcela'] = $valorAVista;
+  $plano['valor_total'] = $valorAVista;
+  if ($valorNormalAVista > 0) {
+    $plano['valor_parcela_normal'] = $valorNormalAVista;
+    $plano['valor_total_normal'] = $valorNormalAVista;
+  }
+  return $plano;
 }
 
 // ---------------------------------------------------------------- depoimentos

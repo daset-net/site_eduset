@@ -160,11 +160,8 @@ function cursoResumo(array $c): array {
 
     // Preço: cada campo diz no próprio nome de que ele é o valor.
     //
-    // "valor_de" e "valor_total" não diziam, e o atendimento preencheu o
-    // buraco sozinho: anunciou "12x de R$ 155,54 ou R$ 311,08 à vista" quando
-    // R$ 311,08 é a parcela sem desconto, e à vista não existe aqui. Nome de
-    // campo é o que o modelo lê para saber o que o número significa — e campo
-    // de pagamento à vista não existir é o que impede a oferta de existir.
+    // Cada campo informa explicitamente se representa parcela ou total. Para
+    // Técnico por Competência, o catálogo já chega normalizado como 1x à vista.
     'parcelamento'                  => $c['parcelas'] . 'x de R$ ' . $c['preco'],
     'parcelas'                      => $c['parcelas'],
     'valor_de_cada_parcela'         => 'R$ ' . $c['preco'],

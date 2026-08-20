@@ -252,7 +252,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
                 </small>
                 <strong>
                   <em v-if="c.parcelas">{{ c.parcelas }}x</em>
-                  R$ {{ c.preco }}<span>/mês</span>
+                  R$ {{ c.preco }}<span>{{ c.categoria === 'tecnico-competencia' ? ' à vista' : '/mês' }}</span>
                 </strong>
               </div>
               <span class="btn btn-primary" style="padding:10px 18px;font-size:14px">Quero <i class="ri-arrow-right-line"></i></span>

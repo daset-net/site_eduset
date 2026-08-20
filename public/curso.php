@@ -155,7 +155,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
           <h2><?= e($curso['nome']) ?></h2>
 
           <?php if ($curso['precoDe'] !== '0,00'): ?>
-            <p class="oferta__de">De <s>R$ <?= e($curso['precoDe']) ?></s> por mês</p>
+            <p class="oferta__de">De <s>R$ <?= e($curso['precoDe']) ?></s><?= $curso['categoria'] === 'tecnico-competencia' ? ' à vista' : ' por mês' ?></p>
           <?php endif; ?>
 
           <p class="oferta__por">
@@ -166,7 +166,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             <p class="oferta__total">Total do curso: R$ <?= e($curso['valorTotal']) ?></p>
           <?php endif; ?>
           <?php if ($economia > 0): ?>
-            <p class="oferta__economia"><i class="ri-price-tag-3-line"></i> Você economiza R$ <?= e(number_format($economia, 2, ',', '.')) ?> por parcela</p>
+            <p class="oferta__economia"><i class="ri-price-tag-3-line"></i> Você economiza R$ <?= e(number_format($economia, 2, ',', '.')) ?><?= $curso['categoria'] === 'tecnico-competencia' ? ' no pagamento à vista' : ' por parcela' ?></p>
           <?php endif; ?>
 
           <?php if ($curso['desconto']): ?>
@@ -455,7 +455,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
           <div><span>Usuário (CPF)</span><strong id="suc-usuario"></strong></div>
           <div><span>Senha inicial</span><strong id="suc-senha"></strong></div>
         </div>
-        <p class="form-nota form-nota--esq">Guarde esses dados. O acesso à plataforma é liberado assim que o pagamento da primeira parcela é confirmado — o boleto chega no seu e-mail. No primeiro login o sistema pede a troca da senha.</p>
+        <p class="form-nota form-nota--esq">Guarde esses dados. O acesso à plataforma é liberado assim que <?= $curso['categoria'] === 'tecnico-competencia' ? 'o pagamento à vista é confirmado' : 'o pagamento da primeira parcela é confirmado' ?> — o boleto chega no seu e-mail. No primeiro login o sistema pede a troca da senha.</p>
         <a id="suc-portal" class="btn btn-primary" href="https://ead.eduset.com.br" target="_blank" rel="noopener">Ir para a plataforma <i class="ri-external-link-line"></i></a>
       </div>
     </div>
@@ -496,7 +496,9 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         </details>
         <details>
           <summary>Como funciona o pagamento?</summary>
-          <p><?= $curso['parcelas'] ? 'Você paga em ' . (int) $curso['parcelas'] . 'x de R$ ' . e($curso['preco']) . '.' : 'O consultor apresenta as formas de pagamento disponíveis.' ?> Não há taxa de matrícula: o valor da parcela é tudo o que você paga.</p>
+          <p><?= $curso['categoria'] === 'tecnico-competencia'
+              ? 'O pagamento é à vista, em 1x de R$ ' . e($curso['preco']) . '.'
+              : ($curso['parcelas'] ? 'Você paga em ' . (int) $curso['parcelas'] . 'x de R$ ' . e($curso['preco']) . '.' : 'O consultor apresenta as formas de pagamento disponíveis.') ?> Não há taxa de matrícula: o valor informado é tudo o que você paga.</p>
         </details>
         <details>
           <summary>Quando começo a estudar?</summary>
@@ -537,7 +539,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
                 <div class="course-card__foot">
                   <div class="course-card__price">
                     <small><s>R$ <?= e($r['precoDe']) ?></s></small>
-                    <strong><em><?= (int) $r['parcelas'] ?>x</em> R$ <?= e($r['preco']) ?><span>/mês</span></strong>
+                    <strong><em><?= (int) $r['parcelas'] ?>x</em> R$ <?= e($r['preco']) ?><span><?= $r['categoria'] === 'tecnico-competencia' ? ' à vista' : '/mês' ?></span></strong>
                   </div>
                   <span class="btn btn-primary" style="padding:10px 18px;font-size:14px">Ver <i class="ri-arrow-right-line"></i></span>
                 </div>
