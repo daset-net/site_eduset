@@ -476,6 +476,12 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             <p style="margin-top:10px;font-size:13px;opacity:.65">Registro da instituição parceira: <span style="font-variant-numeric:tabular-nums;letter-spacing:.3px"><?= e($curso['codigoMec']) ?></span></p>
           <?php endif; ?>
         </details>
+        <?php if ($curso['categoria'] === 'tecnico-competencia'): ?>
+        <details>
+          <summary>Quem pode fazer o Técnico Competência?</summary>
+          <p>É destinado a quem já trabalha na área há pelo menos dois anos e consegue comprovar essa experiência. A comprovação pode ser feita por carteira assinada, atuação como empreendedor ou MEI, trabalho autônomo ou outro vínculo profissional documentado. Os documentos apresentados passam por análise.</p>
+        </details>
+        <?php endif; ?>
         <details>
           <summary>Preciso ir até algum lugar assistir aula?</summary>
           <p><?php if ($curso['categoria'] === 'tecnico-competencia'): ?>Nesta modalidade, o AVA disponibiliza somente as provas de cada módulo. Não são exibidos videoaulas, exercícios, apostilas, jornada ou podcast.<?php else: ?>Não. O conteúdo é <?= e($curso['modalidade']) ?>: você estuda de onde estiver, pelo celular ou computador, no horário que der. <?= $curso['categoria'] === 'tecnico' ? 'Nos cursos técnicos, apenas atividades práticas e estágio, quando exigidos, acontecem com apoio de polo.' : '' ?><?php endif; ?></p>

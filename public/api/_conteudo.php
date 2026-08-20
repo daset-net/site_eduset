@@ -35,15 +35,20 @@ $CONTEUDO_PADRAO = [
     'mercado' => 'Falta técnico qualificado em praticamente todos os setores produtivos do Brasil.',
   ],
   'tecnico-competencia' => [
-    'chamada'  => 'Transforme sua experiência em uma certificação técnica',
-    'promessa' => 'Avance módulo a módulo realizando somente as provas que comprovam as competências que você já domina.',
+    'chamada'  => 'Comprove sua experiência e conquiste sua certificação técnica',
+    'promessa' => 'Modalidade destinada a quem já atua na área há pelo menos dois anos e consegue comprovar sua experiência profissional.',
     'aprender' => [
       'Prova online específica em cada módulo',
       'Avaliação objetiva dos conhecimentos da área',
       'Acompanhamento do resultado diretamente pelo AVA',
       'Progressão pelos módulos conforme o calendário do curso',
     ],
-    'publico' => ['Quem já possui experiência ou conhecimento na área', 'Quem busca comprovar competências profissionais'],
+    'publico' => [
+      'Profissionais que trabalham na área há pelo menos dois anos',
+      'Trabalhadores com experiência comprovada por carteira assinada',
+      'Empreendedores, empresários ou MEIs com atuação comprovável na área',
+      'Autônomos ou profissionais com outro vínculo ou atividade que possam apresentar documentos comprobatórios',
+    ],
     'saidas'  => ['Certificação técnica da área escolhida', 'Valorização da experiência profissional', 'Novas oportunidades no mercado'],
     'mercado' => 'A certificação formal ajuda a transformar experiência prática em novas oportunidades profissionais.',
   ],
