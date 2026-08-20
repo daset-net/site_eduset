@@ -832,6 +832,11 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
   $categoriaDe = function (?string $cat) use ($CATEGORIAS): array {
     return $CATEGORIAS[strtoupper(semAcento((string) $cat))] ?? ['livre', 'Curso Livre'];
   };
+  $idEditorialDe = function (string $id, string $categoriaSlug): string {
+    return $categoriaSlug === 'tecnico-competencia' && preg_match('/^CTC(\d+)$/', $id, $m)
+      ? 'CT' . $m[1]
+      : $id;
+  };
 
   $site = [];
   foreach ($editorial as $e) {
@@ -848,10 +853,10 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
     if ($id === '') continue;
     if (($l['ativo'] ?? true) === false) continue;   // curso desativado no AVASET
 
-    $s = $site[$id] ?? null;
+    [$categoriaSlug] = $categoriaDe($l['categoria'] ?? '');
+    $s = $site[$idEditorialDe($id, $categoriaSlug)] ?? null;
     if ($s && !($s['ativo'] ?? true)) continue;      // oculto pelo painel do site
 
-    [$categoriaSlug] = $categoriaDe($l['categoria'] ?? '');
     $versoes[$id . '|' . $categoriaSlug][] = $l;
   }
 
@@ -862,12 +867,14 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
   }
 
   $peso = ['eja' => 1, 'tecnico' => 2, 'tecnico-competencia' => 3, 'livre' => 4];
-  uasort($melhores, function ($a, $b) use ($categoriaDe, $peso, $site) {
+  uasort($melhores, function ($a, $b) use ($categoriaDe, $idEditorialDe, $peso, $site) {
     $ca = $peso[$categoriaDe($a['categoria'] ?? '')[0]];
     $cb = $peso[$categoriaDe($b['categoria'] ?? '')[0]];
     if ($ca !== $cb) return $ca <=> $cb;
-    $oa = (int) ($site[$a['id_curso']]['ordem'] ?? 999);
-    $ob = (int) ($site[$b['id_curso']]['ordem'] ?? 999);
+    $oaId = $idEditorialDe((string) $a['id_curso'], $categoriaDe($a['categoria'] ?? '')[0]);
+    $obId = $idEditorialDe((string) $b['id_curso'], $categoriaDe($b['categoria'] ?? '')[0]);
+    $oa = (int) ($site[$oaId]['ordem'] ?? 999);
+    $ob = (int) ($site[$obId]['ordem'] ?? 999);
     return $oa <=> $ob ?: strcmp((string) $a['id_curso'], (string) $b['id_curso']);
   });
 
@@ -879,12 +886,12 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
     $id = (string) ($l['id_curso'] ?? '');
     [$slug, $rotulo] = $categoriaDe($l['categoria'] ?? '');
     $competencia = $slug === 'tecnico-competencia';
-    $s        = $site[$id] ?? [];
+    $s        = $site[$idEditorialDe($id, $slug)] ?? [];
     $parcelas = (int) ($l['qtd_parcela'] ?? 0);
     $nome     = trim($s['nome_exibicao'] ?? '') !== '' ? $s['nome_exibicao'] : nomeCurso($l['curso'] ?? '');
 
     $cursos[] = [
-      'id'             => $competencia ? $id . 'COMP' : $id,
+      'id'             => $id,
       'idCatalogo'     => $id,
       'categoria'      => $slug,
       'categoriaLabel' => $rotulo,
@@ -1018,8 +1025,8 @@ function catalogo(): array {
 function planoVigente(string $idCurso): ?array {
   if ($idCurso === '') return null;
 
-  $competencia = str_ends_with($idCurso, 'COMP');
-  $idCatalogo  = $competencia ? substr($idCurso, 0, -4) : $idCurso;
+  $competencia = preg_match('/^CTC\d+$/', $idCurso) === 1;
+  $idCatalogo  = $idCurso;
 
   $linhas = buscarColecao(COL_PRECOS, [
     'filter' => ['id_curso' => ['_eq' => $idCatalogo]],
