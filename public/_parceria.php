@@ -399,7 +399,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
       <div class="par-head"><small>Como funciona</small><h2><?= $ehAfiliado ? 'Da candidatura ao início da parceria' : 'Seu caminho até a abertura da Unidade Flex' ?></h2><p><?= $ehAfiliado ? '' : 'Cada candidatura é analisada individualmente para alinhar cidade, perfil, estrutura e condições da parceria.' ?></p></div>
       <div class="par-steps">
         <article class="par-step"><h3>Envie seus dados</h3><p>Preencha o formulário com seus contatos e sua região.</p></article>
-        <article class="par-step"><h3><?= $ehAfiliado ? 'Análise da escola' : 'Análise da região' ?></h3><p>A equipe avalia o perfil e a disponibilidade na sua localidade.</p></article>
+        <article class="par-step"><h3><?= $ehAfiliado ? 'Análise da candidatura' : 'Análise da região' ?></h3><p><?= $ehAfiliado ? 'A equipe avalia seu perfil e as informações enviadas na candidatura.' : 'A equipe avalia o perfil e a disponibilidade na sua localidade.' ?></p></article>
         <article class="par-step"><h3><?= $ehAfiliado ? 'Conversa e condições' : 'Plano de implantação' ?></h3><p><?= $ehAfiliado ? 'Você conhece as regras, percentuais e responsabilidades.' : 'Alinhamos estrutura, responsabilidades, documentação e próximos passos.' ?></p></article>
         <article class="par-step"><h3><?= $ehAfiliado ? 'Ativação' : 'Capacitação e abertura' ?></h3><p><?= $ehAfiliado ? 'Com a aprovação e o contrato, seu acesso é liberado.' : 'Após aprovação e contrato, a unidade recebe acesso e orientação para iniciar.' ?></p></article>
       </div>
