@@ -96,8 +96,9 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .par-status.ok { display:block; background:#ecfdf5; color:#047857; }
     .par-status.erro { display:block; background:#fef2f2; color:#b91c1c; }
     .par-hp { position:absolute!important; left:-9999px!important; opacity:0!important; }
-    .par-alt { margin-top:14px; text-align:center; font-size:12px; color:var(--muted); }
-    .par-alt a { color:var(--brand-700,#1d4ed8); font-weight:600; }
+    .par-trust { display:flex; flex-wrap:wrap; gap:16px 24px; margin-top:24px; color:rgba(255,255,255,.76); font-size:12px; }
+    .par-trust span { display:flex; align-items:center; gap:7px; }
+    .par-trust i { color:#fff; font-size:17px; }
     .flex-intro { margin-top:-36px; position:relative; z-index:3; }
     .flex-intro__box { display:grid; grid-template-columns:.8fr 1.2fr; gap:36px; align-items:center; padding:34px; border:1px solid var(--line); border-radius:24px; background:#fff; box-shadow:var(--shadow-md); }
     .flex-label { display:inline-flex; align-items:center; gap:8px; color:var(--brand-700,#1d4ed8); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; }
@@ -147,8 +148,32 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .aff-value i { font-size:22px; }
     .aff-value strong { display:block; margin-top:8px; font-size:13px; }
     .aff-value span { display:block; margin-top:3px; color:rgba(255,255,255,.62); font-size:11px; }
-    @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid{grid-template-columns:1fr}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
-    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values{grid-template-columns:1fr}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.par-header .header__cta .btn{display:none} }
+    .conviction { background:#fff; }
+    .conviction__grid { display:grid; grid-template-columns:.82fr 1.18fr; gap:52px; align-items:start; }
+    .conviction__copy { position:sticky; top:110px; }
+    .conviction__copy h2 { margin:10px 0 15px; font-size:clamp(30px,4vw,44px); line-height:1.15; }
+    .conviction__copy p { color:var(--muted); }
+    .conviction__list { display:grid; gap:14px; }
+    .conviction__item { display:grid; grid-template-columns:50px 1fr; gap:16px; padding:22px; border:1px solid var(--line); border-radius:17px; background:var(--bg-soft); }
+    .conviction__item i { width:50px; height:50px; display:grid; place-items:center; border-radius:14px; background:#fff; color:var(--brand-700,#1d4ed8); box-shadow:var(--shadow-sm); font-size:24px; }
+    .conviction__item h3 { margin:1px 0 6px; font-size:15px; }
+    .conviction__item p { color:var(--muted); font-size:12px; }
+    .compare { padding:32px; border-radius:22px; background:var(--ink); color:#fff; margin-top:22px; }
+    .compare h3 { color:#fff; margin-bottom:18px; font-size:20px; }
+    .compare__grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .compare__col { padding:18px; border-radius:14px; background:rgba(255,255,255,.07); }
+    .compare__col.good { background:color-mix(in srgb,var(--brand-600,#2563eb) 38%,transparent); border:1px solid rgba(255,255,255,.14); }
+    .compare__col strong { display:block; margin-bottom:10px; font-size:13px; }
+    .compare__col span { display:flex; gap:7px; margin:8px 0; color:rgba(255,255,255,.7); font-size:11px; }
+    .compare__col i { color:#fff; }
+    .final-cta { padding:0 0 82px; background:var(--bg-soft); }
+    .final-cta__box { position:relative; overflow:hidden; display:grid; grid-template-columns:1fr auto; gap:30px; align-items:center; padding:38px 42px; border-radius:24px; background:var(--grad-brand); color:#fff; box-shadow:var(--shadow-md); }
+    .final-cta__box:after { content:''; position:absolute; width:220px; height:220px; border-radius:50%; right:-70px; top:-120px; background:rgba(255,255,255,.1); }
+    .final-cta h2 { color:#fff; font-size:clamp(25px,3vw,35px); margin-bottom:7px; }
+    .final-cta p { color:rgba(255,255,255,.76); font-size:13px; }
+    .final-cta .btn { position:relative; z-index:1; white-space:nowrap; background:#fff; color:var(--ink); }
+    @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
+    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid{grid-template-columns:1fr}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
   </style>
 </head>
 <body class="par-page">
@@ -168,6 +193,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
         <h1><?= $ehAfiliado ? 'Sua influência pode abrir novos <strong>caminhos</strong>' : 'Uma unidade física. Uma operação mais <strong>flexível</strong>.' ?></h1>
         <p class="lead"><?= $ehAfiliado ? 'Conecte pessoas a novas oportunidades de formação, acompanhe cada indicação pelo seu painel e construa uma parceria transparente com a ' . e($marca) . '.' : 'Abra uma Unidade Flex da ' . e($marca) . ': presença física na sua cidade, estrutura planejada de acordo com a operação e tecnologia para atender, matricular e acompanhar seus alunos.' ?></p>
         <div class="par-actions"><a href="#candidatura" class="btn par-btn-light"><?= $ehAfiliado ? 'Enviar candidatura' : 'Quero abrir uma Unidade Flex' ?> <i class="ri-arrow-right-line"></i></a><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener" class="btn par-btn-ghost"><i class="ri-whatsapp-line"></i> Falar com um consultor</a></div>
+        <div class="par-trust"><span><i class="ri-shield-check-line"></i> Candidatura sem compromisso</span><span><i class="ri-file-list-3-line"></i> Condições formalizadas em contrato</span><span><i class="ri-customer-service-2-line"></i> Acompanhamento da equipe</span></div>
       </div>
       <div class="par-visual">
         <?php if ($ehAfiliado): ?>
@@ -179,6 +205,27 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
           <div class="par-metric"><i class="ri-layout-masonry-line"></i><strong>Implantação flexível</strong><span>Comece com o essencial.</span></div>
           <div class="par-metric"><i class="ri-dashboard-3-line"></i><strong>Gestão integrada</strong><span>Operação no AVASET.</span></div>
         <?php endif; ?>
+      </div>
+    </div>
+  </section>
+
+  <section class="par-section conviction">
+    <div class="container conviction__grid">
+      <div class="conviction__copy"><span class="flex-label"><i class="ri-lightbulb-flash-line"></i> <?= $ehAfiliado ? 'Uma oportunidade real' : 'Um modelo mais atual' ?></span><h2><?= $ehAfiliado ? 'Não basta indicar. É preciso conseguir acompanhar.' : 'Presença física sem começar maior do que precisa.' ?></h2><p><?= $ehAfiliado ? 'Uma boa parceria transforma sua capacidade de comunicação em um processo organizado, rastreável e transparente — do primeiro contato ao acompanhamento no painel.' : 'A Unidade Flex nasce para unir a confiança do atendimento presencial a uma estrutura de implantação racional, apoiada por tecnologia e processos.' ?></p>
+        <div class="compare"><h3><?= $ehAfiliado ? 'O que muda para você' : 'Por que o formato Flex?' ?></h3><div class="compare__grid"><div class="compare__col"><strong><?= $ehAfiliado ? 'Indicação sem estrutura' : 'Modelo engessado' ?></strong><span><i class="ri-close-line"></i><?= $ehAfiliado ? 'Origem difícil de acompanhar' : 'Estrutura inicial desproporcional' ?></span><span><i class="ri-close-line"></i><?= $ehAfiliado ? 'Informações espalhadas' : 'Processos pouco adaptáveis' ?></span><span><i class="ri-close-line"></i><?= $ehAfiliado ? 'Pouca visibilidade do resultado' : 'Crescimento sem etapas claras' ?></span></div><div class="compare__col good"><strong><?= $ehAfiliado ? 'Programa de Afiliados' : 'Unidade Flex' ?></strong><span><i class="ri-check-line"></i><?= $ehAfiliado ? 'Link próprio de indicação' : 'Espaço físico dimensionado' ?></span><span><i class="ri-check-line"></i><?= $ehAfiliado ? 'Painel centralizado' : 'Gestão integrada ao AVASET' ?></span><span><i class="ri-check-line"></i><?= $ehAfiliado ? 'Regras e critérios definidos' : 'Implantação acompanhada' ?></span></div></div></div>
+      </div>
+      <div class="conviction__list">
+        <?php $argumentos = $ehAfiliado ? [
+          ['ri-radar-line','Transforme alcance em conexão','Você não precisa ter milhões de seguidores. Uma rede construída com confiança pode aproximar a pessoa certa da formação que ela procura.'],
+          ['ri-route-line','Cada indicação com um caminho claro','Seu link identifica a origem e ajuda a manter o processo organizado, sem depender de controles improvisados.'],
+          ['ri-scales-3-line','Transparência desde o início','Critérios, percentuais e responsabilidades são apresentados antes da formalização da parceria.'],
+          ['ri-time-line','Atue no seu ritmo','Organize sua divulgação de acordo com sua rotina e com os canais nos quais você já tem presença.'],
+        ] : [
+          ['ri-store-3-line','Uma referência local','Crie um ponto físico onde o aluno encontra orientação, acolhimento e confiança para iniciar sua jornada.'],
+          ['ri-expand-left-right-line','Estrutura que pode evoluir','Comece com os requisitos definidos para a operação e amplie de forma planejada conforme a realidade local.'],
+          ['ri-computer-line','Tecnologia trabalhando com você','Use o AVASET para organizar matrículas, alunos e rotinas sem depender de controles dispersos.'],
+          ['ri-map-pin-user-line','Impacto perto de casa','Ajude a ampliar o acesso à formação e desenvolva uma atuação educacional conectada à sua comunidade.'],
+        ]; foreach ($argumentos as [$icone,$tit,$txt]): ?><article class="conviction__item"><i class="<?= $icone ?>"></i><div><h3><?= e($tit) ?></h3><p><?= e($txt) ?></p></div></article><?php endforeach; ?>
       </div>
     </div>
   </section>
@@ -278,6 +325,8 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   </section>
   <?php endif; ?>
 
+  <section class="final-cta"><div class="container"><div class="final-cta__box"><div><h2><?= $ehAfiliado ? 'Uma indicação pode mudar uma trajetória.' : 'Sua cidade pode estar pronta para uma Unidade Flex.' ?></h2><p><?= $ehAfiliado ? 'Dê o primeiro passo para construir uma parceria organizada, transparente e conectada a novas oportunidades.' : 'Apresente seu perfil e descubra se existe disponibilidade para desenvolver essa oportunidade na sua região.' ?></p></div><a href="#candidatura" class="btn"><?= $ehAfiliado ? 'Quero fazer parte' : 'Quero avaliar minha cidade' ?> <i class="ri-arrow-right-line"></i></a></div></div></section>
+
   <section class="par-section" id="candidatura">
     <div class="container par-form-wrap">
       <div class="par-form-copy">
@@ -300,13 +349,20 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
         <label class="par-consent"><input type="checkbox" name="consentimento" required><span>Autorizo o contato da <?= e($marca) ?> sobre esta candidatura e confirmo que os dados informados são verdadeiros.</span></label>
         <button class="btn btn-primary par-submit" type="submit" id="parSubmit">Enviar candidatura <i class="ri-send-plane-line"></i></button>
         <div class="par-status" id="parStatus" role="status"></div>
-        <p class="par-alt">Prefere conversar agora? <a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener">Fale pelo WhatsApp</a></p>
       </form>
     </div>
   </section>
 </main>
 
-<footer class="footer"><div class="container"><div class="footer__bottom"><span>© <?= $ano ?> <?= e($marca) ?> · Todos os direitos reservados.</span><span><a href="index.php">Voltar ao site</a></span></div></div></footer>
+<footer class="footer"><div class="container">
+  <div class="footer__grid">
+    <div class="footer__brand"><img src="<?= e($logoNegativa) ?>" alt="<?= e($marca) ?>"><p>Educação, tecnologia e atendimento próximo para criar novas oportunidades de aprendizagem.</p><div class="footer__social"><?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?><?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="ri-whatsapp-line"></i></a><?php if (config('youtube')): ?><a href="<?= e(config('youtube')) ?>" target="_blank" rel="noopener" aria-label="YouTube"><i class="ri-youtube-fill"></i></a><?php endif; ?></div></div>
+    <div><h5>Modalidades</h5><ul><li><a href="index.php#cursos">Supletivo EJA</a></li><li><a href="index.php#cursos">Cursos técnicos</a></li><li><a href="index.php#cursos">Cursos livres</a></li></ul></div>
+    <div><h5>Institucional</h5><ul><li><a href="index.php#categorias">Sobre nós</a></li><li><a href="unidades.php">Unidades</a></li><li><a href="afiliados.php">Programa de afiliados</a></li><li><a href="seja-uma-unidade.php">Unidade Flex</a></li><li><a href="index.php#diferenciais">Diferenciais</a></li></ul></div>
+    <div><h5>Atendimento</h5><ul><li><a href="index.php#contato">Central do aluno</a></li><li><a href="index.php#contato">Fale conosco</a></li><li><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener">WhatsApp</a></li></ul></div>
+  </div>
+  <div class="footer__bottom"><span>© <?= $ano ?> <?= e($marca) ?> · Todos os direitos reservados.</span><span><a href="index.php">Voltar ao site</a></span></div>
+</div></footer>
 
 <script>
 document.getElementById('parForm').addEventListener('submit', async function (ev) {
