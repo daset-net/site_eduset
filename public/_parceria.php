@@ -113,6 +113,10 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .par-field label { display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--ink); }
     .par-field input,.par-field select,.par-field textarea { width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 12px; font:inherit; font-size:14px; color:var(--ink); background:#fff; outline:none; }
     .par-field textarea { min-height:105px; resize:vertical; }
+    .par-form-section { grid-column:1/-1; display:flex; align-items:center; gap:10px; margin-top:8px; padding:14px 0 2px; border-top:1px solid var(--line); color:var(--brand-700,#1d4ed8); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; }
+    .par-form-section:first-child { margin-top:0; padding-top:0; border-top:0; }
+    .par-form-section i { font-size:18px; }
+    .par-field small { display:block; margin-top:5px; color:var(--muted); font-size:10px; line-height:1.4; }
     .par-field input:focus,.par-field select:focus,.par-field textarea:focus { border-color:var(--brand-500,#2563eb); box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-500,#2563eb) 14%,transparent); }
     .par-consent { display:flex; align-items:flex-start; gap:9px; font-size:12px; color:var(--muted); margin:18px 0; }
     .par-consent input { margin-top:3px; }
@@ -433,16 +437,35 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
       <form class="par-form" id="parForm">
         <input class="par-hp" type="text" name="empresa_site" tabindex="-1" autocomplete="off">
         <div class="par-fields">
-          <div class="par-field full"><label for="nome">Nome completo *</label><input id="nome" name="nome" required minlength="3" maxlength="120" autocomplete="name"></div>
-          <div class="par-field"><label for="email">E-mail *</label><input id="email" name="email" type="email" required maxlength="160" autocomplete="email"></div>
-          <div class="par-field"><label for="telefone">WhatsApp *</label><input id="telefone" name="telefone" type="tel" required minlength="10" maxlength="20" autocomplete="tel" placeholder="(00) 00000-0000"></div>
+          <div class="par-form-section"><i class="ri-user-line"></i> <?= $ehAfiliado ? 'Dados pessoais' : 'Responsável pela unidade' ?></div>
+          <div class="par-field full"><label for="nome"><?= $ehAfiliado ? 'Nome completo' : 'Nome completo do responsável' ?> *</label><input id="nome" name="nome" required minlength="3" maxlength="120" autocomplete="name"></div>
+          <div class="par-field"><label for="cpf">CPF *</label><input id="cpf" name="cpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></div>
+          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="data_nascimento">Data de nascimento *</label><input id="data_nascimento" name="data_nascimento" type="date" required></div><?php endif; ?>
+          <div class="par-field"><label for="email">E-mail para notificações *</label><input id="email" name="email" type="email" required maxlength="160" autocomplete="email"></div>
+          <div class="par-field"><label for="telefone">WhatsApp *</label><input id="telefone" name="telefone" type="tel" required minlength="10" maxlength="15" autocomplete="tel" placeholder="(00) 00000-0000"></div>
+
+          <?php if (!$ehAfiliado): ?>
+          <div class="par-form-section"><i class="ri-store-2-line"></i> Dados da Unidade Flex</div>
+          <div class="par-field"><label for="empresa">Nome da unidade ou empresa *</label><input id="empresa" name="empresa" required maxlength="160" autocomplete="organization"></div>
+          <div class="par-field"><label for="cnpj">CNPJ <span style="font-weight:400">(opcional)</span></label><input id="cnpj" name="cnpj" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"></div>
+          <?php endif; ?>
+
+          <div class="par-form-section"><i class="ri-map-pin-line"></i> <?= $ehAfiliado ? 'Localização' : 'Endereço da futura unidade' ?></div>
+          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="cep">CEP *</label><input id="cep" name="cep" required inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000"></div><div class="par-field"><label for="endereco">Endereço, número e complemento *</label><input id="endereco" name="endereco" required maxlength="200" autocomplete="street-address"></div><div class="par-field"><label for="bairro">Bairro *</label><input id="bairro" name="bairro" required maxlength="100"></div><?php endif; ?>
           <div class="par-field"><label for="cidade">Cidade *</label><input id="cidade" name="cidade" required maxlength="100" autocomplete="address-level2"></div>
-          <div class="par-field"><label for="estado">Estado *</label><select id="estado" name="estado" required><option value="">Selecione...</option><?php foreach (['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'] as $uf): ?><option><?= $uf ?></option><?php endforeach; ?></select></div>
-          <?php if ($ehAfiliado): ?><div class="par-field full"><label for="canal_divulgacao">Principal canal de divulgação</label><select id="canal_divulgacao" name="canal_divulgacao"><option value="Não informado">Selecione...</option><option>Redes sociais</option><option>WhatsApp e contatos</option><option>Site ou blog</option><option>Atuação comercial presencial</option><option>Outro</option></select></div><?php endif; ?>
-          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="espaco">Já possui espaço físico?</label><select id="espaco" name="espaco"><option value="Não informado">Selecione...</option><option>Sim, já está pronto</option><option>Sim, precisa de adequações</option><option>Ainda estou procurando</option></select></div><div class="par-field"><label for="experiencia_educacional">Já atua na área educacional?</label><select id="experiencia_educacional" name="experiencia_educacional"><option value="Não informado">Selecione...</option><option>Sim</option><option>Não</option></select></div><?php endif; ?>
+          <div class="par-field"><label for="estado">Estado *</label><select id="estado" name="estado" required autocomplete="address-level1"><option value="">Selecione...</option><?php foreach (['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'] as $uf): ?><option><?= $uf ?></option><?php endforeach; ?></select></div>
+
+          <div class="par-form-section"><i class="ri-bank-card-line"></i> Dados para recebimento</div>
+          <div class="par-field"><label for="pix_tipo">Tipo de chave PIX *</label><select id="pix_tipo" name="pix_tipo" required><option value="">Selecione...</option><option value="CPF/CNPJ">CPF/CNPJ</option><option value="E-mail">E-mail</option><option value="Telefone">Telefone</option><option value="Chave aleatória">Chave aleatória</option></select></div>
+          <div class="par-field"><label for="pix_chave">Chave PIX *</label><input id="pix_chave" name="pix_chave" required maxlength="140"><small>Será usada como destino das transferências após aprovação e validação.</small></div>
+          <div class="par-field"><label for="banco_codigo">Código do banco *</label><input id="banco_codigo" name="banco_codigo" required inputmode="numeric" maxlength="10" placeholder="Ex.: 001"></div>
+          <div class="par-field"><label for="banco_nome">Nome do banco *</label><input id="banco_nome" name="banco_nome" required maxlength="80"></div>
+
+          <div class="par-form-section"><i class="ri-questionnaire-line"></i> Perfil da candidatura</div>
+          <?php if ($ehAfiliado): ?><div class="par-field full"><label for="canal_divulgacao">Principal canal de divulgação *</label><select id="canal_divulgacao" name="canal_divulgacao" required><option value="">Selecione...</option><option>Redes sociais</option><option>WhatsApp e contatos</option><option>Site ou blog</option><option>Atuação comercial presencial</option><option>Outro</option></select></div><?php else: ?><div class="par-field"><label for="espaco">Já possui espaço físico? *</label><select id="espaco" name="espaco" required><option value="">Selecione...</option><option>Sim, já está pronto</option><option>Sim, precisa de adequações</option><option>Ainda estou procurando</option></select></div><div class="par-field"><label for="experiencia_educacional">Já atua na área educacional? *</label><select id="experiencia_educacional" name="experiencia_educacional" required><option value="">Selecione...</option><option>Sim</option><option>Não</option></select></div><?php endif; ?>
           <div class="par-field full"><label for="experiencia"><?= $ehAfiliado ? 'Como pretende divulgar os cursos?' : 'Conte sobre sua experiência e estrutura atual' ?></label><textarea id="experiencia" name="experiencia" maxlength="1200" placeholder="<?= $ehAfiliado ? 'Redes sociais, contatos, atuação comercial...' : 'Experiência comercial ou educacional, espaço disponível, região de atuação...' ?>"></textarea></div>
         </div>
-        <label class="par-consent"><input type="checkbox" name="consentimento" required><span>Autorizo o contato da <?= e($marca) ?> sobre esta candidatura e confirmo que os dados informados são verdadeiros.</span></label>
+        <label class="par-consent"><input type="checkbox" name="consentimento" required><span>Autorizo o tratamento dos dados informados para análise, contato, validação e eventual cadastro desta parceria. Confirmo que os dados são verdadeiros.</span></label>
         <button class="btn btn-primary par-submit" type="submit" id="parSubmit">Enviar candidatura <i class="ri-send-plane-line"></i></button>
         <div class="par-status" id="parStatus" role="status"></div>
       </form>
@@ -461,6 +484,15 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
 </div></footer>
 
 <script>
+const somenteDigitos = valor => valor.replace(/\D/g, '');
+const mascaras = {
+  cpf(valor) { const d = somenteDigitos(valor).slice(0,11); return d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); },
+  cnpj(valor) { const d = somenteDigitos(valor).slice(0,14); return d.replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d{1,2})$/,'$1-$2'); },
+  cep(valor) { return somenteDigitos(valor).slice(0,8).replace(/(\d{5})(\d)/,'$1-$2'); },
+  telefone(valor) { const d = somenteDigitos(valor).slice(0,11); return d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{4})$/,'$1-$2'); }
+};
+[['cpf','cpf'],['cnpj','cnpj'],['cep','cep'],['telefone','telefone']].forEach(([id,tipo]) => { const el=document.getElementById(id); if(el) el.addEventListener('input',()=>el.value=mascaras[tipo](el.value)); });
+
 document.getElementById('parForm').addEventListener('submit', async function (ev) {
   ev.preventDefault();
   const form = ev.currentTarget, btn = document.getElementById('parSubmit'), status = document.getElementById('parStatus');
@@ -468,13 +500,20 @@ document.getElementById('parForm').addEventListener('submit', async function (ev
   const original = btn.innerHTML;
   btn.disabled = true; btn.innerHTML = 'Enviando...'; status.className = 'par-status';
   const dados = new FormData(form);
+  const valor = nome => dados.get(nome) || 'Não informado';
   const mensagem = [
     'Tipo de candidatura: <?= e($titulo) ?>',
-    'Cidade/UF: ' + dados.get('cidade') + '/' + dados.get('estado'),
-    <?php if ($ehAfiliado): ?>'Canal de divulgação: ' + dados.get('canal_divulgacao'),<?php endif; ?>
-    <?php if (!$ehAfiliado): ?>'Espaço físico: ' + dados.get('espaco'),
-    'Experiência educacional: ' + dados.get('experiencia_educacional'),<?php endif; ?>
-    'Experiência/observações: ' + (dados.get('experiencia') || 'Não informado')
+    'CPF: ' + valor('cpf'),
+    'Cidade/UF: ' + valor('cidade') + '/' + valor('estado'),
+    <?php if ($ehAfiliado): ?>'Canal de divulgação: ' + valor('canal_divulgacao'),<?php else: ?>'Nome da unidade/empresa: ' + valor('empresa'),
+    'Data de nascimento: ' + valor('data_nascimento'),
+    'CNPJ: ' + valor('cnpj'),
+    'Endereço: ' + valor('endereco') + ' - ' + valor('bairro') + ' - CEP ' + valor('cep'),
+    'Espaço físico: ' + valor('espaco'),
+    'Experiência educacional: ' + valor('experiencia_educacional'),<?php endif; ?>
+    'PIX: ' + valor('pix_tipo') + ' - ' + valor('pix_chave'),
+    'Banco: ' + valor('banco_codigo') + ' - ' + valor('banco_nome'),
+    'Experiência/observações: ' + valor('experiencia')
   ].join('\n');
   try {
     const r = await fetch('api/contato.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nome:dados.get('nome'), email:dados.get('email'), telefone:dados.get('telefone'), interesse:'<?= e($interesse) ?>', mensagem }) });
