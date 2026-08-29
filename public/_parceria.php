@@ -19,27 +19,26 @@ $mensagemWhatsapp = $ehAfiliado
 $numeroCentral = preg_replace('/\D/', '', config('whatsapp', '5500000000000'));
 $whatsapp = 'https://wa.me/' . $numeroCentral . '?text=' . rawurlencode($mensagemWhatsapp);
 
-// Prova social exclusiva da página de Unidade Flex. A janela limitada evita
-// trazer a coleção inteira; o embaralhamento renova os três relatos por visita.
+// Prova social da rede. Hoje a coleção contém relatos de gestores de unidades;
+// na página de afiliados eles aparecem identificados como parceiros da rede.
+// A janela limitada evita trazer tudo; o embaralhamento renova três por visita.
 $depoimentosUnidade = [];
-if (!$ehAfiliado) {
-  $linhas = buscarColecao('unidade_depoimentos', [
+$linhas = buscarColecao('unidade_depoimentos', [
     'fields' => 'nome,empresa,caso_de_sucesso,parceria,data',
     'filter' => ['parceria' => ['_eq' => 'unidade']],
     'sort'   => '-data',
     'limit'  => 120,
-  ]) ?? [];
-  foreach ($linhas as $linha) {
+]) ?? [];
+foreach ($linhas as $linha) {
     $nome = trim((string) ($linha['nome'] ?? ''));
     $empresa = trim((string) ($linha['empresa'] ?? ''));
     $relato = preg_replace('/\s+/u', ' ', trim((string) ($linha['caso_de_sucesso'] ?? '')));
     if ($nome === '' || $relato === '') continue;
     if (mb_strlen($relato) > 560) $relato = rtrim(mb_substr($relato, 0, 557)) . '…';
     $depoimentosUnidade[] = ['nome' => $nome, 'empresa' => $empresa, 'relato' => $relato];
-  }
-  if (count($depoimentosUnidade) > 1) shuffle($depoimentosUnidade);
-  $depoimentosUnidade = array_slice($depoimentosUnidade, 0, 3);
 }
+if (count($depoimentosUnidade) > 1) shuffle($depoimentosUnidade);
+$depoimentosUnidade = array_slice($depoimentosUnidade, 0, 3);
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 ?>
@@ -339,10 +338,10 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   </section>
   <?php endif; ?>
 
-  <?php if (!$ehAfiliado && $depoimentosUnidade): ?>
+  <?php if ($depoimentosUnidade): ?>
   <section class="par-section unit-stories">
     <div class="container">
-      <div class="par-head"><small>Histórias de quem já começou</small><h2>Gestores que transformaram suas operações</h2><p>Experiências de parceiros da <?= e($marca) ?> que encontraram novas possibilidades para crescer por meio da educação.</p></div>
+      <div class="par-head"><small><?= $ehAfiliado ? 'Uma rede construída por pessoas' : 'Histórias de quem já começou' ?></small><h2><?= $ehAfiliado ? 'Conheça quem já cresce com a nossa rede' : 'Gestores que transformaram suas operações' ?></h2><p><?= $ehAfiliado ? 'Experiências de gestores de unidades parceiras que ajudam a mostrar a estrutura, a confiança e o potencial da rede ' . e($marca) . '.' : 'Experiências de parceiros da ' . e($marca) . ' que encontraram novas possibilidades para crescer por meio da educação.' ?></p></div>
       <div class="unit-stories__grid">
         <?php foreach ($depoimentosUnidade as $dep): ?>
         <article class="unit-story">
@@ -428,7 +427,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <div class="footer__grid">
     <div class="footer__brand"><img src="<?= e($logoNegativa) ?>" alt="<?= e($marca) ?>"><p>Educação, tecnologia e atendimento próximo para criar novas oportunidades de aprendizagem.</p><div class="footer__social"><?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?><?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="ri-whatsapp-line"></i></a><?php if (config('youtube')): ?><a href="<?= e(config('youtube')) ?>" target="_blank" rel="noopener" aria-label="YouTube"><i class="ri-youtube-fill"></i></a><?php endif; ?></div></div>
     <div><h5>Modalidades</h5><ul><li><a href="index.php#cursos">Supletivo EJA</a></li><li><a href="index.php#cursos">Cursos técnicos</a></li><li><a href="index.php#cursos">Cursos livres</a></li></ul></div>
-    <div><h5>Institucional</h5><ul><li><a href="index.php#categorias">Sobre nós</a></li><li><a href="unidades.php">Unidades</a></li><li><a href="afiliados.php">Programa de afiliados</a></li><li><a href="seja-uma-unidade.php">Unidade Flex</a></li><li><a href="index.php#diferenciais">Diferenciais</a></li></ul></div>
+    <div><h5>Institucional</h5><ul><li><a href="index.php#categorias">Sobre nós</a></li><li><a href="unidades.php">Unidades</a></li><li><a href="afiliados.php">Programa de afiliados</a></li><li><a href="seja-uma-unidade.php">Abra sua Unidade Flex</a></li><li><a href="index.php#diferenciais">Diferenciais</a></li></ul></div>
     <div><h5>Atendimento</h5><ul><li><a href="index.php#contato">Central do aluno</a></li><li><a href="index.php#contato">Fale conosco</a></li><li><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener">WhatsApp</a></li></ul></div>
   </div>
   <div class="footer__bottom"><span>© <?= $ano ?> <?= e($marca) ?> · Todos os direitos reservados.</span><span><a href="index.php">Voltar ao site</a></span></div>
