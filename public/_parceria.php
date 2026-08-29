@@ -172,8 +172,17 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .final-cta h2 { color:#fff; font-size:clamp(25px,3vw,35px); margin-bottom:7px; }
     .final-cta p { color:rgba(255,255,255,.76); font-size:13px; }
     .final-cta .btn { position:relative; z-index:1; white-space:nowrap; background:#fff; color:var(--ink); }
-    @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
-    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid{grid-template-columns:1fr}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
+    .money-strip { padding:34px 0; background:var(--ink); color:#fff; }
+    .money-strip__grid { display:grid; grid-template-columns:1.05fr repeat(3,1fr); gap:14px; align-items:stretch; }
+    .money-strip__lead { padding:18px 24px 18px 0; }
+    .money-strip__lead small { color:rgba(255,255,255,.58); text-transform:uppercase; letter-spacing:.09em; font-weight:700; }
+    .money-strip__lead strong { display:block; margin-top:7px; color:#fff; font-size:clamp(28px,3vw,39px); line-height:1.08; }
+    .money-card { padding:20px; border:1px solid rgba(255,255,255,.13); border-radius:16px; background:rgba(255,255,255,.07); }
+    .money-card i { font-size:23px; }
+    .money-card strong { display:block; margin:10px 0 4px; font-size:14px; }
+    .money-card span { color:rgba(255,255,255,.62); font-size:11px; line-height:1.5; }
+    @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.money-strip__grid{grid-template-columns:1fr 1fr}.money-strip__lead{grid-column:1/-1}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
+    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid,.money-strip__grid{grid-template-columns:1fr}.money-strip__lead{grid-column:auto}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
   </style>
 </head>
 <body class="par-page">
@@ -209,6 +218,13 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     </div>
   </section>
 
+  <section class="money-strip"><div class="container money-strip__grid">
+    <div class="money-strip__lead"><small>Ganhos e autonomia</small><strong>Ganhe até 50%</strong></div>
+    <div class="money-card"><i class="ri-percent-line"></i><strong><?= $ehAfiliado ? 'Comissão de até 50%' : 'Repasse de até 50%' ?></strong><span>O percentual varia conforme a modalidade do curso e as condições estabelecidas no contrato.</span></div>
+    <div class="money-card"><i class="ri-flashlight-line"></i><strong>Crédito automático</strong><span><?= $ehAfiliado ? 'Quando o pagamento elegível é confirmado, sua comissão é calculada e creditada automaticamente.' : 'Quando o pagamento elegível é confirmado, o repasse da unidade é calculado e creditado automaticamente.' ?></span></div>
+    <div class="money-card"><i class="ri-bank-card-line"></i><strong>PIX a qualquer hora</strong><span>Com saldo disponível e dados validados, solicite pelo painel a transferência para sua chave PIX, de dia ou de noite.</span></div>
+  </div></section>
+
   <section class="par-section conviction">
     <div class="container conviction__grid">
       <div class="conviction__copy"><span class="flex-label"><i class="ri-lightbulb-flash-line"></i> <?= $ehAfiliado ? 'Uma oportunidade real' : 'Um modelo mais atual' ?></span><h2><?= $ehAfiliado ? 'Não basta indicar. É preciso conseguir acompanhar.' : 'Presença física sem começar maior do que precisa.' ?></h2><p><?= $ehAfiliado ? 'Uma boa parceria transforma sua capacidade de comunicação em um processo organizado, rastreável e transparente — do primeiro contato ao acompanhamento no painel.' : 'A Unidade Flex nasce para unir a confiança do atendimento presencial a uma estrutura de implantação racional, apoiada por tecnologia e processos.' ?></p>
@@ -217,13 +233,13 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
       <div class="conviction__list">
         <?php $argumentos = $ehAfiliado ? [
           ['ri-radar-line','Transforme alcance em conexão','Você não precisa ter milhões de seguidores. Uma rede construída com confiança pode aproximar a pessoa certa da formação que ela procura.'],
-          ['ri-route-line','Cada indicação com um caminho claro','Seu link identifica a origem e ajuda a manter o processo organizado, sem depender de controles improvisados.'],
+          ['ri-route-line','Cada indicação com um caminho claro','Seu link identifica a origem, permite receber matrículas online e ajuda a manter o processo organizado, sem controles improvisados.'],
           ['ri-scales-3-line','Transparência desde o início','Critérios, percentuais e responsabilidades são apresentados antes da formalização da parceria.'],
           ['ri-time-line','Atue no seu ritmo','Organize sua divulgação de acordo com sua rotina e com os canais nos quais você já tem presença.'],
         ] : [
           ['ri-store-3-line','Uma referência local','Crie um ponto físico onde o aluno encontra orientação, acolhimento e confiança para iniciar sua jornada.'],
           ['ri-expand-left-right-line','Estrutura que pode evoluir','Comece com os requisitos definidos para a operação e amplie de forma planejada conforme a realidade local.'],
-          ['ri-computer-line','Tecnologia trabalhando com você','Use o AVASET para organizar matrículas, alunos e rotinas sem depender de controles dispersos.'],
+          ['ri-computer-line','Seu link trabalha com você','Divulgue seu link exclusivo de campanha e receba matrículas online já vinculadas à sua Unidade Flex.'],
           ['ri-map-pin-user-line','Impacto perto de casa','Ajude a ampliar o acesso à formação e desenvolva uma atuação educacional conectada à sua comunidade.'],
         ]; foreach ($argumentos as [$icone,$tit,$txt]): ?><article class="conviction__item"><i class="<?= $icone ?>"></i><div><h3><?= e($tit) ?></h3><p><?= e($txt) ?></p></div></article><?php endforeach; ?>
       </div>
@@ -251,8 +267,8 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <section class="par-section par-section--soft"><div class="container"><div class="par-head"><small>Seu ambiente de trabalho</small><h2>Recursos para uma parceria transparente</h2><p>Tenha acesso às informações essenciais para acompanhar sua atuação com clareza e autonomia.</p></div><div class="aff-tools">
     <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-links-line"></i></div><div><h3>Link exclusivo de indicação</h3><p>Uma identificação própria para divulgar os cursos e registrar corretamente a origem das oportunidades.</p></div></article>
     <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-group-line"></i></div><div><h3>Acompanhamento de alunos</h3><p>Consulte no painel os alunos relacionados à sua atuação e o andamento das matrículas.</p></div></article>
-    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-pie-chart-line"></i></div><div><h3>Visão das comissões</h3><p>Acompanhe os valores apurados conforme as categorias e condições definidas na parceria.</p></div></article>
-    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-secure-payment-line"></i></div><div><h3>Conta e solicitações de saque</h3><p>Visualize movimentações e solicite saques pelos recursos disponíveis no ambiente do afiliado.</p></div></article>
+    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-pie-chart-line"></i></div><div><h3>Comissões de até 50%</h3><p>Acompanhe os valores apurados de acordo com o percentual de cada modalidade previsto na parceria.</p></div></article>
+    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-secure-payment-line"></i></div><div><h3>Saque instantâneo via PIX</h3><p>Consulte suas movimentações e transfira o saldo disponível pelo painel a qualquer hora do dia ou da noite.</p></div></article>
   </div></div></section>
 
   <section class="par-section aff-highlight"><div class="container aff-highlight__grid"><div><span class="flex-label" style="color:#fff"><i class="ri-fingerprint-line"></i> Do seu jeito</span><h2>Indique com autenticidade e responsabilidade</h2><p>Você escolhe como apresentar as oportunidades à sua rede, respeitando as informações oficiais dos cursos e as regras da parceria. A confiança de quem recebe sua indicação vem sempre em primeiro lugar.</p></div><div class="aff-values"><div class="aff-value"><i class="ri-smartphone-line"></i><strong>Atuação flexível</strong><span>Compartilhe pelos canais que fazem sentido para você.</span></div><div class="aff-value"><i class="ri-shield-check-line"></i><strong>Informação segura</strong><span>Divulgue condições e cursos com clareza.</span></div><div class="aff-value"><i class="ri-eye-line"></i><strong>Transparência</strong><span>Acompanhe sua atuação no painel.</span></div><div class="aff-value"><i class="ri-customer-service-2-line"></i><strong>Apoio</strong><span>Conte com os canais previstos para parceiros.</span></div></div></div></section>
@@ -265,12 +281,12 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
       <div class="par-grid">
         <?php $beneficios = $ehAfiliado ? [
           ['ri-user-add-line','Cadastro de alunos','Matricule e acompanhe os alunos indicados no seu próprio painel.'],
-          ['ri-percent-line','Comissões por categoria','As condições são definidas no contrato da parceria.'],
-          ['ri-bank-card-line','Conta virtual','Acompanhe os créditos e solicite saques com segurança.'],
+          ['ri-percent-line','Até 50% de comissão','O percentual aplicável varia conforme a modalidade e fica definido no contrato.'],
+          ['ri-bank-card-line','Seu dinheiro, no seu tempo','Receba créditos automáticos e solicite a transferência via PIX quando quiser.'],
         ] : [
           ['ri-book-open-line','Portfólio educacional','Apresente as modalidades e formações disponibilizadas pela instituição.'],
-          ['ri-dashboard-3-line','Gestão com AVASET','Acompanhe matrículas, alunos e rotinas da unidade em um só ambiente.'],
-          ['ri-customer-service-2-line','Implantação acompanhada','Receba orientação para organizar o início e conduzir a operação.'],
+          ['ri-links-line','Link exclusivo de campanha','Divulgue seus cursos e receba matrículas online diretamente pelo link da sua unidade.'],
+          ['ri-dashboard-3-line','Gestão e repasse no AVASET','Acompanhe matrículas, créditos automáticos e solicite transferências pelo painel.'],
         ]; foreach ($beneficios as [$icone,$tit,$txt]): ?>
           <article class="par-card"><div class="ic"><i class="<?= $icone ?>"></i></div><h3><?= e($tit) ?></h3><p><?= e($txt) ?></p></article>
         <?php endforeach; ?>
@@ -295,8 +311,9 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <section class="par-section"><div class="container"><div class="par-head"><small>Dúvidas frequentes</small><h2>Entenda o programa de afiliados</h2></div><div class="flex-faq">
     <details><summary>Preciso pagar para enviar minha candidatura?</summary><p>O envio da candidatura não cria cobrança nem garante aprovação. As condições da parceria são apresentadas pela equipe antes da formalização.</p></details>
     <details><summary>Como minhas indicações são identificadas?</summary><p>Depois da aprovação, você recebe um acesso e um link próprio. As matrículas realizadas a partir dessa identificação ficam relacionadas à sua conta conforme as regras do programa.</p></details>
-    <details><summary>Como funcionam as comissões?</summary><p>Os percentuais e critérios podem variar conforme a categoria do curso e são definidos nas condições e no contrato da parceria. Não há promessa de renda ou resultado garantido.</p></details>
-    <details><summary>Onde acompanho alunos e valores?</summary><p>No painel do afiliado, onde ficam disponíveis os recursos de acompanhamento vinculados à sua conta.</p></details>
+    <details><summary>Posso ganhar até 50% de comissão?</summary><p>Sim. A comissão pode chegar a 50%, conforme a modalidade do curso. O percentual exato de cada categoria é apresentado e formalizado no contrato da parceria.</p></details>
+    <details><summary>Quando a comissão entra na minha conta?</summary><p>Quando um pagamento elegível da matrícula é confirmado, o sistema calcula o percentual e credita a comissão automaticamente na sua conta virtual.</p></details>
+    <details><summary>Posso transferir o dinheiro a qualquer hora?</summary><p>Sim. Com saldo disponível, chave PIX cadastrada e validações de segurança concluídas, você pode solicitar a transferência pelo painel a qualquer hora do dia ou da noite.</p></details>
     <details><summary>Posso divulgar em redes sociais?</summary><p>Sim, desde que a divulgação respeite as informações oficiais, a identidade da instituição e as regras apresentadas durante a ativação.</p></details>
   </div></div></section>
   <?php endif; ?>
@@ -320,6 +337,9 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
       <details><summary>Preciso ter uma grande estrutura pronta?</summary><p>Não necessariamente. A estrutura é avaliada conforme a região, o atendimento previsto e os requisitos aplicáveis. A equipe orientará o que é necessário antes da abertura.</p></details>
       <details><summary>Posso abrir uma Unidade Flex em qualquer cidade?</summary><p>A disponibilidade depende da análise territorial e estratégica da instituição. Informe sua cidade no formulário para que a equipe verifique a possibilidade.</p></details>
       <details><summary>Que suporte receberei?</summary><p>O parceiro recebe orientação de implantação, acesso aos processos e ao sistema de gestão, além dos canais de suporte definidos na formalização da parceria.</p></details>
+      <details><summary>Como recebo matrículas pela internet?</summary><p>A Unidade Flex recebe um link exclusivo de campanha. O gestor pode divulgá-lo em redes sociais, anúncios, WhatsApp e outros canais; as matrículas online feitas por esse caminho ficam vinculadas à unidade.</p></details>
+      <details><summary>Como funcionam os repasses?</summary><p>O repasse pode chegar a 50%, conforme a modalidade e o contrato. Após a confirmação de um pagamento elegível, o sistema calcula e credita automaticamente o valor na conta virtual da unidade.</p></details>
+      <details><summary>Quando posso transferir o saldo?</summary><p>Com saldo disponível e as validações concluídas, o gestor pode solicitar pelo painel uma transferência instantânea via PIX a qualquer hora do dia ou da noite.</p></details>
       <details><summary>O envio da candidatura garante a aprovação?</summary><p>Não. A candidatura inicia o processo de análise. A abertura depende da aprovação, do alinhamento das condições e da formalização contratual.</p></details>
     </div></div>
   </section>
