@@ -19,13 +19,17 @@ $mensagemWhatsapp = $ehAfiliado
 $numeroCentral = preg_replace('/\D/', '', config('whatsapp', '5500000000000'));
 $whatsapp = 'https://wa.me/' . $numeroCentral . '?text=' . rawurlencode($mensagemWhatsapp);
 
-// Prova social da rede. Hoje a coleção contém relatos de gestores de unidades;
-// na página de afiliados eles aparecem identificados como parceiros da rede.
-// A janela limitada evita trazer tudo; o embaralhamento renova três por visita.
+// Prova social própria de cada parceria. A janela limitada evita trazer a
+// coleção inteira; o embaralhamento renova os três relatos a cada visita.
 $depoimentosUnidade = [];
-$linhas = buscarColecao('unidade_depoimentos', [
-    'fields' => 'nome,empresa,caso_de_sucesso,parceria,data',
-    'filter' => ['parceria' => ['_eq' => 'unidade']],
+$tipoDepoimento = $ehAfiliado ? 'afiliado' : 'unidade';
+$colecaoDepoimentos = $ehAfiliado ? 'afiliado_depoimentos' : 'unidade_depoimentos';
+$camposDepoimentos = $ehAfiliado
+  ? 'nome,caso_de_sucesso,parceria,data'
+  : 'nome,empresa,caso_de_sucesso,parceria,data';
+$linhas = buscarColecao($colecaoDepoimentos, [
+    'fields' => $camposDepoimentos,
+    'filter' => ['parceria' => ['_eq' => $tipoDepoimento]],
     'sort'   => '-data',
     'limit'  => 120,
 ]) ?? [];
@@ -212,8 +216,18 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .unit-story__avatar { flex:0 0 42px; width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:var(--grad-brand); color:#fff; font-weight:700; }
     .unit-story__person strong { display:block; font-size:13px; }
     .unit-story__person span { display:block; margin-top:2px; color:var(--muted); font-size:10px; line-height:1.35; }
+    .earning-path { background:#fff; }
+    .earning-path__track { position:relative; display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+    .earning-path__track:before { content:''; position:absolute; left:9%; right:9%; top:28px; height:2px; background:var(--line); }
+    .earning-step { position:relative; z-index:1; text-align:center; }
+    .earning-step__icon { width:58px; height:58px; margin:0 auto 14px; display:grid; place-items:center; border:5px solid #fff; border-radius:50%; background:var(--grad-brand); color:#fff; box-shadow:var(--shadow-sm); font-size:21px; }
+    .earning-step strong { display:block; font-size:13px; }
+    .earning-step span { display:block; margin-top:5px; color:var(--muted); font-size:10px; line-height:1.5; }
+    .earning-path__promise { display:flex; justify-content:center; gap:26px; flex-wrap:wrap; margin-top:38px; padding:20px; border-radius:16px; background:var(--bg-soft); }
+    .earning-path__promise span { display:flex; align-items:center; gap:7px; color:var(--ink); font-size:12px; font-weight:600; }
+    .earning-path__promise i { color:var(--brand-600,#2563eb); font-size:18px; }
     @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.money-strip__grid{grid-template-columns:1fr 1fr}.money-strip__lead{grid-column:1/-1}.unit-stories__grid{grid-template-columns:1fr}.unit-story{min-height:0}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
-    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid,.money-strip__grid{grid-template-columns:1fr}.money-strip__lead{grid-column:auto}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
+    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid,.money-strip__grid,.earning-path__track{grid-template-columns:1fr}.earning-path__track:before{display:none}.earning-step{display:grid;grid-template-columns:58px 1fr;text-align:left;column-gap:14px}.earning-step__icon{grid-row:1/3;margin:0}.money-strip__lead{grid-column:auto}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
   </style>
 </head>
 <body class="par-page">
@@ -341,20 +355,33 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <?php if ($depoimentosUnidade): ?>
   <section class="par-section unit-stories">
     <div class="container">
-      <div class="par-head"><small><?= $ehAfiliado ? 'Uma rede construída por pessoas' : 'Histórias de quem já começou' ?></small><h2><?= $ehAfiliado ? 'Conheça quem já cresce com a nossa rede' : 'Gestores que transformaram suas operações' ?></h2><p><?= $ehAfiliado ? 'Experiências de gestores de unidades parceiras que ajudam a mostrar a estrutura, a confiança e o potencial da rede ' . e($marca) . '.' : 'Experiências de parceiros da ' . e($marca) . ' que encontraram novas possibilidades para crescer por meio da educação.' ?></p></div>
+      <div class="par-head"><small><?= $ehAfiliado ? 'Resultados de afiliados' : 'Histórias de quem já começou' ?></small><h2><?= $ehAfiliado ? 'Pessoas comuns, indicações que geram resultados' : 'Gestores que transformaram suas operações' ?></h2><p><?= $ehAfiliado ? 'Relatos de afiliados da ' . e($marca) . ' que usam seus próprios canais para indicar formações, acompanhar matrículas e receber comissões.' : 'Experiências de parceiros da ' . e($marca) . ' que encontraram novas possibilidades para crescer por meio da educação.' ?></p></div>
       <div class="unit-stories__grid">
         <?php foreach ($depoimentosUnidade as $dep): ?>
         <article class="unit-story">
           <i class="ri-double-quotes-r unit-story__quote"></i>
           <div class="unit-story__stars" aria-label="Depoimento de parceiro"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
           <blockquote>“<?= e($dep['relato']) ?>”</blockquote>
-          <div class="unit-story__person"><div class="unit-story__avatar"><?= e(mb_strtoupper(mb_substr($dep['nome'], 0, 1))) ?></div><div><strong><?= e($dep['nome']) ?></strong><?php if ($dep['empresa'] !== ''): ?><span><?= e($dep['empresa']) ?></span><?php endif; ?></div></div>
+          <div class="unit-story__person"><div class="unit-story__avatar"><?= e(mb_strtoupper(mb_substr($dep['nome'], 0, 1))) ?></div><div><strong><?= e($dep['nome']) ?></strong><span><?= $ehAfiliado ? 'Afiliado parceiro ' . e($marca) : e($dep['empresa']) ?></span></div></div>
         </article>
         <?php endforeach; ?>
       </div>
     </div>
   </section>
   <?php endif; ?>
+
+  <section class="par-section earning-path">
+    <div class="container"><div class="par-head"><small><?= $ehAfiliado ? 'Da indicação ao recebimento' : 'Da campanha ao repasse' ?></small><h2><?= $ehAfiliado ? 'Veja como sua comissão acontece' : 'Seu link pode trabalhar 24 horas por você' ?></h2><p><?= $ehAfiliado ? 'Um fluxo simples, rastreável e acompanhado pelo seu painel.' : 'Divulgue os cursos da Unidade Flex e receba matrículas online vinculadas à sua operação.' ?></p></div>
+      <div class="earning-path__track">
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-links-line"></i></div><strong>Link exclusivo</strong><span><?= $ehAfiliado ? 'Você recebe sua identificação de afiliado.' : 'A unidade recebe links de campanha por curso.' ?></span></div>
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-share-forward-line"></i></div><strong>Divulgação</strong><span>Compartilhe em redes sociais, WhatsApp, anúncios ou contatos.</span></div>
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-user-add-line"></i></div><strong>Matrícula online</strong><span><?= $ehAfiliado ? 'O aluno entra pelo seu link e fica identificado.' : 'A matrícula chega vinculada à sua Unidade Flex.' ?></span></div>
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-flashlight-line"></i></div><strong>Crédito automático</strong><span><?= $ehAfiliado ? 'Pagamento elegível confirmado: 15% creditados.' : 'Pagamento elegível confirmado: repasse creditado.' ?></span></div>
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-bank-card-line"></i></div><strong>PIX quando quiser</strong><span>Com saldo e dados validados, solicite a transferência pelo painel.</span></div>
+      </div>
+      <div class="earning-path__promise"><span><i class="ri-eye-line"></i> Acompanhamento pelo painel</span><span><i class="ri-time-line"></i> Solicitação disponível dia e noite</span><span><i class="ri-shield-check-line"></i> Confirmação com segurança</span></div>
+    </div>
+  </section>
 
   <?php if ($ehAfiliado): ?>
   <section class="par-section"><div class="container"><div class="par-head"><small>Dúvidas frequentes</small><h2>Entenda o programa de afiliados</h2></div><div class="flex-faq">
