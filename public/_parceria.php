@@ -117,6 +117,15 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .par-form-section:first-child { margin-top:0; padding-top:0; border-top:0; }
     .par-form-section i { font-size:18px; }
     .par-field small { display:block; margin-top:5px; color:var(--muted); font-size:10px; line-height:1.4; }
+    .unit-preview { grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .unit-preview__box { display:flex; align-items:center; gap:13px; padding:15px; border:1px dashed color-mix(in srgb,var(--brand-500,#2563eb) 50%,var(--line)); border-radius:12px; background:color-mix(in srgb,var(--brand-500,#2563eb) 5%,#fff); }
+    .unit-preview__box i { color:var(--brand-600,#2563eb); font-size:23px; }
+    .unit-preview__box small { display:block; color:var(--muted); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+    .unit-preview__box strong { display:block; margin-top:2px; color:var(--ink); font-size:13px; word-break:break-word; }
+    .unit-preview__status { grid-column:1/-1; display:none; padding:11px 13px; border-radius:10px; font-size:11px; font-weight:600; }
+    .unit-preview__status.checking { display:block; background:#eff6ff; color:#1d4ed8; }
+    .unit-preview__status.available { display:block; background:#ecfdf5; color:#047857; }
+    .unit-preview__status.duplicate { display:block; background:#fef2f2; color:#b91c1c; }
     .par-field input:focus,.par-field select:focus,.par-field textarea:focus { border-color:var(--brand-500,#2563eb); box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-500,#2563eb) 14%,transparent); }
     .par-consent { display:flex; align-items:flex-start; gap:9px; font-size:12px; color:var(--muted); margin:18px 0; }
     .par-consent input { margin-top:3px; }
@@ -231,7 +240,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .earning-path__promise span { display:flex; align-items:center; gap:7px; color:var(--ink); font-size:12px; font-weight:600; }
     .earning-path__promise i { color:var(--brand-600,#2563eb); font-size:18px; }
     @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.money-strip__grid{grid-template-columns:1fr 1fr}.money-strip__lead{grid-column:1/-1}.unit-stories__grid{grid-template-columns:1fr}.unit-story{min-height:0}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
-    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid,.money-strip__grid,.earning-path__track{grid-template-columns:1fr}.earning-path__track:before{display:none}.earning-step{display:grid;grid-template-columns:58px 1fr;text-align:left;column-gap:14px}.earning-step__icon{grid-row:1/3;margin:0}.money-strip__lead{grid-column:auto}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
+    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid,.money-strip__grid,.earning-path__track,.unit-preview{grid-template-columns:1fr}.earning-path__track:before{display:none}.earning-step{display:grid;grid-template-columns:58px 1fr;text-align:left;column-gap:14px}.earning-step__icon{grid-row:1/3;margin:0}.money-strip__lead{grid-column:auto}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
   </style>
 </head>
 <body class="par-page">
@@ -446,14 +455,14 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
 
           <?php if (!$ehAfiliado): ?>
           <div class="par-form-section"><i class="ri-store-2-line"></i> Dados da Unidade Flex</div>
-          <div class="par-field"><label for="empresa">Nome da unidade ou empresa *</label><input id="empresa" name="empresa" required maxlength="160" autocomplete="organization"></div>
-          <div class="par-field"><label for="cnpj">CNPJ <span style="font-weight:400">(opcional)</span></label><input id="cnpj" name="cnpj" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"></div>
+          <div class="par-field full"><label for="cnpj">CNPJ <span style="font-weight:400">(opcional)</span></label><input id="cnpj" name="cnpj" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"></div>
           <?php endif; ?>
 
           <div class="par-form-section"><i class="ri-map-pin-line"></i> <?= $ehAfiliado ? 'Localização' : 'Endereço da futura unidade' ?></div>
-          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="cep">CEP *</label><input id="cep" name="cep" required inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000"></div><div class="par-field"><label for="endereco">Endereço, número e complemento *</label><input id="endereco" name="endereco" required maxlength="200" autocomplete="street-address"></div><div class="par-field"><label for="bairro">Bairro *</label><input id="bairro" name="bairro" required maxlength="100"></div><?php endif; ?>
+          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="cep">CEP *</label><input id="cep" name="cep" required inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000"></div><div class="par-field"><label for="endereco">Endereço, número e complemento *</label><input id="endereco" name="endereco" required maxlength="200" autocomplete="street-address"></div><div class="par-field full"><label for="bairro">Bairro <span style="font-weight:400">(opcional — distingue unidades na mesma cidade)</span></label><input id="bairro" name="bairro" maxlength="100" placeholder="Ex.: Jóquei"></div><?php endif; ?>
           <div class="par-field"><label for="cidade">Cidade *</label><input id="cidade" name="cidade" required maxlength="100" autocomplete="address-level2"></div>
           <div class="par-field"><label for="estado">Estado *</label><select id="estado" name="estado" required autocomplete="address-level1"><option value="">Selecione...</option><?php foreach (['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'] as $uf): ?><option><?= $uf ?></option><?php endforeach; ?></select></div>
+          <?php if (!$ehAfiliado): ?><div class="unit-preview"><div class="unit-preview__box"><i class="ri-building-line"></i><div><small>Nome da unidade</small><strong id="unidadeNomePreview">Preencha estado e cidade</strong></div></div><div class="unit-preview__box"><i class="ri-at-line"></i><div><small>Identificação da unidade</small><strong id="unidadeEmailPreview">Preencha estado e cidade</strong></div></div><div id="unidadeStatus" class="unit-preview__status" role="status"></div></div><input type="hidden" id="empresa" name="empresa"><input type="hidden" id="unidade_identificacao" name="unidade_identificacao"><?php endif; ?>
 
           <div class="par-form-section"><i class="ri-bank-card-line"></i> Dados para recebimento</div>
           <div class="par-field"><label for="pix_tipo">Tipo de chave PIX *</label><select id="pix_tipo" name="pix_tipo" required><option value="">Selecione...</option><option value="CPF/CNPJ">CPF/CNPJ</option><option value="E-mail">E-mail</option><option value="Telefone">Telefone</option><option value="Chave aleatória">Chave aleatória</option></select></div>
@@ -493,10 +502,53 @@ const mascaras = {
 };
 [['cpf','cpf'],['cnpj','cnpj'],['cep','cep'],['telefone','telefone']].forEach(([id,tipo]) => { const el=document.getElementById(id); if(el) el.addEventListener('input',()=>el.value=mascaras[tipo](el.value)); });
 
+<?php if (!$ehAfiliado): ?>
+let unidadeDuplicada = false, unidadeVerificacao = null;
+const semAcento = valor => valor.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const slugUnidade = valor => semAcento(valor.trim().toLowerCase()).replace(/[^a-z0-9]+/g,'.').replace(/^\.+|\.+$/g,'');
+async function verificarUnidade(imediato = false) {
+  const estado = document.getElementById('estado').value.trim().toUpperCase();
+  const cidade = document.getElementById('cidade').value.trim();
+  const bairro = document.getElementById('bairro').value.trim();
+  const nomeEl = document.getElementById('unidadeNomePreview');
+  const emailEl = document.getElementById('unidadeEmailPreview');
+  const statusEl = document.getElementById('unidadeStatus');
+  const nome = [estado, semAcento(cidade), semAcento(bairro)].filter(Boolean).join(' - ');
+  const local = [slugUnidade(bairro), slugUnidade(cidade), slugUnidade(estado)].filter(Boolean).join('.');
+  nomeEl.textContent = nome || 'Preencha estado e cidade';
+  emailEl.textContent = local || 'Preencha estado e cidade';
+  document.getElementById('empresa').value = nome;
+  document.getElementById('unidade_identificacao').value = local;
+  unidadeDuplicada = false;
+  if (!estado || !cidade) { statusEl.className='unit-preview__status'; statusEl.textContent=''; return false; }
+  statusEl.className='unit-preview__status checking'; statusEl.textContent='Verificando disponibilidade da unidade...';
+  try {
+    const q = new URLSearchParams({estado,cidade,bairro});
+    const r = await fetch('api/verificar-unidade.php?' + q.toString(), {cache:'no-store'});
+    const j = await r.json();
+    if (!r.ok || !j.ok) throw new Error(j.mensagem || 'Não foi possível verificar.');
+    nomeEl.textContent = j.nome; emailEl.textContent = j.email;
+    document.getElementById('empresa').value = j.nome;
+    document.getElementById('unidade_identificacao').value = j.email;
+    unidadeDuplicada = !!j.existe;
+    statusEl.className = 'unit-preview__status ' + (j.existe ? 'duplicate' : 'available');
+    statusEl.textContent = j.existe ? j.mensagem : 'Identificação disponível para candidatura.';
+    return !j.existe;
+  } catch (erro) {
+    statusEl.className='unit-preview__status duplicate';
+    statusEl.textContent='Não foi possível verificar a disponibilidade agora. Tente novamente.';
+    unidadeDuplicada = true;
+    return false;
+  }
+}
+['estado','cidade','bairro'].forEach(id => { const el=document.getElementById(id); const evento=el.tagName==='SELECT'?'change':'input'; el.addEventListener(evento,()=>{ clearTimeout(unidadeVerificacao); unidadeVerificacao=setTimeout(verificarUnidade,500); }); });
+<?php endif; ?>
+
 document.getElementById('parForm').addEventListener('submit', async function (ev) {
   ev.preventDefault();
   const form = ev.currentTarget, btn = document.getElementById('parSubmit'), status = document.getElementById('parStatus');
   if (form.empresa_site.value) return;
+  <?php if (!$ehAfiliado): ?>if (!await verificarUnidade(true)) { document.getElementById('unidadeStatus').scrollIntoView({behavior:'smooth',block:'center'}); return; }<?php endif; ?>
   const original = btn.innerHTML;
   btn.disabled = true; btn.innerHTML = 'Enviando...'; status.className = 'par-status';
   const dados = new FormData(form);
@@ -505,7 +557,8 @@ document.getElementById('parForm').addEventListener('submit', async function (ev
     'Tipo de candidatura: <?= e($titulo) ?>',
     'CPF: ' + valor('cpf'),
     'Cidade/UF: ' + valor('cidade') + '/' + valor('estado'),
-    <?php if ($ehAfiliado): ?>'Canal de divulgação: ' + valor('canal_divulgacao'),<?php else: ?>'Nome da unidade/empresa: ' + valor('empresa'),
+    <?php if ($ehAfiliado): ?>'Canal de divulgação: ' + valor('canal_divulgacao'),<?php else: ?>'Nome da unidade: ' + valor('empresa'),
+    'Identificação da unidade: ' + valor('unidade_identificacao'),
     'Data de nascimento: ' + valor('data_nascimento'),
     'CNPJ: ' + valor('cnpj'),
     'Endereço: ' + valor('endereco') + ' - ' + valor('bairro') + ' - CEP ' + valor('cep'),
