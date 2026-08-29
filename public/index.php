@@ -79,7 +79,6 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <a href="#categorias">Modalidades</a>
         <a href="#cursos">Cursos</a>
         <?php if (!visitaDoPolo()): ?><a href="unidades.php">Unidades</a><?php endif; ?>
-        <a href="afiliados.php">Seja parceiro</a>
         <a href="#diferenciais">Diferenciais</a>
         <a href="#contato">Contato</a>
       </nav>
