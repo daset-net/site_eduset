@@ -79,6 +79,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <a href="#categorias">Modalidades</a>
         <a href="#cursos">Cursos</a>
         <?php if (!visitaDoPolo()): ?><a href="unidades.php">Unidades</a><?php endif; ?>
+        <a href="afiliados.php">Seja parceiro</a>
         <a href="#diferenciais">Diferenciais</a>
         <a href="#contato">Contato</a>
       </nav>
@@ -430,6 +431,8 @@ function selosModalidade(array $tags, int $limite = 3): string {
           <ul>
             <li><a href="#categorias">Sobre nós</a></li>
             <?php if (!visitaDoPolo()): ?><li><a href="unidades.php">Unidades</a></li><?php endif; ?>
+            <li><a href="afiliados.php">Programa de afiliados</a></li>
+            <li><a href="seja-uma-unidade.php">Abra sua unidade</a></li>
             <li><a href="#diferenciais">Diferenciais</a></li>
             <li><a href="#contato">Contato</a></li>
           </ul>
