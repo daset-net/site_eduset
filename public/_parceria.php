@@ -19,6 +19,28 @@ $mensagemWhatsapp = $ehAfiliado
 $numeroCentral = preg_replace('/\D/', '', config('whatsapp', '5500000000000'));
 $whatsapp = 'https://wa.me/' . $numeroCentral . '?text=' . rawurlencode($mensagemWhatsapp);
 
+// Prova social exclusiva da página de Unidade Flex. A janela limitada evita
+// trazer a coleção inteira; o embaralhamento renova os três relatos por visita.
+$depoimentosUnidade = [];
+if (!$ehAfiliado) {
+  $linhas = buscarColecao('unidade_depoimentos', [
+    'fields' => 'nome,empresa,caso_de_sucesso,parceria,data',
+    'filter' => ['parceria' => ['_eq' => 'unidade']],
+    'sort'   => '-data',
+    'limit'  => 120,
+  ]) ?? [];
+  foreach ($linhas as $linha) {
+    $nome = trim((string) ($linha['nome'] ?? ''));
+    $empresa = trim((string) ($linha['empresa'] ?? ''));
+    $relato = preg_replace('/\s+/u', ' ', trim((string) ($linha['caso_de_sucesso'] ?? '')));
+    if ($nome === '' || $relato === '') continue;
+    if (mb_strlen($relato) > 560) $relato = rtrim(mb_substr($relato, 0, 557)) . '…';
+    $depoimentosUnidade[] = ['nome' => $nome, 'empresa' => $empresa, 'relato' => $relato];
+  }
+  if (count($depoimentosUnidade) > 1) shuffle($depoimentosUnidade);
+  $depoimentosUnidade = array_slice($depoimentosUnidade, 0, 3);
+}
+
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 ?>
 <!DOCTYPE html>
@@ -181,7 +203,17 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .money-card i { font-size:23px; }
     .money-card strong { display:block; margin:10px 0 4px; font-size:14px; }
     .money-card span { color:rgba(255,255,255,.62); font-size:11px; line-height:1.5; }
-    @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.money-strip__grid{grid-template-columns:1fr 1fr}.money-strip__lead{grid-column:1/-1}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
+    .unit-stories { background:var(--bg-soft); }
+    .unit-stories__grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .unit-story { position:relative; display:flex; flex-direction:column; min-height:285px; padding:28px; border:1px solid var(--line); border-radius:20px; background:#fff; box-shadow:var(--shadow-sm); }
+    .unit-story__quote { position:absolute; right:22px; top:17px; color:color-mix(in srgb,var(--brand-500,#2563eb) 18%,transparent); font-size:48px; }
+    .unit-story__stars { display:flex; gap:2px; color:#f59e0b; font-size:15px; }
+    .unit-story blockquote { flex:1; margin:20px 0 24px; color:var(--ink); font-size:13px; line-height:1.75; }
+    .unit-story__person { display:flex; align-items:center; gap:12px; padding-top:17px; border-top:1px solid var(--line); }
+    .unit-story__avatar { flex:0 0 42px; width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:var(--grad-brand); color:#fff; font-weight:700; }
+    .unit-story__person strong { display:block; font-size:13px; }
+    .unit-story__person span { display:block; margin-top:2px; color:var(--muted); font-size:10px; line-height:1.35; }
+    @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.money-strip__grid{grid-template-columns:1fr 1fr}.money-strip__lead{grid-column:1/-1}.unit-stories__grid{grid-template-columns:1fr}.unit-story{min-height:0}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
     @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid,.money-strip__grid{grid-template-columns:1fr}.money-strip__lead{grid-column:auto}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
   </style>
 </head>
@@ -219,8 +251,8 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   </section>
 
   <section class="money-strip"><div class="container money-strip__grid">
-    <div class="money-strip__lead"><small>Ganhos e autonomia</small><strong>Ganhe até 50%</strong></div>
-    <div class="money-card"><i class="ri-percent-line"></i><strong><?= $ehAfiliado ? 'Comissão de até 50%' : 'Repasse de até 50%' ?></strong><span>O percentual varia conforme a modalidade do curso e as condições estabelecidas no contrato.</span></div>
+    <div class="money-strip__lead"><small>Ganhos e autonomia</small><strong><?= $ehAfiliado ? 'Ganhe 15%' : 'Ganhe até 50%' ?></strong></div>
+    <div class="money-card"><i class="ri-percent-line"></i><strong><?= $ehAfiliado ? '15% de comissão' : 'Repasse de até 50%' ?></strong><span><?= $ehAfiliado ? 'Receba 15% de comissão nas matrículas elegíveis, conforme as condições estabelecidas no contrato.' : 'O percentual varia conforme a modalidade do curso e as condições estabelecidas no contrato.' ?></span></div>
     <div class="money-card"><i class="ri-flashlight-line"></i><strong>Crédito automático</strong><span><?= $ehAfiliado ? 'Quando o pagamento elegível é confirmado, sua comissão é calculada e creditada automaticamente.' : 'Quando o pagamento elegível é confirmado, o repasse da unidade é calculado e creditado automaticamente.' ?></span></div>
     <div class="money-card"><i class="ri-bank-card-line"></i><strong>PIX a qualquer hora</strong><span>Com saldo disponível e dados validados, solicite pelo painel a transferência para sua chave PIX, de dia ou de noite.</span></div>
   </div></section>
@@ -267,7 +299,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <section class="par-section par-section--soft"><div class="container"><div class="par-head"><small>Seu ambiente de trabalho</small><h2>Recursos para uma parceria transparente</h2><p>Tenha acesso às informações essenciais para acompanhar sua atuação com clareza e autonomia.</p></div><div class="aff-tools">
     <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-links-line"></i></div><div><h3>Link exclusivo de indicação</h3><p>Uma identificação própria para divulgar os cursos e registrar corretamente a origem das oportunidades.</p></div></article>
     <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-group-line"></i></div><div><h3>Acompanhamento de alunos</h3><p>Consulte no painel os alunos relacionados à sua atuação e o andamento das matrículas.</p></div></article>
-    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-pie-chart-line"></i></div><div><h3>Comissões de até 50%</h3><p>Acompanhe os valores apurados de acordo com o percentual de cada modalidade previsto na parceria.</p></div></article>
+    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-pie-chart-line"></i></div><div><h3>15% de comissão</h3><p>Acompanhe pelo painel os valores apurados nas matrículas elegíveis vinculadas à sua conta.</p></div></article>
     <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-secure-payment-line"></i></div><div><h3>Saque instantâneo via PIX</h3><p>Consulte suas movimentações e transfira o saldo disponível pelo painel a qualquer hora do dia ou da noite.</p></div></article>
   </div></div></section>
 
@@ -281,7 +313,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
       <div class="par-grid">
         <?php $beneficios = $ehAfiliado ? [
           ['ri-user-add-line','Cadastro de alunos','Matricule e acompanhe os alunos indicados no seu próprio painel.'],
-          ['ri-percent-line','Até 50% de comissão','O percentual aplicável varia conforme a modalidade e fica definido no contrato.'],
+          ['ri-percent-line','15% de comissão','Receba comissão nas matrículas elegíveis identificadas pelo seu link.'],
           ['ri-bank-card-line','Seu dinheiro, no seu tempo','Receba créditos automáticos e solicite a transferência via PIX quando quiser.'],
         ] : [
           ['ri-book-open-line','Portfólio educacional','Apresente as modalidades e formações disponibilizadas pela instituição.'],
@@ -307,11 +339,29 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   </section>
   <?php endif; ?>
 
+  <?php if (!$ehAfiliado && $depoimentosUnidade): ?>
+  <section class="par-section unit-stories">
+    <div class="container">
+      <div class="par-head"><small>Histórias de quem já começou</small><h2>Gestores que transformaram suas operações</h2><p>Experiências de parceiros da <?= e($marca) ?> que encontraram novas possibilidades para crescer por meio da educação.</p></div>
+      <div class="unit-stories__grid">
+        <?php foreach ($depoimentosUnidade as $dep): ?>
+        <article class="unit-story">
+          <i class="ri-double-quotes-r unit-story__quote"></i>
+          <div class="unit-story__stars" aria-label="Depoimento de parceiro"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
+          <blockquote>“<?= e($dep['relato']) ?>”</blockquote>
+          <div class="unit-story__person"><div class="unit-story__avatar"><?= e(mb_strtoupper(mb_substr($dep['nome'], 0, 1))) ?></div><div><strong><?= e($dep['nome']) ?></strong><?php if ($dep['empresa'] !== ''): ?><span><?= e($dep['empresa']) ?></span><?php endif; ?></div></div>
+        </article>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </section>
+  <?php endif; ?>
+
   <?php if ($ehAfiliado): ?>
   <section class="par-section"><div class="container"><div class="par-head"><small>Dúvidas frequentes</small><h2>Entenda o programa de afiliados</h2></div><div class="flex-faq">
     <details><summary>Preciso pagar para enviar minha candidatura?</summary><p>O envio da candidatura não cria cobrança nem garante aprovação. As condições da parceria são apresentadas pela equipe antes da formalização.</p></details>
     <details><summary>Como minhas indicações são identificadas?</summary><p>Depois da aprovação, você recebe um acesso e um link próprio. As matrículas realizadas a partir dessa identificação ficam relacionadas à sua conta conforme as regras do programa.</p></details>
-    <details><summary>Posso ganhar até 50% de comissão?</summary><p>Sim. A comissão pode chegar a 50%, conforme a modalidade do curso. O percentual exato de cada categoria é apresentado e formalizado no contrato da parceria.</p></details>
+    <details><summary>Qual é a comissão do afiliado?</summary><p>O afiliado recebe 15% de comissão nas matrículas elegíveis vinculadas à sua conta, conforme os critérios formalizados no contrato da parceria.</p></details>
     <details><summary>Quando a comissão entra na minha conta?</summary><p>Quando um pagamento elegível da matrícula é confirmado, o sistema calcula o percentual e credita a comissão automaticamente na sua conta virtual.</p></details>
     <details><summary>Posso transferir o dinheiro a qualquer hora?</summary><p>Sim. Com saldo disponível, chave PIX cadastrada e validações de segurança concluídas, você pode solicitar a transferência pelo painel a qualquer hora do dia ou da noite.</p></details>
     <details><summary>Posso divulgar em redes sociais?</summary><p>Sim, desde que a divulgação respeite as informações oficiais, a identidade da instituição e as regras apresentadas durante a ativação.</p></details>
