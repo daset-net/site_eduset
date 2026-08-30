@@ -98,6 +98,8 @@ $email     = trim($dados['email']     ?? '');
 $telefone  = trim($dados['telefone']  ?? '');
 $interesse = trim($dados['interesse'] ?? '');
 $mensagem  = trim($dados['mensagem']  ?? '');
+$tipoCandidatura = trim((string)($dados['tipo_candidatura'] ?? ''));
+$campos = is_array($dados['campos'] ?? null) ? $dados['campos'] : [];
 
 // Validação
 $erros = [];
@@ -105,6 +107,27 @@ if (mb_strlen($nome) < 3)                           $erros[] = 'Informe seu nome
 if (!filter_var($email, FILTER_VALIDATE_EMAIL))     $erros[] = 'Informe um e-mail válido.';
 if (mb_strlen(preg_replace('/\D/', '', $telefone)) < 10) $erros[] = 'Informe um telefone válido.';
 if ($interesse === '')                              $erros[] = 'Selecione uma modalidade.';
+if ($tipoCandidatura === 'unidade') {
+  $obrigatorios = [
+    'cpf' => 'CPF', 'data_nascimento' => 'data de nascimento',
+    'nome_empresa' => 'nome da empresa', 'cnpj' => 'CNPJ',
+    'cep' => 'CEP', 'endereco' => 'endereço', 'bairro' => 'bairro',
+    'cidade' => 'cidade', 'estado' => 'estado',
+    'unidade_nome' => 'nome institucional do polo',
+    'unidade_identificacao' => 'e-mail institucional do polo',
+    'pix_tipo' => 'tipo de chave PIX', 'pix_chave' => 'chave PIX',
+    'banco_codigo' => 'código do banco', 'banco_nome' => 'nome do banco',
+    'espaco' => 'situação do espaço físico',
+    'experiencia_educacional' => 'experiência educacional',
+    'experiencia' => 'experiência e estrutura',
+  ];
+  foreach ($obrigatorios as $campo => $rotulo) {
+    if (trim((string)($campos[$campo] ?? '')) === '') $erros[] = 'Informe ' . $rotulo . '.';
+  }
+  if (strlen(preg_replace('/\D/', '', (string)($campos['cpf'] ?? ''))) !== 11) $erros[] = 'Informe um CPF válido.';
+  if (strlen(preg_replace('/\D/', '', (string)($campos['cnpj'] ?? ''))) !== 14) $erros[] = 'Informe um CNPJ válido.';
+  if (empty($campos['consentimento'])) $erros[] = 'Confirme a autorização para tratamento dos dados.';
+}
 
 if ($erros) {
   http_response_code(422);
