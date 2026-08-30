@@ -455,14 +455,15 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
 
           <?php if (!$ehAfiliado): ?>
           <div class="par-form-section"><i class="ri-store-2-line"></i> Dados da Unidade Flex</div>
-          <div class="par-field full"><label for="cnpj">CNPJ <span style="font-weight:400">(opcional)</span></label><input id="cnpj" name="cnpj" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"></div>
+          <div class="par-field"><label for="nome_empresa">Nome da empresa *</label><input id="nome_empresa" name="nome_empresa" required minlength="3" maxlength="160" autocomplete="organization" placeholder="Razão social ou nome empresarial"></div>
+          <div class="par-field"><label for="cnpj">CNPJ *</label><input id="cnpj" name="cnpj" required inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"></div>
           <?php endif; ?>
 
           <div class="par-form-section"><i class="ri-map-pin-line"></i> <?= $ehAfiliado ? 'Localização' : 'Endereço da futura unidade' ?></div>
-          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="cep">CEP *</label><input id="cep" name="cep" required inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000"></div><div class="par-field"><label for="endereco">Endereço, número e complemento *</label><input id="endereco" name="endereco" required maxlength="200" autocomplete="street-address"></div><div class="par-field full"><label for="bairro">Bairro <span style="font-weight:400">(opcional — distingue unidades na mesma cidade)</span></label><input id="bairro" name="bairro" maxlength="100" placeholder="Ex.: Jóquei"></div><?php endif; ?>
+          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="cep">CEP *</label><input id="cep" name="cep" required inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000"></div><div class="par-field"><label for="endereco">Endereço, número e complemento *</label><input id="endereco" name="endereco" required maxlength="200" autocomplete="street-address"></div><div class="par-field full"><label for="bairro">Bairro *</label><input id="bairro" name="bairro" required minlength="2" maxlength="100" autocomplete="address-level3" placeholder="Ex.: Jóquei"></div><?php endif; ?>
           <div class="par-field"><label for="cidade">Cidade *</label><input id="cidade" name="cidade" required maxlength="100" autocomplete="address-level2"></div>
           <div class="par-field"><label for="estado">Estado *</label><select id="estado" name="estado" required autocomplete="address-level1"><option value="">Selecione...</option><?php foreach (['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'] as $uf): ?><option><?= $uf ?></option><?php endforeach; ?></select></div>
-          <?php if (!$ehAfiliado): ?><div class="unit-preview"><div class="unit-preview__box"><i class="ri-building-line"></i><div><small>Nome da unidade</small><strong id="unidadeNomePreview">Preencha estado e cidade</strong></div></div><div class="unit-preview__box"><i class="ri-at-line"></i><div><small>Identificação da unidade</small><strong id="unidadeEmailPreview">Preencha estado e cidade</strong></div></div><div id="unidadeStatus" class="unit-preview__status" role="status"></div></div><input type="hidden" id="empresa" name="empresa"><input type="hidden" id="unidade_identificacao" name="unidade_identificacao"><?php endif; ?>
+          <?php if (!$ehAfiliado): ?><div class="unit-preview"><div class="unit-preview__box"><i class="ri-building-line"></i><div><small>Nome institucional do polo (automático)</small><strong id="unidadeNomePreview">Preencha bairro, cidade e estado</strong></div></div><div class="unit-preview__box"><i class="ri-at-line"></i><div><small>E-mail institucional do polo (automático)</small><strong id="unidadeEmailPreview">Preencha bairro, cidade e estado</strong></div></div><div id="unidadeStatus" class="unit-preview__status" role="status"></div></div><input type="hidden" id="unidade_nome" name="unidade_nome" required><input type="hidden" id="unidade_identificacao" name="unidade_identificacao" required><?php endif; ?>
 
           <div class="par-form-section"><i class="ri-bank-card-line"></i> Dados para recebimento</div>
           <div class="par-field"><label for="pix_tipo">Tipo de chave PIX *</label><select id="pix_tipo" name="pix_tipo" required><option value="">Selecione...</option><option value="CPF/CNPJ">CPF/CNPJ</option><option value="E-mail">E-mail</option><option value="Telefone">Telefone</option><option value="Chave aleatória">Chave aleatória</option></select></div>
@@ -472,7 +473,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
 
           <div class="par-form-section"><i class="ri-questionnaire-line"></i> Perfil da candidatura</div>
           <?php if ($ehAfiliado): ?><div class="par-field full"><label for="canal_divulgacao">Principal canal de divulgação *</label><select id="canal_divulgacao" name="canal_divulgacao" required><option value="">Selecione...</option><option>Redes sociais</option><option>WhatsApp e contatos</option><option>Site ou blog</option><option>Atuação comercial presencial</option><option>Outro</option></select></div><?php else: ?><div class="par-field"><label for="espaco">Já possui espaço físico? *</label><select id="espaco" name="espaco" required><option value="">Selecione...</option><option>Sim, já está pronto</option><option>Sim, precisa de adequações</option><option>Ainda estou procurando</option></select></div><div class="par-field"><label for="experiencia_educacional">Já atua na área educacional? *</label><select id="experiencia_educacional" name="experiencia_educacional" required><option value="">Selecione...</option><option>Sim</option><option>Não</option></select></div><?php endif; ?>
-          <div class="par-field full"><label for="experiencia"><?= $ehAfiliado ? 'Como pretende divulgar os cursos?' : 'Conte sobre sua experiência e estrutura atual' ?></label><textarea id="experiencia" name="experiencia" maxlength="1200" placeholder="<?= $ehAfiliado ? 'Redes sociais, contatos, atuação comercial...' : 'Experiência comercial ou educacional, espaço disponível, região de atuação...' ?>"></textarea></div>
+          <div class="par-field full"><label for="experiencia"><?= $ehAfiliado ? 'Como pretende divulgar os cursos?' : 'Conte sobre sua experiência e estrutura atual' ?> *</label><textarea id="experiencia" name="experiencia" required minlength="10" maxlength="1200" placeholder="<?= $ehAfiliado ? 'Redes sociais, contatos, atuação comercial...' : 'Experiência comercial ou educacional, espaço disponível, região de atuação...' ?>"></textarea></div>
         </div>
         <label class="par-consent"><input type="checkbox" name="consentimento" required><span>Autorizo o tratamento dos dados informados para análise, contato, validação e eventual cadastro desta parceria. Confirmo que os dados são verdadeiros.</span></label>
         <button class="btn btn-primary par-submit" type="submit" id="parSubmit">Enviar candidatura <i class="ri-send-plane-line"></i></button>
@@ -505,7 +506,9 @@ const mascaras = {
 <?php if (!$ehAfiliado): ?>
 let unidadeDuplicada = false, unidadeVerificacao = null;
 const semAcento = valor => valor.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-const slugUnidade = valor => semAcento(valor.trim().toLowerCase()).replace(/[^a-z0-9]+/g,'.').replace(/^\.+|\.+$/g,'');
+// Mesmo padrão do cadastro real: remove espaços/sinais dentro de bairro,
+// cidade e UF; os pontos existem somente entre essas três partes.
+const slugUnidade = valor => semAcento(valor.trim().toLowerCase()).replace(/[^a-z0-9]/g,'');
 async function verificarUnidade(imediato = false) {
   const estado = document.getElementById('estado').value.trim().toUpperCase();
   const cidade = document.getElementById('cidade').value.trim();
@@ -515,12 +518,12 @@ async function verificarUnidade(imediato = false) {
   const statusEl = document.getElementById('unidadeStatus');
   const nome = [estado, semAcento(cidade), semAcento(bairro)].filter(Boolean).join(' - ');
   const local = [slugUnidade(bairro), slugUnidade(cidade), slugUnidade(estado)].filter(Boolean).join('.');
-  nomeEl.textContent = nome || 'Preencha estado e cidade';
-  emailEl.textContent = local || 'Preencha estado e cidade';
-  document.getElementById('empresa').value = nome;
+  nomeEl.textContent = nome || 'Preencha bairro, cidade e estado';
+  emailEl.textContent = local || 'Preencha bairro, cidade e estado';
+  document.getElementById('unidade_nome').value = nome;
   document.getElementById('unidade_identificacao').value = local;
   unidadeDuplicada = false;
-  if (!estado || !cidade) { statusEl.className='unit-preview__status'; statusEl.textContent=''; return false; }
+  if (!estado || !cidade || !bairro) { statusEl.className='unit-preview__status'; statusEl.textContent='Informe bairro, cidade e estado para consultar a disponibilidade.'; return false; }
   statusEl.className='unit-preview__status checking'; statusEl.textContent='Verificando disponibilidade da unidade...';
   try {
     const q = new URLSearchParams({estado,cidade,bairro});
@@ -528,7 +531,7 @@ async function verificarUnidade(imediato = false) {
     const j = await r.json();
     if (!r.ok || !j.ok) throw new Error(j.mensagem || 'Não foi possível verificar.');
     nomeEl.textContent = j.nome; emailEl.textContent = j.email;
-    document.getElementById('empresa').value = j.nome;
+    document.getElementById('unidade_nome').value = j.nome;
     document.getElementById('unidade_identificacao').value = j.email;
     unidadeDuplicada = !!j.existe;
     statusEl.className = 'unit-preview__status ' + (j.existe ? 'duplicate' : 'available');
@@ -557,7 +560,8 @@ document.getElementById('parForm').addEventListener('submit', async function (ev
     'Tipo de candidatura: <?= e($titulo) ?>',
     'CPF: ' + valor('cpf'),
     'Cidade/UF: ' + valor('cidade') + '/' + valor('estado'),
-    <?php if ($ehAfiliado): ?>'Canal de divulgação: ' + valor('canal_divulgacao'),<?php else: ?>'Nome da unidade: ' + valor('empresa'),
+    <?php if ($ehAfiliado): ?>'Canal de divulgação: ' + valor('canal_divulgacao'),<?php else: ?>'Nome da empresa: ' + valor('nome_empresa'),
+    'Nome institucional do polo: ' + valor('unidade_nome'),
     'Identificação da unidade: ' + valor('unidade_identificacao'),
     'Data de nascimento: ' + valor('data_nascimento'),
     'CNPJ: ' + valor('cnpj'),
@@ -569,7 +573,7 @@ document.getElementById('parForm').addEventListener('submit', async function (ev
     'Experiência/observações: ' + valor('experiencia')
   ].join('\n');
   try {
-    const r = await fetch('api/contato.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nome:dados.get('nome'), email:dados.get('email'), telefone:dados.get('telefone'), interesse:'<?= e($interesse) ?>', mensagem }) });
+    const r = await fetch('api/contato.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nome:dados.get('nome'), email:dados.get('email'), telefone:dados.get('telefone'), interesse:'<?= e($interesse) ?>', mensagem, tipo_candidatura:'<?= $ehAfiliado ? 'afiliado' : 'unidade' ?>', campos:Object.fromEntries(dados.entries()) }) });
     const j = await r.json();
     if (!r.ok || !j.ok) throw new Error(j.mensagem || 'Não foi possível enviar.');
     status.className = 'par-status ok'; status.textContent = 'Candidatura enviada! Nossa equipe entrará em contato em breve.'; form.reset();
