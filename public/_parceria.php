@@ -127,6 +127,17 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .unit-preview__status.available { display:block; background:#ecfdf5; color:#047857; }
     .unit-preview__status.duplicate { display:block; background:#fef2f2; color:#b91c1c; }
     .par-field input:focus,.par-field select:focus,.par-field textarea:focus { border-color:var(--brand-500,#2563eb); box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-500,#2563eb) 14%,transparent); }
+    .par-select { position:relative; }
+    .par-select__native { position:absolute!important; width:1px!important; height:1px!important; opacity:0; pointer-events:none; }
+    .par-select__toggle { width:100%; min-height:44px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); font:inherit; font-size:14px; text-align:left; cursor:pointer; }
+    .par-select__toggle:focus { outline:none; border-color:var(--brand-500,#2563eb); box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-500,#2563eb) 14%,transparent); }
+    .par-select__toggle i { transition:transform .15s; }
+    .par-select.open .par-select__toggle i { transform:rotate(180deg); }
+    .par-select__menu { display:none; position:absolute; z-index:200; top:calc(100% + 6px); left:0; right:0; max-height:250px; overflow-y:auto; padding:6px; border:1px solid var(--line); border-radius:10px; background:#fff; box-shadow:0 14px 30px rgba(15,23,42,.18); }
+    .par-select.open .par-select__menu { display:grid; }
+    .par-select__option { padding:10px 11px; border:0; border-radius:7px; background:transparent; color:var(--ink); font:inherit; font-size:13px; text-align:left; cursor:pointer; }
+    .par-select__option:hover,.par-select__option:focus { outline:none; background:color-mix(in srgb,var(--brand-500,#2563eb) 10%,#fff); }
+    .par-select__option[aria-selected="true"] { background:var(--brand-600,#2563eb); color:#fff; font-weight:700; }
     .par-consent { display:flex; align-items:flex-start; gap:9px; font-size:12px; color:var(--muted); margin:18px 0; }
     .par-consent input { margin-top:3px; }
     .par-submit { width:100%; justify-content:center; border:0; }
@@ -466,7 +477,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
           <?php if (!$ehAfiliado): ?><div class="unit-preview"><div class="unit-preview__box"><i class="ri-building-line"></i><div><small>Nome institucional do polo (automático)</small><strong id="unidadeNomePreview">Preencha bairro, cidade e estado</strong></div></div><div class="unit-preview__box"><i class="ri-at-line"></i><div><small>E-mail institucional do polo (automático)</small><strong id="unidadeEmailPreview">Preencha bairro, cidade e estado</strong></div></div><div id="unidadeStatus" class="unit-preview__status" role="status"></div></div><input type="hidden" id="unidade_nome" name="unidade_nome" required><input type="hidden" id="unidade_identificacao" name="unidade_identificacao" required><?php endif; ?>
 
           <div class="par-form-section"><i class="ri-bank-card-line"></i> Dados para recebimento</div>
-          <div class="par-field"><label for="pix_tipo">Tipo de chave PIX *</label><select id="pix_tipo" name="pix_tipo" required><option value="">Selecione...</option><option value="CPF/CNPJ">CPF/CNPJ</option><option value="E-mail">E-mail</option><option value="Telefone">Telefone</option><option value="Chave aleatória">Chave aleatória</option></select></div>
+          <div class="par-field"><label for="pix_tipo">Tipo de chave PIX *</label><select id="pix_tipo" name="pix_tipo" required><option value="">Selecione...</option><option value="CPF">CPF</option><option value="CNPJ">CNPJ</option><option value="E-mail">E-mail</option><option value="Telefone">Telefone</option><option value="Chave aleatória">Chave aleatória</option></select></div>
           <div class="par-field"><label for="pix_chave">Chave PIX *</label><input id="pix_chave" name="pix_chave" required maxlength="140"><small>Será usada como destino das transferências após aprovação e validação.</small></div>
           <div class="par-field"><label for="banco_codigo">Código do banco *</label><input id="banco_codigo" name="banco_codigo" required inputmode="numeric" maxlength="10" placeholder="Ex.: 001"></div>
           <div class="par-field"><label for="banco_nome">Nome do banco *</label><input id="banco_nome" name="banco_nome" required maxlength="80"></div>
@@ -502,6 +513,28 @@ const mascaras = {
   telefone(valor) { const d = somenteDigitos(valor).slice(0,11); return d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{4})$/,'$1-$2'); }
 };
 [['cpf','cpf'],['cnpj','cnpj'],['cep','cep'],['telefone','telefone']].forEach(([id,tipo]) => { const el=document.getElementById(id); if(el) el.addEventListener('input',()=>el.value=mascaras[tipo](el.value)); });
+
+// Menus próprios: permanecem abertos até a escolha e evitam o fechamento
+// prematuro dos selects nativos em páginas que atualizam campos dinamicamente.
+function prepararSelects() {
+  const fecharTodos = excecao => document.querySelectorAll('.par-select.open').forEach(box => { if (box !== excecao) { box.classList.remove('open'); box.querySelector('.par-select__toggle').setAttribute('aria-expanded','false'); } });
+  document.querySelectorAll('#parForm select').forEach(select => {
+    const box = document.createElement('div'); box.className = 'par-select';
+    select.parentNode.insertBefore(box, select); box.appendChild(select); select.classList.add('par-select__native');
+    const toggle = document.createElement('button'); toggle.type='button'; toggle.className='par-select__toggle'; toggle.setAttribute('aria-haspopup','listbox'); toggle.setAttribute('aria-expanded','false');
+    const texto = document.createElement('span'); const seta = document.createElement('i'); seta.className='ri-arrow-down-s-line'; toggle.append(texto,seta);
+    const menu = document.createElement('div'); menu.className='par-select__menu'; menu.setAttribute('role','listbox');
+    const montar = () => {
+      texto.textContent = select.options[select.selectedIndex]?.textContent || 'Selecione...'; menu.replaceChildren();
+      [...select.options].forEach(opt => { const item=document.createElement('button'); item.type='button'; item.className='par-select__option'; item.setAttribute('role','option'); item.setAttribute('aria-selected',String(opt.value===select.value)); item.textContent=opt.textContent; item.addEventListener('click',()=>{ select.value=opt.value; select.dispatchEvent(new Event('change',{bubbles:true})); montar(); box.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }); menu.appendChild(item); });
+    };
+    toggle.addEventListener('click',()=>{ const abrir=!box.classList.contains('open'); fecharTodos(box); box.classList.toggle('open',abrir); toggle.setAttribute('aria-expanded',String(abrir)); if(abrir) menu.querySelector('[aria-selected="true"]')?.focus(); });
+    box.append(toggle,menu); montar();
+  });
+  document.addEventListener('click',ev=>{ if(!ev.target.closest('.par-select')) fecharTodos(); });
+  document.addEventListener('keydown',ev=>{ if(ev.key==='Escape') fecharTodos(); });
+}
+prepararSelects();
 
 <?php if (!$ehAfiliado): ?>
 let unidadeDuplicada = false, unidadeVerificacao = null;
