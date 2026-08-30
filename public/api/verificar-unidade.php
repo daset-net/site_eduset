@@ -56,22 +56,26 @@ if ($dominio === '') {
 if ($dominio === '') $dominio = 'avaset.net';
 $email = $local . '@' . strtolower($dominio);
 
-$duplicadas = buscarColecao('tabela_unidades', [
+$duplicadasEmail = buscarColecao('tabela_unidades', [
   'fields' => 'id,unidade_nome,unidade_email',
   'filter' => ['unidade_email' => ['_eq' => $email]],
   'limit'  => 1,
 ]);
-if ($duplicadas === null) {
+$duplicadasNome = buscarColecao('tabela_unidades', [
+  'fields' => 'id,unidade_nome,unidade_email',
+  'filter' => ['unidade_nome' => ['_eq' => $nome]],
+  'limit'  => 1,
+]);
+if ($duplicadasEmail === null || $duplicadasNome === null) {
   http_response_code(503);
   echo json_encode(['ok' => false, 'mensagem' => 'Não foi possível consultar as unidades agora.'], JSON_UNESCAPED_UNICODE);
   exit;
 }
-$existe = !empty($duplicadas);
+$existe = !empty($duplicadasEmail) || !empty($duplicadasNome);
 
 $mensagem = '';
 if ($existe) {
-  $mensagem = 'Já existe a unidade ' . $nome . '.';
-  $mensagem .= ' Este polo já está cadastrado. Informe outro bairro ou confirme os dados com a equipe.';
+  $mensagem = 'Já existe um polo com o nome ' . $nome . '. Para continuar, informe outro bairro onde deseja abrir a unidade.';
 }
 
 echo json_encode([
