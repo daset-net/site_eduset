@@ -19,8 +19,7 @@ function unidadeTexto(string $valor): string {
 
 function unidadeSlugPublico(string $valor): string {
   $valor = strtolower(unidadeTexto($valor));
-  $valor = preg_replace('/[^a-z0-9]+/', '.', $valor);
-  return trim($valor, '.');
+  return preg_replace('/[^a-z0-9]/', '', $valor);
 }
 
 $estado = strtoupper(substr(unidadeTexto((string) ($_GET['estado'] ?? '')), 0, 2));
@@ -29,9 +28,9 @@ $bairroOriginal = trim((string) ($_GET['bairro'] ?? ''));
 $cidade = unidadeTexto($cidadeOriginal);
 $bairro = unidadeTexto($bairroOriginal);
 
-if (!preg_match('/^[A-Z]{2}$/', $estado) || $cidade === '') {
+if (!preg_match('/^[A-Z]{2}$/', $estado) || $cidade === '' || $bairro === '') {
   http_response_code(422);
-  echo json_encode(['ok' => false, 'mensagem' => 'Informe estado e cidade.'], JSON_UNESCAPED_UNICODE);
+  echo json_encode(['ok' => false, 'mensagem' => 'Informe bairro, cidade e estado.'], JSON_UNESCAPED_UNICODE);
   exit;
 }
 
@@ -72,8 +71,7 @@ $existe = !empty($duplicadas);
 $mensagem = '';
 if ($existe) {
   $mensagem = 'Já existe a unidade ' . $nome . '.';
-  if ($bairro === '') $mensagem .= ' Para cadastrar outra na mesma cidade, informe o bairro.';
-  else $mensagem .= ' Informe outro bairro ou confirme os dados com a equipe.';
+  $mensagem .= ' Este polo já está cadastrado. Informe outro bairro ou confirme os dados com a equipe.';
 }
 
 echo json_encode([
