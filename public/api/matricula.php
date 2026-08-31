@@ -105,6 +105,8 @@ $cpf         = so_digitos($dados['cpf'] ?? '');
 $nascimento  = trim((string) ($dados['nascimento'] ?? ''));
 $email       = trim((string) ($dados['email'] ?? ''));
 $celular     = so_digitos($dados['celular'] ?? '');
+$celular_ddi = preg_replace('/[^0-9]/', '', $dados['celular_ddi'] ?? '55');
+if ($celular_ddi === '') $celular_ddi = '55';
 $sexo        = strtoupper(substr(trim((string) ($dados['sexo'] ?? '')), 0, 1));
 $cep         = so_digitos($dados['cep'] ?? '');
 $endereco    = trim((string) ($dados['endereco'] ?? ''));
@@ -121,7 +123,11 @@ $erros = [];
 if (mb_strlen($nome) < 5 || mb_strpos(trim($nome), ' ') === false) $erros[] = 'Informe seu nome completo.';
 if (!cpfValido($cpf))                                    $erros[] = 'CPF inválido.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL))          $erros[] = 'Informe um e-mail válido.';
-if (strlen($celular) < 10 || strlen($celular) > 11)      $erros[] = 'Informe um WhatsApp válido com DDD.';
+if ($celular_ddi === '55') {
+    if (strlen($celular) < 10 || strlen($celular) > 11) $erros[] = 'Informe um WhatsApp válido com DDD.';
+} else {
+    if (strlen($celular) < 6 || strlen($celular) > 15) $erros[] = 'Informe um número de celular válido.';
+}
 if (!in_array($sexo, ['M', 'F'], true))                  $erros[] = 'Selecione o sexo.';
 if (strlen($cep) !== 8)                                  $erros[] = 'Informe um CEP válido.';
 if ($endereco === '' || $numero === '' || $bairro === '' || $cidade === '') $erros[] = 'Complete o endereço.';
@@ -172,6 +178,7 @@ $payload = [
   'sexo'        => $sexo,
   'email'       => $email,
   'celular'     => $celular,
+  'celular_ddi' => $celular_ddi,
   'cep'         => $cep,
   'endereco'    => $endereco,
   'numero'      => $numero,

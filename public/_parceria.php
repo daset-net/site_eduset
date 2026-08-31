@@ -462,7 +462,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
           <div class="par-field"><label for="cpf">CPF *</label><input id="cpf" name="cpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></div>
           <?php if (!$ehAfiliado): ?><div class="par-field"><label for="data_nascimento">Data de nascimento *</label><input id="data_nascimento" name="data_nascimento" type="date" required></div><?php endif; ?>
           <div class="par-field"><label for="email">E-mail para notificações *</label><input id="email" name="email" type="email" required maxlength="160" autocomplete="email"></div>
-          <div class="par-field"><label for="telefone">WhatsApp *</label><input id="telefone" name="telefone" type="tel" required minlength="10" maxlength="15" autocomplete="tel" placeholder="(00) 00000-0000"></div>
+          <div class="par-field"><label for="telefone">WhatsApp *</label><input id="telefone" name="telefone" type="tel" required minlength="6" maxlength="15" autocomplete="tel" placeholder="(00) 00000-0000"></div>
 
           <?php if (!$ehAfiliado): ?>
           <div class="par-form-section"><i class="ri-store-2-line"></i> Dados da Unidade Flex</div>
@@ -504,6 +504,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <div class="footer__bottom"><span>© <?= $ano ?> <?= e($marca) ?> · Todos os direitos reservados.</span><span><a href="index.php">Voltar ao site</a></span></div>
 </div></footer>
 
+<script src="assets/js/intl-phone.js"></script>
 <script>
 const somenteDigitos = valor => valor.replace(/\D/g, '');
 const mascaras = {
@@ -512,7 +513,9 @@ const mascaras = {
   cep(valor) { return somenteDigitos(valor).slice(0,8).replace(/(\d{5})(\d)/,'$1-$2'); },
   telefone(valor) { const d = somenteDigitos(valor).slice(0,11); return d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{4})$/,'$1-$2'); }
 };
-[['cpf','cpf'],['cnpj','cnpj'],['cep','cep'],['telefone','telefone']].forEach(([id,tipo]) => { const el=document.getElementById(id); if(el) el.addEventListener('input',()=>el.value=mascaras[tipo](el.value)); });
+[['cpf','cpf'],['cnpj','cnpj'],['cep','cep']].forEach(([id,tipo]) => { const el=document.getElementById(id); if(el) el.addEventListener('input',()=>el.value=mascaras[tipo](el.value)); });
+// Seletor DDI internacional para telefone
+var intlParceria = IntlPhone.init('#telefone', {});
 
 // Menus próprios: permanecem abertos até a escolha e evitam o fechamento
 // prematuro dos selects nativos em páginas que atualizam campos dinamicamente.
@@ -606,7 +609,7 @@ document.getElementById('parForm').addEventListener('submit', async function (ev
     'Experiência/observações: ' + valor('experiencia')
   ].join('\n');
   try {
-    const r = await fetch('api/contato.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nome:dados.get('nome'), email:dados.get('email'), telefone:dados.get('telefone'), interesse:'<?= e($interesse) ?>', mensagem, tipo_candidatura:'<?= $ehAfiliado ? 'afiliado' : 'unidade' ?>', campos:Object.fromEntries(dados.entries()) }) });
+    const r = await fetch('api/contato.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nome:dados.get('nome'), email:dados.get('email'), telefone:dados.get('telefone'), telefone_ddi:dados.get('telefone_ddi'), interesse:'<?= e($interesse) ?>', mensagem, tipo_candidatura:'<?= $ehAfiliado ? 'afiliado' : 'unidade' ?>', campos:Object.fromEntries(dados.entries()) }) });
     const j = await r.json();
     if (!r.ok || !j.ok) throw new Error(j.mensagem || 'Não foi possível enviar.');
     status.className = 'par-status ok'; status.textContent = 'Candidatura enviada! Nossa equipe entrará em contato em breve.'; form.reset();

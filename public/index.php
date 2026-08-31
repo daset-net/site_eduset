@@ -380,7 +380,12 @@ function selosModalidade(array $tags, int $limite = 3): string {
         </div>
         <div class="field">
           <label>WhatsApp</label>
-          <input type="tel" v-model="form.telefone" placeholder="(00) 00000-0000" required>
+          <div class="intl-phone-wrap">
+            <select v-model="form.telefone_ddi" class="intl-phone-ddi" aria-label="País">
+              <option v-for="p in paisesIntl" :key="p.iso" :value="p.iso">{{ p.emoji }} {{ p.iso }} +{{ p.ddi }}</option>
+            </select>
+            <input type="tel" v-model="form.telefone" @input="form.telefone = maskFoneIntl(form.telefone, form.telefone_ddi)" :placeholder="form.telefone_ddi === 'BR' ? '(00) 00000-0000' : 'Número do celular'" required class="intl-phone-input">
+          </div>
         </div>
         <div class="field">
           <label>Modalidade de interesse</label>
@@ -458,7 +463,9 @@ function selosModalidade(array $tags, int $limite = 3): string {
 </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="<?= versao('assets/js/app.js') ?>"></script>
+<script src="assets/js/intl-phone.js"></script>
+<script src="assets/js/intl-phone.js"></script>
+  <script src="<?= versao('assets/js/app.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>
 </html>

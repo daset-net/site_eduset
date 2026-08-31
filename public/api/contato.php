@@ -49,7 +49,10 @@ function telefoneDigitos(string $bruto): string {
   $d = preg_replace('/\D/', '', $bruto);
   if ($d === '') return '';
   // 10 (fixo) ou 11 (celular) dígitos é número brasileiro sem DDI
-  if (strlen($d) === 10 || strlen($d) === 11) $d = '55' . $d;
+  // Se número sem DDI, usar o DDI informado pelo frontend
+  global $telefone_ddi;
+  $ddi_usar = !empty($telefone_ddi) ? $telefone_ddi : '55';
+  if (strlen($d) >= 6 && strlen($d) <= 11) $d = $ddi_usar . $d;
 
   // Celular brasileiro escrito sem o nono dígito: 55 + DDD + 8 dígitos
   // começando em 6 a 9. Fixo (2 a 5) fica como está — ele não é celular
@@ -96,6 +99,8 @@ if (!is_array($dados)) { $dados = $_POST; }
 $nome      = trim($dados['nome']      ?? '');
 $email     = trim($dados['email']     ?? '');
 $telefone  = trim($dados['telefone']  ?? '');
+$telefone_ddi = preg_replace('/[^0-9]/', '', $dados['telefone_ddi'] ?? '55');
+if ($telefone_ddi === '') $telefone_ddi = '55';
 $interesse = trim($dados['interesse'] ?? '');
 $mensagem  = trim($dados['mensagem']  ?? '');
 $tipoCandidatura = trim((string)($dados['tipo_candidatura'] ?? ''));
@@ -105,7 +110,12 @@ $campos = is_array($dados['campos'] ?? null) ? $dados['campos'] : [];
 $erros = [];
 if (mb_strlen($nome) < 3)                           $erros[] = 'Informe seu nome completo.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL))     $erros[] = 'Informe um e-mail válido.';
-if (mb_strlen(preg_replace('/\D/', '', $telefone)) < 10) $erros[] = 'Informe um telefone válido.';
+$telefone_digitos_len = mb_strlen(preg_replace('/\D/', '', $telefone));
+if ($telefone_ddi === '55') {
+    if ($telefone_digitos_len < 10) $erros[] = 'Informe um telefone válido.';
+} else {
+    if ($telefone_digitos_len < 6) $erros[] = 'Informe um telefone válido.';
+}
 if ($interesse === '')                              $erros[] = 'Selecione uma modalidade.';
 if ($tipoCandidatura === 'unidade') {
   $obrigatorios = [

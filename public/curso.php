@@ -620,6 +620,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   </div>
 
 <script src="<?= versao('assets/js/curso.js') ?>"></script>
+<script src="assets/js/intl-phone.js"></script>
 <script src="<?= versao('assets/js/matricula.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>
