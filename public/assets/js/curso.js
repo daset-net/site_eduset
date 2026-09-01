@@ -11,30 +11,44 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  // Gente vendo o curso agora — total do site × 5 (fator amplificador).
-  // Mínimo de 5: mesmo com 1 visitante no ar já mostra atividade real.
+  // ── Contador de pessoas vendo o curso ────────────────────────────────────
+  // Número aleatório entre 10 e 1000.
+  // Regra: 99% das vezes é um número não-redondo (ex: 11, 45, 89, 137…).
+  //        1% das vezes pode ser múltiplo de 10 (10, 20, 30…).
+  // Nunca mostra zero.
   var online = document.getElementById('online');
   if (online) {
-    var pingar = function () {
-      fetch('api/online.php?curso=' + encodeURIComponent(online.dataset.curso))
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          var n = d && d.online ? d.online : 0;
-          if (n < 1) { online.hidden = true; return; }
-          var texto = n === 1
-            ? '1 pessoa vendo este curso agora'
-            : n + ' pessoas vendo este curso agora';
-          document.getElementById('online-texto').textContent = texto;
-          online.hidden = false;
-        })
-        .catch(function () { online.hidden = true; });
+    var gerarNumero = function () {
+      // 1% de chance de ser múltiplo de 10
+      var redondo = Math.random() < 0.01;
+      var n;
+      if (redondo) {
+        // Múltiplo de 10 entre 10 e 1000: sorteio de 1 a 100 × 10
+        n = (Math.floor(Math.random() * 100) + 1) * 10;
+      } else {
+        // Número entre 10 e 1000 que NÃO seja múltiplo de 10
+        do {
+          n = Math.floor(Math.random() * 991) + 10; // 10..1000
+        } while (n % 10 === 0);
+      }
+      return n;
     };
-    pingar();
-    setInterval(pingar, 60000);
+
+    var mostrar = function () {
+      var n = gerarNumero();
+      var texto = n + ' pessoas vendo este curso agora';
+      document.getElementById('online-texto').textContent = texto;
+      online.hidden = false;
+    };
+
+    mostrar();
+    // Atualiza o número a cada 60 segundos com um novo sorteio
+    setInterval(mostrar, 60000);
   }
 
-  // Contador da oferta. O prazo vem do servidor (fim do ciclo da campanha) e não
-  // reinicia a cada visita: quando zera, o preço muda mesmo.
+  // ── Contador da oferta ───────────────────────────────────────────────────
+  // O prazo vem do servidor (fim do ciclo da campanha) e não reinicia a cada
+  // visita: quando zera, o preço muda mesmo.
   var contador = document.querySelector('.contador');
   if (!contador) return;
 
