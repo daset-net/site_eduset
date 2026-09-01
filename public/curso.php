@@ -265,6 +265,15 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             </div>
           </li>
         <?php endforeach; ?>
+        <?php if ($curso['id'] === 'CT003'): ?>
+          <li style="background:#f0fdf4;border:1px dashed #86efac;border-radius:8px;margin-top:8px;">
+            <span class="grade-lista__n" style="background:#16a34a;color:white">★</span>
+            <div>
+              <strong>Estágio Supervisionado</strong>
+              <small>260h adicionais em ambiente odontológico</small>
+            </div>
+          </li>
+        <?php endif; ?>
       </ol>
     </div>
   </section>
@@ -493,6 +502,9 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <details>
           <summary>Preciso ir até algum lugar assistir aula?</summary>
           <p><?php if ($curso['categoria'] === 'tecnico-competencia'): ?>Nesta modalidade, o AVA disponibiliza somente as provas de cada módulo. Não são exibidos videoaulas, exercícios, apostilas, jornada ou podcast.<?php else: ?>Não. O conteúdo é <?= e($curso['modalidade']) ?>: você estuda de onde estiver, pelo celular ou computador, no horário que der. <?= $curso['categoria'] === 'tecnico' ? 'Nos cursos técnicos, apenas atividades práticas e estágio, quando exigidos, acontecem com apoio de polo.' : '' ?><?php endif; ?></p>
+          <?php if ($curso['id'] === 'CT003'): ?>
+          <p style="margin-top:10px;font-size:13px;opacity:.75"><strong>Saúde Bucal:</strong> o curso inclui 260 horas de estágio supervisionado em ambiente odontológico (consultório ou clínica parceira). O estágio é orientado pelo polo e acontece na cidade do aluno.</p>
+          <?php endif; ?>
         </details>
         <details>
           <summary>Quanto tempo leva para concluir?</summary>
