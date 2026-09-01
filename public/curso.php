@@ -472,7 +472,17 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <details>
           <summary>O certificado tem validade?</summary>
           <p>Sim. Ao concluir o curso você recebe o certificado emitido por instituição parceira credenciada, com validade nacional — o mesmo aceito por empresas, instituições de ensino e órgãos públicos.</p>
-          <p style="margin-top:10px;font-size:13px;opacity:.65">Registro da instituição parceira: Código INEP <span style="font-variant-numeric:tabular-nums;letter-spacing:.3px">15161943</span></p>
+          <?php
+            $mec = trim((string) ($curso['codigoMec'] ?? ''));
+            if ($mec !== '' && !str_contains($mec, '_')) {
+              [$orgao, $num] = array_pad(explode('-', $mec, 2), 2, '');
+              $orgao = strtoupper($orgao);
+              $link  = trim((string) ($curso['linkMec'] ?? ''));
+              $numHtml = '<span style="font-variant-numeric:tabular-nums;letter-spacing:.3px">' . htmlspecialchars($num) . '</span>';
+              $codigoHtml = $link !== '' ? '<a href="' . htmlspecialchars($link) . '" target="_blank" rel="noopener" style="color:inherit">' . $numHtml . '</a>' : $numHtml;
+          ?>
+          <p style="margin-top:10px;font-size:13px;opacity:.65">Código <?= htmlspecialchars($orgao) ?>: <?= $codigoHtml ?></p>
+          <?php } ?>
         </details>
         <?php if ($curso['categoria'] === 'tecnico-competencia'): ?>
         <details>
