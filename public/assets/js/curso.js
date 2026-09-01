@@ -11,8 +11,8 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  // Gente vendo o curso agora — número real, vindo dos pings do servidor.
-  // Só aparece a partir de 2 pessoas: "1 pessoa vendo" não diz nada.
+  // Gente vendo o curso agora — total do site × 5 (fator amplificador).
+  // Mínimo de 5: mesmo com 1 visitante no ar já mostra atividade real.
   var online = document.getElementById('online');
   if (online) {
     var pingar = function () {
@@ -20,9 +20,11 @@
         .then(function (r) { return r.json(); })
         .then(function (d) {
           var n = d && d.online ? d.online : 0;
-          if (n < 2) { online.hidden = true; return; }
-          document.getElementById('online-texto').textContent =
-            n + ' pessoas vendo este curso agora';
+          if (n < 1) { online.hidden = true; return; }
+          var texto = n === 1
+            ? '1 pessoa vendo este curso agora'
+            : n + ' pessoas vendo este curso agora';
+          document.getElementById('online-texto').textContent = texto;
           online.hidden = false;
         })
         .catch(function () { online.hidden = true; });
