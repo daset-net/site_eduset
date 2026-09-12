@@ -58,7 +58,7 @@ var IntlPhone = (function () {
     cssInjetado = true;
     var style = document.createElement('style');
     style.textContent =
-      '.intl-phone-wrap{display:flex;align-items:stretch;gap:0;position:relative;}' +
+      '.intl-phone-wrap{display:flex;align-items:stretch;gap:0;position:relative;margin-bottom:24px;}' +
       '.intl-phone-wrap .intl-phone-ddi{' +
         'flex:0 0 96px;width:96px;min-width:96px;max-width:96px;' +
         'padding:6px 8px;font-size:14px;' +
@@ -69,11 +69,11 @@ var IntlPhone = (function () {
       '.intl-phone-wrap .intl-phone-ddi option{color:#111827;background:#fff;}' +
       '.intl-phone-country-display{' +
         'position:absolute;z-index:3;pointer-events:none;left:0;top:0;bottom:0;width:96px;padding-right:22px;box-sizing:border-box;' +
-        'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1;' +
+        'display:flex;align-items:center;justify-content:center;line-height:1;' +
       '}' +
       '.intl-phone-country-display:after{content:"";position:absolute;right:11px;top:50%;width:6px;height:6px;border-right:1.5px solid #374151;border-bottom:1.5px solid #374151;transform:translateY(-70%) rotate(45deg);}' +
       '.intl-phone-country-code{font-size:12px;font-weight:600;color:#111827;}' +
-      '.intl-phone-country-flag{font-size:16px;line-height:16px;}' +
+      '.intl-phone-country-flag{position:absolute;left:0;top:calc(100% + 5px);width:74px;text-align:center;font-size:17px;line-height:17px;}' +
       '.intl-phone-wrap .intl-phone-ddi:focus{outline:none;border-color:#2f74f0;box-shadow:0 0 0 3px rgba(47,116,240,.12);}' +
       '.intl-phone-wrap .intl-phone-input{' +
         'flex:1 1 auto;min-width:0;' +
