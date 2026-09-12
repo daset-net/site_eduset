@@ -107,7 +107,72 @@
   mascarar(form.cpf, mascaraCpf);
   mascarar(form.cpf_responsavel, mascaraCpf);
   mascarar(form.nascimento, mascaraData);
-  var intlCelular = IntlPhone.init(form.celular, {});
+  var feedbackCelular = document.getElementById('feedback-celular');
+  var celularValido = false;
+
+  function limparValidacaoCelular() {
+    celularValido = false;
+    form.celular.classList.remove('input-valid', 'input-invalid');
+    if (feedbackCelular) {
+      feedbackCelular.hidden = true;
+      feedbackCelular.textContent = '';
+      feedbackCelular.className = 'campo-feedback';
+    }
+  }
+
+  function exibirValidacaoCelular(valido, mensagem) {
+    celularValido = valido;
+    form.celular.classList.toggle('input-valid', valido);
+    form.celular.classList.toggle('input-invalid', !valido);
+    if (feedbackCelular) {
+      feedbackCelular.hidden = false;
+      feedbackCelular.textContent = mensagem;
+      feedbackCelular.className = 'campo-feedback ' + (valido ? 'is-valid' : 'is-invalid');
+    }
+  }
+
+  function validarNumeroCelular() {
+    var numero = intlCelular ? intlCelular.getDigitos() : digitos(form.celular.value, 15);
+    var paisISO = intlCelular ? intlCelular.getPaisISO() : 'BR';
+    var minimo = paisISO === 'BR' ? 10 : 6;
+    var maximo = paisISO === 'BR' ? 11 : 15;
+
+    if (numero.length < minimo) {
+      exibirValidacaoCelular(false, 'Número muito curto');
+      return false;
+    }
+    if (numero.length > maximo) {
+      exibirValidacaoCelular(false, 'Número muito longo');
+      return false;
+    }
+
+    var assinante = paisISO === 'BR' && numero.length > 2 ? numero.substring(2) : numero;
+    if (/^(\d)\1+$/.test(assinante)) {
+      exibirValidacaoCelular(false, 'Número inválido (dígitos repetidos)');
+      return false;
+    }
+
+    if (typeof window.validarCelular === 'function') {
+      var resultado = window.validarCelular(numero, paisISO);
+      if (!resultado.success) {
+        exibirValidacaoCelular(false, 'Celular inválido');
+        return false;
+      }
+      exibirValidacaoCelular(true, '✓ ' + resultado.data.nacional);
+      return true;
+    }
+
+    // A biblioteca é local, mas esta verificação mantém o formulário utilizável
+    // se o navegador impedir o carregamento do arquivo por algum motivo.
+    exibirValidacaoCelular(true, '✓ Celular válido');
+    return true;
+  }
+
+  var intlCelular = IntlPhone.init(form.celular, {
+    onCountryChange: limparValidacaoCelular
+  });
+  form.celular.addEventListener('input', limparValidacaoCelular);
+  form.celular.addEventListener('blur', validarNumeroCelular);
   mascarar(form.cep, mascaraCep);
 
   form.estado.addEventListener('input', function () {
@@ -167,6 +232,12 @@
     if (!form.checkValidity()) {
       mostrar('err', 'Preencha todos os campos obrigatórios.');
       form.reportValidity();
+      return;
+    }
+
+    if (!celularValido && !validarNumeroCelular()) {
+      mostrar('err', 'Informe um número de celular válido para o país selecionado.');
+      form.celular.focus();
       return;
     }
 

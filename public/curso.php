@@ -385,6 +385,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
               <svg class="celular-label__whatsapp" viewBox="0 0 24 24" aria-label="WhatsApp" role="img"><path d="M12 2a10 10 0 0 0-8.66 15L2 22l5.2-1.36A10 10 0 1 0 12 2Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.2 7.8c.4 4.3 3.7 7.6 8 8l1.1-2.2-2.5-1.1-1.1 1.1a8 8 0 0 1-3.3-3.3l1.1-1.1-1.1-2.5-2.2 1.1Z" fill="currentColor"/></svg>
             </label>
             <input type="tel" id="mat-celular" name="celular" placeholder="(00) 00000-0000" autocomplete="tel" required>
+            <span id="feedback-celular" class="campo-feedback" aria-live="polite" hidden></span>
           </div>
         </div>
         <div class="field">
@@ -658,6 +659,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
 
 <script src="<?= versao('assets/js/curso.js') ?>"></script>
 <script src="<?= versao('assets/js/intl-phone.js') ?>"></script>
+<script src="<?= versao('assets/js/libphonenumber-bundle.min.js') ?>"></script>
 <script src="<?= versao('assets/js/matricula.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>

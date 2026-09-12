@@ -788,6 +788,12 @@ ul { list-style: none; }
 .form-linha--contato { grid-template-columns: minmax(150px, 3fr) minmax(0, 5fr); }
 .field .celular-label { display: flex; align-items: center; gap: 5px; }
 .celular-label__whatsapp { width: 16px; height: 16px; color: #16a34a; flex: 0 0 16px; }
+.campo-feedback { display: block; margin-top: 6px; font-size: 12px; font-weight: 600; line-height: 1.3; }
+.campo-feedback[hidden] { display: none; }
+.campo-feedback.is-valid { color: #10b981; }
+.campo-feedback.is-invalid { color: #ef4444; }
+.field input.input-valid { border-color: #10b981; background: #ecfdf5; }
+.field input.input-invalid { border-color: #ef4444; background: #fef2f2; }
 .campo-armadilha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-nota--esq { text-align: left; margin-bottom: 16px; }
 
