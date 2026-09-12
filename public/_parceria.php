@@ -504,7 +504,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <div class="footer__bottom"><span>© <?= $ano ?> <?= e($marca) ?> · Todos os direitos reservados.</span><span><a href="index.php">Voltar ao site</a></span></div>
 </div></footer>
 
-<script src="assets/js/intl-phone.js"></script>
+<script src="<?= versao('assets/js/intl-phone.js') ?>"></script>
 <script>
 const somenteDigitos = valor => valor.replace(/\D/g, '');
 const mascaras = {

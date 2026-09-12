@@ -476,8 +476,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
 </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="assets/js/intl-phone.js"></script>
-<script src="assets/js/intl-phone.js"></script>
+<script src="<?= versao('assets/js/intl-phone.js') ?>"></script>
   <script src="<?= versao('assets/js/app.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>
