@@ -785,6 +785,7 @@ ul { list-style: none; }
 }
 .form-etapa + .field, .form-etapa + .form-linha { margin-top: 0; }
 .form-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+.form-linha--contato { grid-template-columns: minmax(150px, 3fr) minmax(0, 5fr); }
 .campo-armadilha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-nota--esq { text-align: left; margin-bottom: 16px; }
 

@@ -60,7 +60,7 @@ var IntlPhone = (function () {
     style.textContent =
       '.intl-phone-wrap{display:flex;align-items:stretch;gap:0;}' +
       '.intl-phone-wrap .intl-phone-ddi{' +
-        'flex:0 0 84px;width:84px;min-width:84px;max-width:84px;' +
+        'flex:0 0 76px;width:76px;min-width:76px;max-width:76px;' +
         'padding:6px 8px;font-size:14px;' +
         'border:1px solid #ced4da;border-right:none;' +
         'border-radius:6px 0 0 6px;background:#f8f9fa;' +
@@ -125,10 +125,9 @@ var IntlPhone = (function () {
     for (var i = 0; i < paises.length; i++) {
       var opt = document.createElement('option');
       opt.value = paises[i].iso;
-      // No campo fechado, exibe somente o essencial para deixar mais espaço
-      // para o número. O nome completo continua disponível para leitores de
-      // tela e ao passar o mouse sobre a opção.
-      opt.textContent = paises[i].emoji + ' +' + paises[i].ddi;
+      // No campo fechado, exibe somente a bandeira e a sigla do país. O DDI
+      // numérico continua no valor interno enviado com o formulário.
+      opt.textContent = paises[i].emoji + ' ' + paises[i].iso;
       opt.setAttribute('aria-label', paises[i].nome + ', +' + paises[i].ddi);
       opt.title = paises[i].nome + ' (+' + paises[i].ddi + ')';
       if (paises[i].iso === paisInicial) opt.selected = true;

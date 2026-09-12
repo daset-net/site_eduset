@@ -371,7 +371,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             <input type="tel" id="mat-nascimento" name="nascimento" placeholder="DD/MM/AAAA" inputmode="numeric" required>
           </div>
         </div>
-        <div class="form-linha">
+        <div class="form-linha form-linha--contato">
           <div class="field">
             <label for="mat-sexo">Sexo</label>
             <select id="mat-sexo" name="sexo" required>
