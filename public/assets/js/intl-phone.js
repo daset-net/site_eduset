@@ -125,9 +125,9 @@ var IntlPhone = (function () {
     for (var i = 0; i < paises.length; i++) {
       var opt = document.createElement('option');
       opt.value = paises[i].iso;
-      // No campo fechado, exibe somente a bandeira e a sigla do país. O DDI
-      // numérico continua no valor interno enviado com o formulário.
-      opt.textContent = paises[i].emoji + ' ' + paises[i].iso;
+      // Exibe o DDI separado do número para evitar que ele seja digitado duas
+      // vezes. O mesmo valor segue no campo oculto enviado pelo formulário.
+      opt.textContent = '+' + paises[i].ddi;
       opt.setAttribute('aria-label', paises[i].nome + ', +' + paises[i].ddi);
       opt.title = paises[i].nome + ' (+' + paises[i].ddi + ')';
       if (paises[i].iso === paisInicial) opt.selected = true;

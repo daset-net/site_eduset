@@ -381,7 +381,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             </select>
           </div>
           <div class="field">
-            <label for="mat-celular">WhatsApp</label>
+            <label for="mat-celular">Celular</label>
             <input type="tel" id="mat-celular" name="celular" placeholder="(00) 00000-0000" autocomplete="tel" required>
           </div>
         </div>
