@@ -60,7 +60,7 @@ var IntlPhone = (function () {
     style.textContent =
       '.intl-phone-wrap{display:flex;align-items:stretch;gap:0;}' +
       '.intl-phone-wrap .intl-phone-ddi{' +
-        'flex:0 0 76px;width:76px;min-width:76px;max-width:76px;' +
+        'flex:0 0 96px;width:96px;min-width:96px;max-width:96px;' +
         'padding:6px 8px;font-size:14px;' +
         'border:1px solid #ced4da;border-right:none;' +
         'border-radius:6px 0 0 6px;background:#f8f9fa;' +
