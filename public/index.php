@@ -220,7 +220,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
       <div class="section-head" data-reveal>
         <span class="eyebrow">Profissionalizantes</span>
         <h2>Profissionalizantes <span class="gradient-text">EAD</span></h2>
-        <p>Os Cursos Profissionalizantes da Alfa Pleno são desenvolvidos em total conformidade com as diretrizes federais da Educação Profissional e Tecnológica (EPT), amparados pela Portaria CNE/CP nº 1, de 5 de janeiro de 2021 (MEC), e respaldados pelo Decreto Federal nº 5.154, de 23 de julho de 2004. Nossas formações enquadram-se na modalidade de Formação Inicial e Continuada (FIC) de nível básico. Os programas são autorizados e registrados sob a Resolução de Diretoria / ALFA PLENO nº 1042/2026, garantindo certificação com peso institucional e validade em todo o território nacional para comprovação de competências, enriquecimento de currículo e progressão profissional.</p>
+        <p>Os Cursos Profissionalizantes da Eduset são desenvolvidos em total conformidade com as diretrizes federais da Educação Profissional e Tecnológica (EPT), amparados pela Portaria CNE/CP nº 1, de 5 de janeiro de 2021 (MEC), e respaldados pelo Decreto Federal nº 5.154, de 23 de julho de 2004. Nossas formações enquadram-se na modalidade de Formação Inicial e Continuada (FIC) de nível básico. Os programas são autorizados e registrados sob a Resolução de Diretoria / EDUSET nº 1042/2026, garantindo certificação com peso institucional e validade em todo o território nacional para comprovação de competências, enriquecimento de currículo e progressão profissional.</p>
       </div>
       <?php endif; ?>
       <div class="section-head" data-reveal>

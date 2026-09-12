@@ -1416,7 +1416,7 @@ function metadadosCertificadoProfissionalizante(array $curso): ?array {
   $horas = array_sum(array_column($materias, 'horas'));
   if ($horas <= 0) $horas = cargaMinima($curso);
 
-  $texto = "O {$nome} da Alfa Pleno é uma formação desenvolvida em total conformidade com as diretrizes federais da Educação Profissional e Tecnológica (EPT), amparado pela Portaria CNE/CP nº 1, de 5 de janeiro de 2021 (MEC), e respaldado pelo Decreto Federal nº 5.154, de 23 de julho de 2004. Esta formação enquadra-se na modalidade de Formação Inicial e Continuada (FIC), sendo autorizada e registrada sob a Resolução de Diretoria / ALFA PLENO nº 1042/2026 (Qualificação Profissional Básica em {$nome} EAD).\n\n"
+  $texto = "O {$nome} da Eduset é uma formação desenvolvida em total conformidade com as diretrizes federais da Educação Profissional e Tecnológica (EPT), amparado pela Portaria CNE/CP nº 1, de 5 de janeiro de 2021 (MEC), e respaldado pelo Decreto Federal nº 5.154, de 23 de julho de 2004. Esta formação enquadra-se na modalidade de Formação Inicial e Continuada (FIC), sendo autorizada e registrada sob a Resolução de Diretoria / EDUSET nº 1042/2026 (Qualificação Profissional Básica em {$nome} EAD).\n\n"
          . "• Curso: {$nome}\n"
          . "• Modalidade: Educação a Distância (EAD)\n"
          . '• Carga Horária: ' . ($horas > 0 ? $horas : '[X]') . ' horas';
@@ -1425,7 +1425,7 @@ function metadadosCertificadoProfissionalizante(array $curso): ?array {
     'curso' => $nome,
     'modalidade' => 'Educação a Distância (EAD)',
     'carga_horaria' => $horas > 0 ? $horas : null,
-    'resolucao' => 'Resolução de Diretoria / ALFA PLENO nº 1042/2026',
+    'resolucao' => 'Resolução de Diretoria / EDUSET nº 1042/2026',
     'texto_verso' => $texto,
   ];
 }
