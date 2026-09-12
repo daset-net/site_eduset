@@ -7,7 +7,7 @@ Paleta visual baseada na logo da marca: azul-marinho, azul royal e ciano (a iden
 ## ✨ Recursos
 
 - **Design moderno e responsivo** (mobile-first), com animações suaves.
-- **3 modalidades de cursos:** Supletivo EJA, Curso Técnico e Curso Livre.
+- **4 modalidades de cursos:** Supletivo EJA, Curso Técnico, Técnico Competência e Profissionalizantes.
 - **Catálogo dinâmico** com filtro por modalidade (Vue 3), alimentado pelo **Directus**,
   com preços e descontos reais.
 - **Conteúdo editável no Directus**: textos, imagens de capa, contatos e SEO são
@@ -262,7 +262,7 @@ cada matéria e a lista é ajustada proporcionalmente até o total cair nesse al
 para cima quando o conteúdo cadastrado é pouco, para baixo quando é muito. A
 proporção entre as matérias não muda e o total continua sendo a soma da lista.
 
-Curso **livre** não tem mínimo legal (`carga_minima_livre = 0`): mostra a soma
+Formação **profissionalizante** não tem mínimo legal (`carga_minima_livre = 0`): mostra a soma
 real, sem ajuste.
 
 > Enquanto as atividades não estiverem cadastradas no Directus da escola, quase
@@ -436,7 +436,7 @@ acesso aqui na hora.
   `api/login.php` do AVASET, para nenhum gestor existente ficar de fora.
 - **O que dá para fazer:** trocar a **imagem do topo (hero)** da home,
   trocar/remover a capa dos cursos, mostrar ou esconder um curso, pôr um curso
-  livre na vitrine, editar todos os textos da página do curso e as configurações
+  profissionalizante na vitrine, editar todos os textos da página do curso e as configurações
   gerais do site (topo, contatos, redes, números e SEO).
 - **O que NÃO dá para fazer:** mexer em preço, parcelas ou desconto — isso é do
   catálogo do AVASET, de propósito.

@@ -52,18 +52,18 @@ $CONTEUDO_PADRAO = [
     'saidas'  => ['Certificação técnica da área escolhida', 'Valorização da experiência profissional', 'Novas oportunidades no mercado'],
     'mercado' => 'A certificação formal ajuda a transformar experiência prática em novas oportunidades profissionais.',
   ],
-  'livre' => [
-    'chamada'  => 'Aprenda rápido, aplique amanhã e melhore o seu currículo',
-    'promessa' => 'Curso livre é objetivo: conteúdo direto, certificado na conclusão e uma habilidade nova que você já leva para a próxima entrevista ou para o próprio negócio.',
+  'profissionalizante' => [
+    'chamada'  => 'Qualificação profissional com base institucional',
+    'promessa' => 'Formação Inicial e Continuada (FIC) de nível básico, desenvolvida para comprovar competências, enriquecer o currículo e apoiar sua progressão profissional.',
     'aprender' => [
-      'Conteúdo prático, sem teoria desnecessária',
-      'Aulas curtas que cabem na sua rotina',
+      'Competências aplicáveis ao exercício profissional',
+      'Conteúdo organizado conforme a área de qualificação',
       'Acesso pelo celular, tablet ou computador',
       'Certificado de conclusão ao final',
     ],
-    'publico' => ['Quem quer se qualificar rápido', 'Quem busca renda extra ou recolocação'],
-    'saidas'  => ['Novas vagas e funções', 'Renda extra como autônomo', 'Diferencial no currículo'],
-    'mercado' => 'Qualificação curta é a forma mais rápida de sair da lista de descartados numa seleção.',
+    'publico' => ['Quem busca qualificação profissional', 'Quem deseja fortalecer o currículo ou se recolocar'],
+    'saidas'  => ['Comprovação de competências', 'Progressão profissional', 'Diferencial no currículo'],
+    'mercado' => 'A qualificação profissional amplia a comprovação de competências e fortalece a trajetória no mercado de trabalho.',
   ],
 ];
 
@@ -73,7 +73,7 @@ $CONTEUDO_PADRAO = [
  */
 function conteudoCurso(array $curso): array {
   global $CONTEUDO_PADRAO;
-  $padrao = $CONTEUDO_PADRAO[$curso['categoria']] ?? $CONTEUDO_PADRAO['livre'];
+  $padrao = $CONTEUDO_PADRAO[$curso['categoria']] ?? $CONTEUDO_PADRAO['profissionalizante'];
 
   // A ficha editorial é compartilhada pelo técnico comum e pela versão por
   // competência. Nesta última, o texto próprio evita prometer aulas e materiais.

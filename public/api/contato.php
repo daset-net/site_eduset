@@ -49,7 +49,10 @@ function telefoneDigitos(string $bruto): string {
   $d = preg_replace('/\D/', '', $bruto);
   if ($d === '') return '';
   // 10 (fixo) ou 11 (celular) dígitos é número brasileiro sem DDI
-  if (strlen($d) === 10 || strlen($d) === 11) $d = '55' . $d;
+  // Se número sem DDI, usar o DDI informado pelo frontend
+  global $telefone_ddi;
+  $ddi_usar = !empty($telefone_ddi) ? $telefone_ddi : '55';
+  if (strlen($d) >= 6 && strlen($d) <= 11) $d = $ddi_usar . $d;
 
   // Celular brasileiro escrito sem o nono dígito: 55 + DDD + 8 dígitos
   // começando em 6 a 9. Fixo (2 a 5) fica como está — ele não é celular
@@ -96,15 +99,45 @@ if (!is_array($dados)) { $dados = $_POST; }
 $nome      = trim($dados['nome']      ?? '');
 $email     = trim($dados['email']     ?? '');
 $telefone  = trim($dados['telefone']  ?? '');
+$telefone_ddi = preg_replace('/[^0-9]/', '', $dados['telefone_ddi'] ?? '55');
+if ($telefone_ddi === '') $telefone_ddi = '55';
 $interesse = trim($dados['interesse'] ?? '');
 $mensagem  = trim($dados['mensagem']  ?? '');
+$tipoCandidatura = trim((string)($dados['tipo_candidatura'] ?? ''));
+$campos = is_array($dados['campos'] ?? null) ? $dados['campos'] : [];
 
 // Validação
 $erros = [];
 if (mb_strlen($nome) < 3)                           $erros[] = 'Informe seu nome completo.';
 if (!filter_var($email, FILTER_VALIDATE_EMAIL))     $erros[] = 'Informe um e-mail válido.';
-if (mb_strlen(preg_replace('/\D/', '', $telefone)) < 10) $erros[] = 'Informe um telefone válido.';
+$telefone_digitos_len = mb_strlen(preg_replace('/\D/', '', $telefone));
+if ($telefone_ddi === '55') {
+    if ($telefone_digitos_len < 10) $erros[] = 'Informe um telefone válido.';
+} else {
+    if ($telefone_digitos_len < 6) $erros[] = 'Informe um telefone válido.';
+}
 if ($interesse === '')                              $erros[] = 'Selecione uma modalidade.';
+if ($tipoCandidatura === 'unidade') {
+  $obrigatorios = [
+    'cpf' => 'CPF', 'data_nascimento' => 'data de nascimento',
+    'nome_empresa' => 'nome da empresa', 'cnpj' => 'CNPJ',
+    'cep' => 'CEP', 'endereco' => 'endereço', 'bairro' => 'bairro',
+    'cidade' => 'cidade', 'estado' => 'estado',
+    'unidade_nome' => 'nome institucional do polo',
+    'unidade_identificacao' => 'e-mail institucional do polo',
+    'pix_tipo' => 'tipo de chave PIX', 'pix_chave' => 'chave PIX',
+    'banco_codigo' => 'código do banco', 'banco_nome' => 'nome do banco',
+    'espaco' => 'situação do espaço físico',
+    'experiencia_educacional' => 'experiência educacional',
+    'experiencia' => 'experiência e estrutura',
+  ];
+  foreach ($obrigatorios as $campo => $rotulo) {
+    if (trim((string)($campos[$campo] ?? '')) === '') $erros[] = 'Informe ' . $rotulo . '.';
+  }
+  if (strlen(preg_replace('/\D/', '', (string)($campos['cpf'] ?? ''))) !== 11) $erros[] = 'Informe um CPF válido.';
+  if (strlen(preg_replace('/\D/', '', (string)($campos['cnpj'] ?? ''))) !== 14) $erros[] = 'Informe um CNPJ válido.';
+  if (empty($campos['consentimento'])) $erros[] = 'Confirme a autorização para tratamento dos dados.';
+}
 
 if ($erros) {
   http_response_code(422);

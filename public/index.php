@@ -11,13 +11,14 @@ $whatsapp = whatsappLink();
 // Link de divulgação de um polo (?polo=codigo): guarda o cookie da visita antes
 // de qualquer saída e, se a unidade existir, anuncia por quem o visitante veio.
 $polo = poloUnidade();
+$paginaProfissionalizantes = ($_GET['categoria'] ?? '') === 'profissionalizantes';
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 
 // Os selos de cada modalidade saem do próprio catálogo: só entra curso que o
 // site está exibindo de verdade, para o cartão não prometer o que não existe.
 [$cursosDoSite] = catalogo();
-$tagsModalidade = ['eja' => [], 'tecnico' => [], 'tecnico-competencia' => [], 'livre' => []];
+$tagsModalidade = ['eja' => [], 'tecnico' => [], 'tecnico-competencia' => [], 'profissionalizante' => []];
 foreach ($cursosDoSite as $c) {
   $slug = $c['categoria'] ?? '';
   if (!isset($tagsModalidade[$slug])) continue;
@@ -49,9 +50,10 @@ function selosModalidade(array $tags, int $limite = 3): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="<?= e(config('seo_descricao', 'EDUSET — Educação que transforma. Supletivo EJA, Cursos Técnicos e Cursos Livres com certificação reconhecida, 100% online e no seu ritmo.')) ?>">
+  <meta name="description" content="<?= e($paginaProfissionalizantes ? 'Profissionalizantes EAD - Eduset' : config('seo_descricao', 'EDUSET — Educação que transforma. Supletivo EJA, Cursos Técnicos e Profissionalizantes com certificação reconhecida, 100% online e no seu ritmo.')) ?>">
   <meta name="theme-color" content="#002454">
-  <title><?= e(config('seo_titulo', 'EDUSET · Educação que transforma vidas')) ?></title>
+  <title><?= e($paginaProfissionalizantes ? 'Profissionalizantes EAD - Eduset' : config('seo_titulo', 'EDUSET · Educação que transforma vidas')) ?></title>
+  <?php if ($paginaProfissionalizantes): ?><link rel="canonical" href="/profissionalizantes"><?php endif; ?>
 
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="assets/img/favicon.png">
@@ -79,7 +81,6 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <a href="#categorias">Modalidades</a>
         <a href="#cursos">Cursos</a>
         <?php if (!visitaDoPolo()): ?><a href="unidades.php">Unidades</a><?php endif; ?>
-        <a href="afiliados.php">Seja parceiro</a>
         <a href="#diferenciais">Diferenciais</a>
         <a href="#contato">Contato</a>
       </nav>
@@ -106,11 +107,15 @@ function selosModalidade(array $tags, int $limite = 3): string {
           <?php endif; ?>
         </span>
         <h1>
+          <?php if ($paginaProfissionalizantes): ?>
+          Profissionalizantes <span class="hl">EAD</span>
+          <?php else: ?>
           <?= e(config('hero_titulo', 'Seu futuro começa com uma')) ?>
           <?php if (config('hero_destaque')): ?><span class="hl"><?= e(config('hero_destaque')) ?></span><?php endif; ?>
+          <?php endif; ?>
         </h1>
         <p class="lead">
-          <?= e(config('hero_subtitulo', 'EJA, Cursos Técnicos e Cursos Livres reconhecidos. Estude 100% online, no seu tempo e de onde estiver.')) ?>
+          <?= e(config('hero_subtitulo', 'EJA, Cursos Técnicos e Profissionalizantes reconhecidos. Estude 100% online, no seu tempo e de onde estiver.')) ?>
         </p>
         <div class="hero__actions">
           <a href="#cursos" class="btn btn-primary">Conheça os cursos <i class="ri-arrow-right-line"></i></a>
@@ -197,11 +202,11 @@ function selosModalidade(array $tags, int $limite = 3): string {
           <span class="more">Ver cursos <i class="ri-arrow-right-line"></i></span>
         </div>
 
-        <div class="cat-card" data-reveal @click="filtrar('livre')" style="cursor:pointer">
+        <div class="cat-card" data-reveal @click="window.location.href='/profissionalizantes'" style="cursor:pointer">
           <div class="ic"><i class="ri-lightbulb-flash-line"></i></div>
-          <h3>Curso Livre</h3>
-          <p>Atualize-se e desenvolva novas habilidades com cursos livres de curta duração e certificado imediato.</p>
-          <?= selosModalidade($tagsModalidade['livre']) ?>
+          <h3>Profissionalizantes</h3>
+          <p>Formações FIC de nível básico para desenvolver competências, fortalecer o currículo e ampliar oportunidades profissionais.</p>
+          <?= selosModalidade($tagsModalidade['profissionalizante']) ?>
           <span class="more">Ver cursos <i class="ri-arrow-right-line"></i></span>
         </div>
       </div>
@@ -211,6 +216,13 @@ function selosModalidade(array $tags, int $limite = 3): string {
   <!-- ===================== CURSOS ===================== -->
   <section class="section section--soft" id="cursos">
     <div class="container">
+      <?php if ($paginaProfissionalizantes): ?>
+      <div class="section-head" data-reveal>
+        <span class="eyebrow">Profissionalizantes</span>
+        <h2>Profissionalizantes <span class="gradient-text">EAD</span></h2>
+        <p>Os Cursos Profissionalizantes da Alfa Pleno são desenvolvidos em total conformidade com as diretrizes federais da Educação Profissional e Tecnológica (EPT), amparados pela Portaria CNE/CP nº 1, de 5 de janeiro de 2021 (MEC), e respaldados pelo Decreto Federal nº 5.154, de 23 de julho de 2004. Nossas formações enquadram-se na modalidade de Formação Inicial e Continuada (FIC) de nível básico. Os programas são autorizados e registrados sob a Resolução de Diretoria / ALFA PLENO nº 1042/2026, garantindo certificação com peso institucional e validade em todo o território nacional para comprovação de competências, enriquecimento de currículo e progressão profissional.</p>
+      </div>
+      <?php endif; ?>
       <div class="section-head" data-reveal>
         <span class="eyebrow">Catálogo</span>
         <h2>Encontre o curso <span class="gradient-text">perfeito para você</span></h2>
@@ -223,7 +235,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <button :class="{active: filtro==='eja'}" @click="filtro='eja'">Supletivo EJA</button>
         <button :class="{active: filtro==='tecnico'}" @click="filtro='tecnico'">Curso Técnico</button>
         <button :class="{active: filtro==='tecnico-competencia'}" @click="filtro='tecnico-competencia'">Técnico Competência</button>
-        <button :class="{active: filtro==='livre'}" @click="filtro='livre'">Curso Livre</button>
+        <button :class="{active: filtro==='profissionalizante'}" @click="filtro='profissionalizante'">Profissionalizantes</button>
       </div>
 
       <div class="course-grid">
@@ -381,7 +393,12 @@ function selosModalidade(array $tags, int $limite = 3): string {
         </div>
         <div class="field">
           <label>WhatsApp</label>
-          <input type="tel" v-model="form.telefone" placeholder="(00) 00000-0000" required>
+          <div class="intl-phone-wrap">
+            <select v-model="form.telefone_ddi" class="intl-phone-ddi" aria-label="País">
+              <option v-for="p in paisesIntl" :key="p.iso" :value="p.iso">{{ p.emoji }} {{ p.iso }} +{{ p.ddi }}</option>
+            </select>
+            <input type="tel" v-model="form.telefone" @input="form.telefone = maskFoneIntl(form.telefone, form.telefone_ddi)" :placeholder="form.telefone_ddi === 'BR' ? '(00) 00000-0000' : 'Número do celular'" required class="intl-phone-input">
+          </div>
         </div>
         <div class="field">
           <label>Modalidade de interesse</label>
@@ -389,7 +406,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
             <option value="">Selecione…</option>
             <option value="Supletivo EJA">Supletivo EJA</option>
             <option value="Curso Técnico">Curso Técnico</option>
-            <option value="Curso Livre">Curso Livre</option>
+            <option value="Profissionalizantes">Profissionalizantes</option>
           </select>
         </div>
         <div class="field">
@@ -410,7 +427,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
       <div class="footer__grid">
         <div class="footer__brand">
           <img src="assets/img/eduset-negativo.png" alt="EDUSET">
-          <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos livres com certificação reconhecida e 100% online.</p>
+          <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos profissionalizantes com certificação reconhecida e 100% online.</p>
           <div class="footer__social">
             <?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?>
             <?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?>
@@ -423,7 +440,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
           <ul>
             <li><a href="#cursos">Supletivo EJA</a></li>
             <li><a href="#cursos">Curso Técnico</a></li>
-            <li><a href="#cursos">Curso Livre</a></li>
+            <li><a href="/profissionalizantes">Profissionalizantes</a></li>
           </ul>
         </div>
         <div>
@@ -459,7 +476,9 @@ function selosModalidade(array $tags, int $limite = 3): string {
 </div>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="<?= versao('assets/js/app.js') ?>"></script>
+<script src="assets/js/intl-phone.js"></script>
+<script src="assets/js/intl-phone.js"></script>
+  <script src="<?= versao('assets/js/app.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>
 </html>

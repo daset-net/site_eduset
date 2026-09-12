@@ -51,7 +51,7 @@ foreach ($cursos as $c) {
   $chave = $cat === 'EJA' ? 'EJA' : ($cat === 'TECNICO' ? 'TECNICO' : 'OUTROS');
   $grupos[$chave][] = $c;
 }
-$rotulos = ['EJA' => 'Supletivo EJA', 'TECNICO' => 'Cursos Técnicos', 'OUTROS' => 'Cursos Livres'];
+$rotulos = ['EJA' => 'Supletivo EJA', 'TECNICO' => 'Cursos Técnicos', 'OUTROS' => 'Profissionalizantes'];
 
 $titulo   = 'Cursos e capas';
 $abaAtiva = 'cursos';
@@ -77,7 +77,6 @@ require __DIR__ . '/_topo.php';
     <?php foreach ($lista as $c):
       $capa = $c['imagem_capa'] ?? null;
       $nome = trim((string) ($c['nome_exibicao'] ?? '')) !== '' ? $c['nome_exibicao'] : $c['_nome_catalogo'];
-      $livre = $chave === 'OUTROS';
     ?>
       <article class="curso-item <?= empty($c['ativo']) ? 'curso-item--off' : '' ?>">
         <div class="curso-item__capa">

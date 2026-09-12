@@ -6,12 +6,15 @@ createApp({
     return {
       scrolled: false,
       menuOpen: false,
-      filtro: 'todos',
+      filtro: location.pathname.replace(/\/+$/, '').endsWith('/profissionalizantes')
+        ? 'profissionalizante'
+        : 'todos',
       carregando: true,
       cursos: [],
       enviando: false,
       feedback: { tipo: '', msg: '' },
-      form: { nome: '', email: '', telefone: '', interesse: '', mensagem: '' },
+      form: { nome: '', email: '', telefone: '', telefone_ddi: 'BR', interesse: '', mensagem: '' },
+      paisesIntl: (typeof IntlPhone !== 'undefined') ? IntlPhone.paises : [],
       // Link de campanha com ?ir=matricula: leva o visitante direto à matrícula.
       irMatricula: new URLSearchParams(location.search).get('ir') === 'matricula'
     };
@@ -25,6 +28,10 @@ createApp({
   },
 
   methods: {
+    maskFoneIntl(v, ddi) {
+        if (typeof IntlPhone !== 'undefined') return IntlPhone.mascaraPorPais(ddi || 'BR', v);
+        return (v || '').replace(/\D/g, '').slice(0, 15);
+    },
     filtrar(cat) {
       this.filtro = cat;
       const el = document.getElementById('cursos');

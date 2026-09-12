@@ -11,6 +11,11 @@
 
 RewriteEngine On
 
+# URL canônica da categoria profissionalizante. O endereço antigo permanece
+# válido apenas como redirecionamento permanente para preservar a indexação.
+RewriteRule ^cursos-livres/?$ /profissionalizantes [R=301,L,NE]
+RewriteRule ^profissionalizantes/?$ index.php?categoria=profissionalizantes [L,QSA]
+
 # 1. Arquivo ou pasta que existe de verdade é servido normalmente.
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

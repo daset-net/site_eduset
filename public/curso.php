@@ -56,6 +56,7 @@ $metaDescricao = $curso['seoDescricao'] !== ''
 // Grade do curso (ava_pacote_curso): as matérias que o aluno vai estudar.
 $materias = materiasDoCurso($curso);
 $horasGrade = array_sum(array_column($materias, 'horas'));
+$certificadoProfissionalizante = metadadosCertificadoProfissionalizante($curso);
 
 // Sob o link de campanha de um polo, quem recebe a dúvida é o polo.
 $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'] . '.');
@@ -265,6 +266,15 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             </div>
           </li>
         <?php endforeach; ?>
+        <?php if ($curso['id'] === 'CT003'): ?>
+          <li style="background:#f0fdf4;border:1px dashed #86efac;border-radius:8px;margin-top:8px;">
+            <span class="grade-lista__n" style="background:#16a34a;color:white">★</span>
+            <div>
+              <strong>Estágio Supervisionado</strong>
+              <small>260h adicionais em ambiente odontológico</small>
+            </div>
+          </li>
+        <?php endif; ?>
       </ol>
     </div>
   </section>
@@ -461,6 +471,18 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
     </div>
   </section>
 
+  <?php if ($certificadoProfissionalizante): ?>
+  <section class="section section--soft" id="validacao-certificado">
+    <div class="container container--estreito">
+      <div class="section-head">
+        <span class="eyebrow">Certificação</span>
+        <h2>Base legal e dados do <span class="gradient-text">certificado</span></h2>
+      </div>
+      <div class="faq"><div style="white-space:pre-line"><?= e($certificadoProfissionalizante['texto_verso']) ?></div></div>
+    </div>
+  </section>
+  <?php endif; ?>
+
   <!-- ===================== FAQ ===================== -->
   <section class="section">
     <div class="container container--estreito">
@@ -472,9 +494,17 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <details>
           <summary>O certificado tem validade?</summary>
           <p>Sim. Ao concluir o curso você recebe o certificado emitido por instituição parceira credenciada, com validade nacional — o mesmo aceito por empresas, instituições de ensino e órgãos públicos.</p>
-          <?php if (($curso['codigoMec'] ?? '') !== ''): ?>
-            <p style="margin-top:10px;font-size:13px;opacity:.65">Registro da instituição parceira: <span style="font-variant-numeric:tabular-nums;letter-spacing:.3px"><?= e($curso['codigoMec']) ?></span></p>
-          <?php endif; ?>
+          <?php
+            $mec = trim((string) ($curso['codigoMec'] ?? ''));
+            if ($mec !== '' && !str_contains($mec, '_')) {
+              [$orgao, $num] = array_pad(explode('-', $mec, 2), 2, '');
+              $orgao = strtoupper($orgao);
+              $link  = trim((string) ($curso['linkMec'] ?? ''));
+              $numHtml = '<span style="font-variant-numeric:tabular-nums;letter-spacing:.3px">' . htmlspecialchars($num) . '</span>';
+              $codigoHtml = $link !== '' ? '<a href="' . htmlspecialchars($link) . '" target="_blank" rel="noopener" style="color:inherit">' . $numHtml . '</a>' : $numHtml;
+          ?>
+          <p style="margin-top:10px;font-size:13px;opacity:.65">Código <?= htmlspecialchars($orgao) ?>: <?= $codigoHtml ?></p>
+          <?php } ?>
         </details>
         <?php if ($curso['categoria'] === 'tecnico-competencia'): ?>
         <details>
@@ -485,6 +515,9 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <details>
           <summary>Preciso ir até algum lugar assistir aula?</summary>
           <p><?php if ($curso['categoria'] === 'tecnico-competencia'): ?>Nesta modalidade, o AVA disponibiliza somente as provas de cada módulo. Não são exibidos videoaulas, exercícios, apostilas, jornada ou podcast.<?php else: ?>Não. O conteúdo é <?= e($curso['modalidade']) ?>: você estuda de onde estiver, pelo celular ou computador, no horário que der. <?= $curso['categoria'] === 'tecnico' ? 'Nos cursos técnicos, apenas atividades práticas e estágio, quando exigidos, acontecem com apoio de polo.' : '' ?><?php endif; ?></p>
+          <?php if ($curso['id'] === 'CT003'): ?>
+          <p style="margin-top:10px;font-size:13px;opacity:.75"><strong>Saúde Bucal:</strong> o curso inclui 260 horas de estágio supervisionado em ambiente odontológico (consultório ou clínica parceira). O estágio é orientado pelo polo e acontece na cidade do aluno.</p>
+          <?php endif; ?>
         </details>
         <details>
           <summary>Quanto tempo leva para concluir?</summary>
@@ -567,7 +600,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
       <div class="footer__grid">
         <div class="footer__brand">
           <img src="assets/img/eduset-negativo.png" alt="EDUSET">
-          <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos livres com certificação reconhecida e 100% online.</p>
+          <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos profissionalizantes com certificação reconhecida e 100% online.</p>
           <div class="footer__social">
             <?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?>
             <?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?>
@@ -580,7 +613,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
           <ul>
             <li><a href="index.php#cursos">Supletivo EJA</a></li>
             <li><a href="index.php#cursos">Curso Técnico</a></li>
-            <li><a href="index.php#cursos">Curso Livre</a></li>
+            <li><a href="/profissionalizantes">Profissionalizantes</a></li>
           </ul>
         </div>
         <div>
@@ -622,6 +655,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   </div>
 
 <script src="<?= versao('assets/js/curso.js') ?>"></script>
+<script src="assets/js/intl-phone.js"></script>
 <script src="<?= versao('assets/js/matricula.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>

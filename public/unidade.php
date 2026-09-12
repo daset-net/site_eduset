@@ -223,7 +223,7 @@ $vizinhas = visitaDoPolo() ? [] : array_slice(array_values(array_filter(
       <div class="footer__grid">
         <div class="footer__brand">
           <img src="assets/img/eduset-negativo.png" alt="EDUSET">
-          <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos livres com certificação reconhecida e 100% online.</p>
+          <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos profissionalizantes com certificação reconhecida e 100% online.</p>
           <div class="footer__social">
             <?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?>
             <?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?>
@@ -236,7 +236,7 @@ $vizinhas = visitaDoPolo() ? [] : array_slice(array_values(array_filter(
           <ul>
             <li><a href="index.php#cursos">Supletivo EJA</a></li>
             <li><a href="index.php#cursos">Curso Técnico</a></li>
-            <li><a href="index.php#cursos">Curso Livre</a></li>
+            <li><a href="/profissionalizantes">Profissionalizantes</a></li>
           </ul>
         </div>
         <div>

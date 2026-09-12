@@ -107,7 +107,7 @@
   mascarar(form.cpf, mascaraCpf);
   mascarar(form.cpf_responsavel, mascaraCpf);
   mascarar(form.nascimento, mascaraData);
-  mascarar(form.celular, mascaraFone);
+  var intlCelular = IntlPhone.init(form.celular, {});
   mascarar(form.cep, mascaraCep);
 
   form.estado.addEventListener('input', function () {
@@ -183,6 +183,7 @@
       sexo: form.sexo.value,
       email: form.email.value,
       celular: form.celular.value,
+      celular_ddi: intlCelular ? intlCelular.getDDI() : '55',
       cep: form.cep.value,
       endereco: form.endereco.value,
       numero: form.numero.value,

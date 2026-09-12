@@ -138,6 +138,8 @@ function cursoParaAtendimento(array $c, bool $comGrade = false): array {
       $materias
     );
   }
+  $certificado = metadadosCertificadoProfissionalizante($c);
+  if ($certificado) $dados['certificado'] = $certificado;
   return $dados;
 }
 
@@ -187,7 +189,7 @@ function cursoResumo(array $c): array {
   ];
 
   // Registro da instituição parceira que certifica. Só entra quando existe:
-  // curso livre não tem parceira, e mandar o campo vazio faria o atendimento
+  // curso profissionalizante não tem parceira, e mandar o campo vazio faria o atendimento
   // achar que a informação sumiu — em vez de entender que ali ela não se aplica.
   //
   // O nome do campo é o que diz ao atendimento o que o número é. Com

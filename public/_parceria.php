@@ -9,15 +9,40 @@ $logoNormal = $logoNormal ?? 'assets/img/logo.png';
 $corTema = $corTema ?? '#1d4ed8';
 $ano = date('Y');
 $ehAfiliado = $tipo === 'afiliado';
-$titulo = $ehAfiliado ? 'Programa de Afiliados' : 'Abra sua Unidade';
+$titulo = $ehAfiliado ? 'Programa de Afiliados' : 'Unidade Flex';
 $interesse = $ehAfiliado ? 'Programa de afiliados' : 'Abertura de nova unidade';
 $mensagemWhatsapp = $ehAfiliado
   ? 'Olá! Quero saber mais sobre o programa de afiliados da ' . $marca . '.'
-  : 'Olá! Quero saber mais sobre como abrir uma unidade da ' . $marca . '.';
+  : 'Olá! Quero saber mais sobre como abrir uma Unidade Flex da ' . $marca . '.';
 // Parceria é analisada pela central da escola, nunca pelo polo guardado no cookie
 // de uma campanha de matrícula.
 $numeroCentral = preg_replace('/\D/', '', config('whatsapp', '5500000000000'));
 $whatsapp = 'https://wa.me/' . $numeroCentral . '?text=' . rawurlencode($mensagemWhatsapp);
+
+// Prova social própria de cada parceria. A janela limitada evita trazer a
+// coleção inteira; o embaralhamento renova os três relatos a cada visita.
+$depoimentosUnidade = [];
+$tipoDepoimento = $ehAfiliado ? 'afiliado' : 'unidade';
+$colecaoDepoimentos = $ehAfiliado ? 'afiliado_depoimentos' : 'unidade_depoimentos';
+$camposDepoimentos = $ehAfiliado
+  ? 'nome,caso_de_sucesso,parceria,data'
+  : 'nome,empresa,caso_de_sucesso,parceria,data';
+$linhas = buscarColecao($colecaoDepoimentos, [
+    'fields' => $camposDepoimentos,
+    'filter' => ['parceria' => ['_eq' => $tipoDepoimento]],
+    'sort'   => '-data',
+    'limit'  => 120,
+]) ?? [];
+foreach ($linhas as $linha) {
+    $nome = trim((string) ($linha['nome'] ?? ''));
+    $empresa = trim((string) ($linha['empresa'] ?? ''));
+    $relato = preg_replace('/\s+/u', ' ', trim((string) ($linha['caso_de_sucesso'] ?? '')));
+    if ($nome === '' || $relato === '') continue;
+    if (mb_strlen($relato) > 560) $relato = rtrim(mb_substr($relato, 0, 557)) . '…';
+    $depoimentosUnidade[] = ['nome' => $nome, 'empresa' => $empresa, 'relato' => $relato];
+}
+if (count($depoimentosUnidade) > 1) shuffle($depoimentosUnidade);
+$depoimentosUnidade = array_slice($depoimentosUnidade, 0, 3);
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 ?>
@@ -88,7 +113,31 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .par-field label { display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--ink); }
     .par-field input,.par-field select,.par-field textarea { width:100%; border:1px solid var(--line); border-radius:10px; padding:11px 12px; font:inherit; font-size:14px; color:var(--ink); background:#fff; outline:none; }
     .par-field textarea { min-height:105px; resize:vertical; }
+    .par-form-section { grid-column:1/-1; display:flex; align-items:center; gap:10px; margin-top:8px; padding:14px 0 2px; border-top:1px solid var(--line); color:var(--brand-700,#1d4ed8); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; }
+    .par-form-section:first-child { margin-top:0; padding-top:0; border-top:0; }
+    .par-form-section i { font-size:18px; }
+    .par-field small { display:block; margin-top:5px; color:var(--muted); font-size:10px; line-height:1.4; }
+    .unit-preview { grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .unit-preview__box { display:flex; align-items:center; gap:13px; padding:15px; border:1px dashed color-mix(in srgb,var(--brand-500,#2563eb) 50%,var(--line)); border-radius:12px; background:color-mix(in srgb,var(--brand-500,#2563eb) 5%,#fff); }
+    .unit-preview__box i { color:var(--brand-600,#2563eb); font-size:23px; }
+    .unit-preview__box small { display:block; color:var(--muted); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+    .unit-preview__box strong { display:block; margin-top:2px; color:var(--ink); font-size:13px; word-break:break-word; }
+    .unit-preview__status { grid-column:1/-1; display:none; padding:11px 13px; border-radius:10px; font-size:11px; font-weight:600; }
+    .unit-preview__status.checking { display:block; background:#eff6ff; color:#1d4ed8; }
+    .unit-preview__status.available { display:block; background:#ecfdf5; color:#047857; }
+    .unit-preview__status.duplicate { display:block; background:#fef2f2; color:#b91c1c; }
     .par-field input:focus,.par-field select:focus,.par-field textarea:focus { border-color:var(--brand-500,#2563eb); box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-500,#2563eb) 14%,transparent); }
+    .par-select { position:relative; }
+    .par-select__native { position:absolute!important; width:1px!important; height:1px!important; opacity:0; pointer-events:none; }
+    .par-select__toggle { width:100%; min-height:44px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); font:inherit; font-size:14px; text-align:left; cursor:pointer; }
+    .par-select__toggle:focus { outline:none; border-color:var(--brand-500,#2563eb); box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-500,#2563eb) 14%,transparent); }
+    .par-select__toggle i { transition:transform .15s; }
+    .par-select.open .par-select__toggle i { transform:rotate(180deg); }
+    .par-select__menu { display:none; position:absolute; z-index:200; top:calc(100% + 6px); left:0; right:0; max-height:250px; overflow-y:auto; padding:6px; border:1px solid var(--line); border-radius:10px; background:#fff; box-shadow:0 14px 30px rgba(15,23,42,.18); }
+    .par-select.open .par-select__menu { display:grid; }
+    .par-select__option { padding:10px 11px; border:0; border-radius:7px; background:transparent; color:var(--ink); font:inherit; font-size:13px; text-align:left; cursor:pointer; }
+    .par-select__option:hover,.par-select__option:focus { outline:none; background:color-mix(in srgb,var(--brand-500,#2563eb) 10%,#fff); }
+    .par-select__option[aria-selected="true"] { background:var(--brand-600,#2563eb); color:#fff; font-weight:700; }
     .par-consent { display:flex; align-items:flex-start; gap:9px; font-size:12px; color:var(--muted); margin:18px 0; }
     .par-consent input { margin-top:3px; }
     .par-submit { width:100%; justify-content:center; border:0; }
@@ -96,10 +145,113 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     .par-status.ok { display:block; background:#ecfdf5; color:#047857; }
     .par-status.erro { display:block; background:#fef2f2; color:#b91c1c; }
     .par-hp { position:absolute!important; left:-9999px!important; opacity:0!important; }
-    .par-alt { margin-top:14px; text-align:center; font-size:12px; color:var(--muted); }
-    .par-alt a { color:var(--brand-700,#1d4ed8); font-weight:600; }
-    @media(max-width:900px){ .par-hero__grid,.par-form-wrap{grid-template-columns:1fr}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
-    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields{grid-template-columns:1fr}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.par-header .header__cta .btn{display:none} }
+    .par-trust { display:flex; flex-wrap:wrap; gap:16px 24px; margin-top:24px; color:rgba(255,255,255,.76); font-size:12px; }
+    .par-trust span { display:flex; align-items:center; gap:7px; }
+    .par-trust i { color:#fff; font-size:17px; }
+    .flex-intro { margin-top:-36px; position:relative; z-index:3; }
+    .flex-intro__box { display:grid; grid-template-columns:.8fr 1.2fr; gap:36px; align-items:center; padding:34px; border:1px solid var(--line); border-radius:24px; background:#fff; box-shadow:var(--shadow-md); }
+    .flex-label { display:inline-flex; align-items:center; gap:8px; color:var(--brand-700,#1d4ed8); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.09em; }
+    .flex-intro h2 { margin:10px 0 0; font-size:clamp(26px,3vw,38px); line-height:1.16; }
+    .flex-intro p { color:var(--muted); font-size:15px; }
+    .flex-points { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; }
+    .flex-point { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--ink); }
+    .flex-point i { flex:0 0 25px; width:25px; height:25px; display:grid; place-items:center; border-radius:8px; color:#fff; background:var(--grad-brand); }
+    .flex-band { overflow:hidden; background:var(--ink); color:#fff; }
+    .flex-band__grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+    .flex-band h2 { color:#fff; font-size:clamp(30px,4vw,46px); line-height:1.15; margin:12px 0 16px; }
+    .flex-band p { color:rgba(255,255,255,.7); }
+    .flex-profile { display:grid; gap:12px; }
+    .flex-profile__item { display:flex; gap:14px; padding:18px; border:1px solid rgba(255,255,255,.13); border-radius:15px; background:rgba(255,255,255,.06); }
+    .flex-profile__item i { color:#fff; font-size:23px; }
+    .flex-profile__item strong { display:block; font-size:14px; }
+    .flex-profile__item span { display:block; margin-top:3px; color:rgba(255,255,255,.62); font-size:12px; }
+    .flex-faq { max-width:820px; margin:0 auto; display:grid; gap:12px; }
+    .flex-faq details { border:1px solid var(--line); border-radius:14px; background:#fff; padding:0 20px; }
+    .flex-faq summary { cursor:pointer; list-style:none; padding:18px 30px 18px 0; position:relative; font-weight:600; font-size:14px; }
+    .flex-faq summary:after { content:'+'; position:absolute; right:0; top:14px; font-size:23px; color:var(--brand-600,#2563eb); }
+    .flex-faq details[open] summary:after { content:'−'; }
+    .flex-faq details p { padding:0 0 18px; color:var(--muted); font-size:13px; }
+    .aff-intro { margin-top:-36px; position:relative; z-index:3; }
+    .aff-intro__box { padding:34px; border:1px solid var(--line); border-radius:24px; background:#fff; box-shadow:var(--shadow-md); }
+    .aff-intro__grid { display:grid; grid-template-columns:.9fr 1.1fr; gap:42px; align-items:center; }
+    .aff-intro h2 { margin:10px 0 12px; font-size:clamp(27px,3vw,39px); line-height:1.16; }
+    .aff-intro p { color:var(--muted); font-size:14px; }
+    .aff-flow { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .aff-flow__item { padding:18px 14px; border-radius:15px; background:var(--bg-soft); border:1px solid var(--line); }
+    .aff-flow__item i { font-size:24px; color:var(--brand-700,#1d4ed8); }
+    .aff-flow__item strong { display:block; margin:10px 0 3px; font-size:13px; }
+    .aff-flow__item span { color:var(--muted); font-size:11px; }
+    .aff-tools { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+    .aff-tool { display:flex; gap:16px; padding:22px; border:1px solid var(--line); border-radius:17px; background:#fff; transition:.2s ease; }
+    .aff-tool:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); border-color:color-mix(in srgb,var(--brand-500,#2563eb) 35%,var(--line)); }
+    .aff-tool__icon { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; border-radius:13px; background:var(--grad-brand); color:#fff; font-size:22px; }
+    .aff-tool h3 { margin:1px 0 6px; font-size:15px; }
+    .aff-tool p { color:var(--muted); font-size:12px; }
+    .aff-highlight { position:relative; overflow:hidden; background:var(--grad-hero); color:#fff; }
+    .aff-highlight:after { content:''; position:absolute; width:380px; height:380px; border-radius:50%; right:-120px; bottom:-220px; background:rgba(255,255,255,.08); }
+    .aff-highlight__grid { position:relative; z-index:1; display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:center; }
+    .aff-highlight h2 { color:#fff; margin:10px 0 14px; font-size:clamp(29px,4vw,44px); line-height:1.16; }
+    .aff-highlight p { color:rgba(255,255,255,.72); }
+    .aff-values { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .aff-value { padding:19px; border:1px solid rgba(255,255,255,.15); border-radius:15px; background:rgba(255,255,255,.08); }
+    .aff-value i { font-size:22px; }
+    .aff-value strong { display:block; margin-top:8px; font-size:13px; }
+    .aff-value span { display:block; margin-top:3px; color:rgba(255,255,255,.62); font-size:11px; }
+    .conviction { background:#fff; }
+    .conviction__grid { display:grid; grid-template-columns:.82fr 1.18fr; gap:52px; align-items:start; }
+    .conviction__copy { position:sticky; top:110px; }
+    .conviction__copy h2 { margin:10px 0 15px; font-size:clamp(30px,4vw,44px); line-height:1.15; }
+    .conviction__copy p { color:var(--muted); }
+    .conviction__list { display:grid; gap:14px; }
+    .conviction__item { display:grid; grid-template-columns:50px 1fr; gap:16px; padding:22px; border:1px solid var(--line); border-radius:17px; background:var(--bg-soft); }
+    .conviction__item i { width:50px; height:50px; display:grid; place-items:center; border-radius:14px; background:#fff; color:var(--brand-700,#1d4ed8); box-shadow:var(--shadow-sm); font-size:24px; }
+    .conviction__item h3 { margin:1px 0 6px; font-size:15px; }
+    .conviction__item p { color:var(--muted); font-size:12px; }
+    .compare { padding:32px; border-radius:22px; background:var(--ink); color:#fff; margin-top:22px; }
+    .compare h3 { color:#fff; margin-bottom:18px; font-size:20px; }
+    .compare__grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .compare__col { padding:18px; border-radius:14px; background:rgba(255,255,255,.07); }
+    .compare__col.good { background:color-mix(in srgb,var(--brand-600,#2563eb) 38%,transparent); border:1px solid rgba(255,255,255,.14); }
+    .compare__col strong { display:block; margin-bottom:10px; font-size:13px; }
+    .compare__col span { display:flex; gap:7px; margin:8px 0; color:rgba(255,255,255,.7); font-size:11px; }
+    .compare__col i { color:#fff; }
+    .final-cta { padding:0 0 82px; background:var(--bg-soft); }
+    .final-cta__box { position:relative; overflow:hidden; display:grid; grid-template-columns:1fr auto; gap:30px; align-items:center; padding:38px 42px; border-radius:24px; background:var(--grad-brand); color:#fff; box-shadow:var(--shadow-md); }
+    .final-cta__box:after { content:''; position:absolute; width:220px; height:220px; border-radius:50%; right:-70px; top:-120px; background:rgba(255,255,255,.1); }
+    .final-cta h2 { color:#fff; font-size:clamp(25px,3vw,35px); margin-bottom:7px; }
+    .final-cta p { color:rgba(255,255,255,.76); font-size:13px; }
+    .final-cta .btn { position:relative; z-index:1; white-space:nowrap; background:#fff; color:var(--ink); }
+    .money-strip { padding:34px 0; background:var(--ink); color:#fff; }
+    .money-strip__grid { display:grid; grid-template-columns:1.05fr repeat(3,1fr); gap:14px; align-items:stretch; }
+    .money-strip__lead { padding:18px 24px 18px 0; }
+    .money-strip__lead small { color:rgba(255,255,255,.58); text-transform:uppercase; letter-spacing:.09em; font-weight:700; }
+    .money-strip__lead strong { display:block; margin-top:7px; color:#fff; font-size:clamp(28px,3vw,39px); line-height:1.08; }
+    .money-card { padding:20px; border:1px solid rgba(255,255,255,.13); border-radius:16px; background:rgba(255,255,255,.07); }
+    .money-card i { font-size:23px; }
+    .money-card strong { display:block; margin:10px 0 4px; font-size:14px; }
+    .money-card span { color:rgba(255,255,255,.62); font-size:11px; line-height:1.5; }
+    .unit-stories { background:var(--bg-soft); }
+    .unit-stories__grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .unit-story { position:relative; display:flex; flex-direction:column; min-height:285px; padding:28px; border:1px solid var(--line); border-radius:20px; background:#fff; box-shadow:var(--shadow-sm); }
+    .unit-story__quote { position:absolute; right:22px; top:17px; color:color-mix(in srgb,var(--brand-500,#2563eb) 18%,transparent); font-size:48px; }
+    .unit-story__stars { display:flex; gap:2px; color:#f59e0b; font-size:15px; }
+    .unit-story blockquote { flex:1; margin:20px 0 24px; color:var(--ink); font-size:13px; line-height:1.75; }
+    .unit-story__person { display:flex; align-items:center; gap:12px; padding-top:17px; border-top:1px solid var(--line); }
+    .unit-story__avatar { flex:0 0 42px; width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:var(--grad-brand); color:#fff; font-weight:700; }
+    .unit-story__person strong { display:block; font-size:13px; }
+    .unit-story__person span { display:block; margin-top:2px; color:var(--muted); font-size:10px; line-height:1.35; }
+    .earning-path { background:#fff; }
+    .earning-path__track { position:relative; display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+    .earning-path__track:before { content:''; position:absolute; left:9%; right:9%; top:28px; height:2px; background:var(--line); }
+    .earning-step { position:relative; z-index:1; text-align:center; }
+    .earning-step__icon { width:58px; height:58px; margin:0 auto 14px; display:grid; place-items:center; border:5px solid #fff; border-radius:50%; background:var(--grad-brand); color:#fff; box-shadow:var(--shadow-sm); font-size:21px; }
+    .earning-step strong { display:block; font-size:13px; }
+    .earning-step span { display:block; margin-top:5px; color:var(--muted); font-size:10px; line-height:1.5; }
+    .earning-path__promise { display:flex; justify-content:center; gap:26px; flex-wrap:wrap; margin-top:38px; padding:20px; border-radius:16px; background:var(--bg-soft); }
+    .earning-path__promise span { display:flex; align-items:center; gap:7px; color:var(--ink); font-size:12px; font-weight:600; }
+    .earning-path__promise i { color:var(--brand-600,#2563eb); font-size:18px; }
+    @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.money-strip__grid{grid-template-columns:1fr 1fr}.money-strip__lead{grid-column:1/-1}.unit-stories__grid{grid-template-columns:1fr}.unit-story{min-height:0}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
+    @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid,.money-strip__grid,.earning-path__track,.unit-preview{grid-template-columns:1fr}.earning-path__track:before{display:none}.earning-step{display:grid;grid-template-columns:58px 1fr;text-align:left;column-gap:14px}.earning-step__icon{grid-row:1/3;margin:0}.money-strip__lead{grid-column:auto}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
   </style>
 </head>
 <body class="par-page">
@@ -116,36 +268,94 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     <div class="container par-hero__grid">
       <div>
         <span class="par-kicker"><i class="<?= $ehAfiliado ? 'ri-hand-coin-line' : 'ri-community-line' ?>"></i> <?= e($titulo) ?></span>
-        <h1><?= $ehAfiliado ? 'Transforme indicações em <strong>oportunidades</strong>' : 'Leve educação e oportunidades para <strong>sua cidade</strong>' ?></h1>
-        <p class="lead"><?= $ehAfiliado ? 'Faça parte da rede de parceiros da ' . e($marca) . ', indique alunos, acompanhe suas matrículas e receba comissões pelas vendas realizadas.' : 'Empreenda com a ' . e($marca) . ' e conte com plataforma, catálogo de cursos e suporte para desenvolver uma operação educacional na sua região.' ?></p>
-        <div class="par-actions"><a href="#candidatura" class="btn par-btn-light">Enviar candidatura <i class="ri-arrow-right-line"></i></a><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener" class="btn par-btn-ghost"><i class="ri-whatsapp-line"></i> Tirar dúvidas</a></div>
+        <h1><?= $ehAfiliado ? 'Sua influência pode abrir novos <strong>caminhos</strong>' : 'Uma unidade física. Uma operação mais <strong>flexível</strong>.' ?></h1>
+        <p class="lead"><?= $ehAfiliado ? 'Conecte pessoas a novas oportunidades de formação, acompanhe cada indicação pelo seu painel e construa uma parceria transparente com a ' . e($marca) . '.' : 'Abra uma Unidade Flex da ' . e($marca) . ': presença física na sua cidade, estrutura planejada de acordo com a operação e tecnologia para atender, matricular e acompanhar seus alunos.' ?></p>
+        <div class="par-actions"><a href="#candidatura" class="btn par-btn-light"><?= $ehAfiliado ? 'Enviar candidatura' : 'Quero abrir uma Unidade Flex' ?> <i class="ri-arrow-right-line"></i></a><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener" class="btn par-btn-ghost"><i class="ri-whatsapp-line"></i> Falar com um consultor</a></div>
+        <div class="par-trust"><span><i class="ri-shield-check-line"></i> Candidatura sem compromisso</span><span><i class="ri-file-list-3-line"></i> Condições formalizadas em contrato</span><span><i class="ri-customer-service-2-line"></i> Acompanhamento da equipe</span></div>
       </div>
       <div class="par-visual">
         <?php if ($ehAfiliado): ?>
-          <div class="par-metric"><i class="ri-links-line"></i><strong>Indique de qualquer lugar</strong><span>Atuação digital com apoio do painel do afiliado.</span></div>
-          <div class="par-metric"><i class="ri-line-chart-line"></i><strong>Acompanhe</strong><span>Veja alunos e comissões.</span></div>
-          <div class="par-metric"><i class="ri-wallet-3-line"></i><strong>Receba</strong><span>Conta virtual e saque.</span></div>
+          <div class="par-metric"><i class="ri-links-line"></i><strong>Um link que identifica suas indicações</strong><span>Compartilhe sua oportunidade e mantenha a origem de cada indicação organizada.</span></div>
+          <div class="par-metric"><i class="ri-line-chart-line"></i><strong>Acompanhe</strong><span>Matrículas e comissões.</span></div>
+          <div class="par-metric"><i class="ri-wallet-3-line"></i><strong>Gerencie</strong><span>Conta e solicitações.</span></div>
         <?php else: ?>
-          <div class="par-metric"><i class="ri-school-line"></i><strong>Negócio educacional estruturado</strong><span>Uma operação local apoiada por tecnologia e portfólio de cursos.</span></div>
-          <div class="par-metric"><i class="ri-customer-service-2-line"></i><strong>Suporte</strong><span>Apoio operacional.</span></div>
-          <div class="par-metric"><i class="ri-map-pin-line"></i><strong>Presença local</strong><span>Atenda sua região.</span></div>
+          <div class="par-metric"><i class="ri-store-2-line"></i><strong>Presença física, formato inteligente</strong><span>Um espaço real de acolhimento e atendimento, dimensionado para a sua realidade.</span></div>
+          <div class="par-metric"><i class="ri-layout-masonry-line"></i><strong>Implantação flexível</strong><span>Comece com o essencial.</span></div>
+          <div class="par-metric"><i class="ri-dashboard-3-line"></i><strong>Gestão integrada</strong><span>Operação no AVASET.</span></div>
         <?php endif; ?>
       </div>
     </div>
   </section>
 
+  <section class="money-strip"><div class="container money-strip__grid">
+    <div class="money-strip__lead"><small>Ganhos e autonomia</small><strong><?= $ehAfiliado ? 'Ganhe 15%' : 'Ganhe até 50%' ?></strong></div>
+    <div class="money-card"><i class="ri-percent-line"></i><strong><?= $ehAfiliado ? '15% de comissão' : 'Repasse de até 50%' ?></strong><span><?= $ehAfiliado ? 'Receba 15% de comissão nas matrículas elegíveis, conforme as condições estabelecidas no contrato.' : 'O percentual varia conforme a modalidade do curso e as condições estabelecidas no contrato.' ?></span></div>
+    <div class="money-card"><i class="ri-flashlight-line"></i><strong>Crédito automático</strong><span><?= $ehAfiliado ? 'Quando o pagamento elegível é confirmado, sua comissão é calculada e creditada automaticamente.' : 'Quando o pagamento elegível é confirmado, o repasse da unidade é calculado e creditado automaticamente.' ?></span></div>
+    <div class="money-card"><i class="ri-bank-card-line"></i><strong>PIX a qualquer hora</strong><span>Com saldo disponível e dados validados, solicite pelo painel a transferência para sua chave PIX, de dia ou de noite.</span></div>
+  </div></section>
+
+  <section class="par-section conviction">
+    <div class="container conviction__grid">
+      <div class="conviction__copy"><span class="flex-label"><i class="ri-lightbulb-flash-line"></i> <?= $ehAfiliado ? 'Uma oportunidade real' : 'Um modelo mais atual' ?></span><h2><?= $ehAfiliado ? 'Não basta indicar. É preciso conseguir acompanhar.' : 'Presença física sem começar maior do que precisa.' ?></h2><p><?= $ehAfiliado ? 'Uma boa parceria transforma sua capacidade de comunicação em um processo organizado, rastreável e transparente — do primeiro contato ao acompanhamento no painel.' : 'A Unidade Flex nasce para unir a confiança do atendimento presencial a uma estrutura de implantação racional, apoiada por tecnologia e processos.' ?></p>
+        <div class="compare"><h3><?= $ehAfiliado ? 'O que muda para você' : 'Por que o formato Flex?' ?></h3><div class="compare__grid"><div class="compare__col"><strong><?= $ehAfiliado ? 'Indicação sem estrutura' : 'Modelo engessado' ?></strong><span><i class="ri-close-line"></i><?= $ehAfiliado ? 'Origem difícil de acompanhar' : 'Estrutura inicial desproporcional' ?></span><span><i class="ri-close-line"></i><?= $ehAfiliado ? 'Informações espalhadas' : 'Processos pouco adaptáveis' ?></span><span><i class="ri-close-line"></i><?= $ehAfiliado ? 'Pouca visibilidade do resultado' : 'Crescimento sem etapas claras' ?></span></div><div class="compare__col good"><strong><?= $ehAfiliado ? 'Programa de Afiliados' : 'Unidade Flex' ?></strong><span><i class="ri-check-line"></i><?= $ehAfiliado ? 'Link próprio de indicação' : 'Espaço físico dimensionado' ?></span><span><i class="ri-check-line"></i><?= $ehAfiliado ? 'Painel centralizado' : 'Gestão integrada ao AVASET' ?></span><span><i class="ri-check-line"></i><?= $ehAfiliado ? 'Regras e critérios definidos' : 'Implantação acompanhada' ?></span></div></div></div>
+      </div>
+      <div class="conviction__list">
+        <?php $argumentos = $ehAfiliado ? [
+          ['ri-radar-line','Transforme alcance em conexão','Você não precisa ter milhões de seguidores. Uma rede construída com confiança pode aproximar a pessoa certa da formação que ela procura.'],
+          ['ri-route-line','Cada indicação com um caminho claro','Seu link identifica a origem, permite receber matrículas online e ajuda a manter o processo organizado, sem controles improvisados.'],
+          ['ri-scales-3-line','Transparência desde o início','Critérios, percentuais e responsabilidades são apresentados antes da formalização da parceria.'],
+          ['ri-time-line','Atue no seu ritmo','Organize sua divulgação de acordo com sua rotina e com os canais nos quais você já tem presença.'],
+        ] : [
+          ['ri-store-3-line','Uma referência local','Crie um ponto físico onde o aluno encontra orientação, acolhimento e confiança para iniciar sua jornada.'],
+          ['ri-expand-left-right-line','Estrutura que pode evoluir','Comece com os requisitos definidos para a operação e amplie de forma planejada conforme a realidade local.'],
+          ['ri-computer-line','Seu link trabalha com você','Divulgue seu link exclusivo de campanha e receba matrículas online já vinculadas à sua Unidade Flex.'],
+          ['ri-map-pin-user-line','Impacto perto de casa','Ajude a ampliar o acesso à formação e desenvolva uma atuação educacional conectada à sua comunidade.'],
+        ]; foreach ($argumentos as [$icone,$tit,$txt]): ?><article class="conviction__item"><i class="<?= $icone ?>"></i><div><h3><?= e($tit) ?></h3><p><?= e($txt) ?></p></div></article><?php endforeach; ?>
+      </div>
+    </div>
+  </section>
+
+  <?php if ($ehAfiliado): ?>
+  <section class="aff-intro"><div class="container"><div class="aff-intro__box"><div class="aff-intro__grid">
+    <div><span class="flex-label"><i class="ri-sparkling-2-line"></i> Parceria inteligente</span><h2>Você indica. A plataforma organiza.</h2><p>O programa foi pensado para quem já conversa com pessoas, cria conteúdo, atua comercialmente ou simplesmente conhece alguém buscando uma nova formação.</p></div>
+    <div class="aff-flow"><div class="aff-flow__item"><i class="ri-share-forward-line"></i><strong>Compartilhe</strong><span>Use seu link exclusivo.</span></div><div class="aff-flow__item"><i class="ri-user-follow-line"></i><strong>Conecte</strong><span>Apresente oportunidades.</span></div><div class="aff-flow__item"><i class="ri-bar-chart-box-line"></i><strong>Acompanhe</strong><span>Visualize seus resultados.</span></div></div>
+  </div></div></div></section>
+  <?php endif; ?>
+
+  <?php if (!$ehAfiliado): ?>
+  <section class="flex-intro">
+    <div class="container">
+      <div class="flex-intro__box">
+        <div><span class="flex-label"><i class="ri-focus-3-line"></i> O conceito</span><h2>O físico que acompanha o seu ritmo</h2></div>
+        <div><p>A Unidade Flex é uma unidade física de atendimento educacional com uma implantação mais adaptável. Você mantém presença real na cidade e organiza a estrutura de forma responsável, conforme o perfil da região e a evolução da operação.</p><div class="flex-points"><div class="flex-point"><i class="ri-check-line"></i><span>Atendimento presencial e humanizado</span></div><div class="flex-point"><i class="ri-check-line"></i><span>Estrutura planejada para cada fase</span></div><div class="flex-point"><i class="ri-check-line"></i><span>Tecnologia para gestão e matrículas</span></div><div class="flex-point"><i class="ri-check-line"></i><span>Orientação durante a implantação</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <?php if ($ehAfiliado): ?>
+  <section class="par-section par-section--soft"><div class="container"><div class="par-head"><small>Seu ambiente de trabalho</small><h2>Recursos para uma parceria transparente</h2><p>Tenha acesso às informações essenciais para acompanhar sua atuação com clareza e autonomia.</p></div><div class="aff-tools">
+    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-links-line"></i></div><div><h3>Link exclusivo de indicação</h3><p>Uma identificação própria para divulgar os cursos e registrar corretamente a origem das oportunidades.</p></div></article>
+    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-group-line"></i></div><div><h3>Acompanhamento de alunos</h3><p>Consulte no painel os alunos relacionados à sua atuação e o andamento das matrículas.</p></div></article>
+    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-pie-chart-line"></i></div><div><h3>15% de comissão</h3><p>Acompanhe pelo painel os valores apurados nas matrículas elegíveis vinculadas à sua conta.</p></div></article>
+    <article class="aff-tool"><div class="aff-tool__icon"><i class="ri-secure-payment-line"></i></div><div><h3>Saque instantâneo via PIX</h3><p>Consulte suas movimentações e transfira o saldo disponível pelo painel a qualquer hora do dia ou da noite.</p></div></article>
+  </div></div></section>
+
+  <section class="par-section aff-highlight"><div class="container aff-highlight__grid"><div><span class="flex-label" style="color:#fff"><i class="ri-fingerprint-line"></i> Do seu jeito</span><h2>Indique com autenticidade e responsabilidade</h2><p>Você escolhe como apresentar as oportunidades à sua rede, respeitando as informações oficiais dos cursos e as regras da parceria. A confiança de quem recebe sua indicação vem sempre em primeiro lugar.</p></div><div class="aff-values"><div class="aff-value"><i class="ri-smartphone-line"></i><strong>Atuação flexível</strong><span>Compartilhe pelos canais que fazem sentido para você.</span></div><div class="aff-value"><i class="ri-shield-check-line"></i><strong>Informação segura</strong><span>Divulgue condições e cursos com clareza.</span></div><div class="aff-value"><i class="ri-eye-line"></i><strong>Transparência</strong><span>Acompanhe sua atuação no painel.</span></div><div class="aff-value"><i class="ri-customer-service-2-line"></i><strong>Apoio</strong><span>Conte com os canais previstos para parceiros.</span></div></div></div></section>
+  <?php endif; ?>
+  <?php endif; ?>
+
   <section class="par-section">
     <div class="container">
-      <div class="par-head"><small>Por que participar</small><h2><?= $ehAfiliado ? 'Uma parceria simples, transparente e digital' : 'Estrutura para você focar no crescimento local' ?></h2><p><?= $ehAfiliado ? 'Você aproxima novos alunos da formação que procuram; a plataforma organiza o restante do caminho.' : 'A unidade combina o relacionamento da sua região com a estrutura acadêmica e tecnológica da rede.' ?></p></div>
+      <div class="par-head"><small><?= $ehAfiliado ? 'Por que participar' : 'Estrutura para crescer' ?></small><h2><?= $ehAfiliado ? 'Uma parceria simples, transparente e digital' : 'Mais que uma unidade: uma operação conectada' ?></h2><p><?= $ehAfiliado ? 'Você aproxima novos alunos da formação que procuram; a plataforma organiza o restante do caminho.' : 'A Unidade Flex une relacionamento local, processos claros e recursos de gestão para você concentrar energia no atendimento e no desenvolvimento da sua região.' ?></p></div>
       <div class="par-grid">
         <?php $beneficios = $ehAfiliado ? [
           ['ri-user-add-line','Cadastro de alunos','Matricule e acompanhe os alunos indicados no seu próprio painel.'],
-          ['ri-percent-line','Comissões por categoria','As condições são definidas no contrato da parceria.'],
-          ['ri-bank-card-line','Conta virtual','Acompanhe os créditos e solicite saques com segurança.'],
+          ['ri-percent-line','15% de comissão','Receba comissão nas matrículas elegíveis identificadas pelo seu link.'],
+          ['ri-bank-card-line','Seu dinheiro, no seu tempo','Receba créditos automáticos e solicite a transferência via PIX quando quiser.'],
         ] : [
-          ['ri-book-open-line','Portfólio de cursos','Ofereça modalidades e formações disponibilizadas pela rede.'],
-          ['ri-dashboard-3-line','Painel de gestão','Gerencie matrículas, alunos e operação em um só ambiente.'],
-          ['ri-team-line','Apoio da rede','Conte com processos e suporte para iniciar sua unidade.'],
+          ['ri-book-open-line','Portfólio educacional','Apresente as modalidades e formações disponibilizadas pela instituição.'],
+          ['ri-links-line','Link exclusivo de campanha','Divulgue seus cursos e receba matrículas online diretamente pelo link da sua unidade.'],
+          ['ri-dashboard-3-line','Gestão e repasse no AVASET','Acompanhe matrículas, créditos automáticos e solicite transferências pelo painel.'],
         ]; foreach ($beneficios as [$icone,$tit,$txt]): ?>
           <article class="par-card"><div class="ic"><i class="<?= $icone ?>"></i></div><h3><?= e($tit) ?></h3><p><?= e($txt) ?></p></article>
         <?php endforeach; ?>
@@ -153,61 +363,253 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     </div>
   </section>
 
+  <?php if (!$ehAfiliado): ?>
+  <section class="par-section flex-band">
+    <div class="container flex-band__grid">
+      <div><span class="flex-label" style="color:#fff"><i class="ri-user-star-line"></i> Perfil do parceiro</span><h2>Para quem quer construir presença na própria região</h2><p>Não é preciso chegar com uma grande operação pronta. Procuramos pessoas comprometidas com atendimento, organização e desenvolvimento local, dispostas a seguir os critérios acadêmicos e operacionais da instituição.</p></div>
+      <div class="flex-profile">
+        <div class="flex-profile__item"><i class="ri-community-line"></i><div><strong>Conexão com a cidade</strong><span>Conhece o público e deseja gerar oportunidades por meio da educação.</span></div></div>
+        <div class="flex-profile__item"><i class="ri-service-line"></i><div><strong>Vocação para atender</strong><span>Valoriza proximidade, clareza e uma boa experiência para cada aluno.</span></div></div>
+        <div class="flex-profile__item"><i class="ri-rocket-2-line"></i><div><strong>Visão de crescimento</strong><span>Quer começar de forma planejada e evoluir com consistência.</span></div></div>
+      </div>
+    </div>
+  </section>
+  <?php endif; ?>
+
+  <?php if ($depoimentosUnidade): ?>
+  <section class="par-section unit-stories">
+    <div class="container">
+      <div class="par-head"><small><?= $ehAfiliado ? 'Resultados de afiliados' : 'Histórias de quem já começou' ?></small><h2><?= $ehAfiliado ? 'Pessoas comuns, indicações que geram resultados' : 'Gestores que transformaram suas operações' ?></h2><p><?= $ehAfiliado ? 'Relatos de afiliados da ' . e($marca) . ' que usam seus próprios canais para indicar formações, acompanhar matrículas e receber comissões.' : 'Experiências de parceiros da ' . e($marca) . ' que encontraram novas possibilidades para crescer por meio da educação.' ?></p></div>
+      <div class="unit-stories__grid">
+        <?php foreach ($depoimentosUnidade as $dep): ?>
+        <article class="unit-story">
+          <i class="ri-double-quotes-r unit-story__quote"></i>
+          <div class="unit-story__stars" aria-label="Depoimento de parceiro"><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i></div>
+          <blockquote>“<?= e($dep['relato']) ?>”</blockquote>
+          <div class="unit-story__person"><div class="unit-story__avatar"><?= e(mb_strtoupper(mb_substr($dep['nome'], 0, 1))) ?></div><div><strong><?= e($dep['nome']) ?></strong><span><?= $ehAfiliado ? 'Afiliado parceiro ' . e($marca) : e($dep['empresa']) ?></span></div></div>
+        </article>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </section>
+  <?php endif; ?>
+
+  <section class="par-section earning-path">
+    <div class="container"><div class="par-head"><small><?= $ehAfiliado ? 'Da indicação ao recebimento' : 'Da campanha ao repasse' ?></small><h2><?= $ehAfiliado ? 'Veja como sua comissão acontece' : 'Seu link pode trabalhar 24 horas por você' ?></h2><p><?= $ehAfiliado ? 'Um fluxo simples, rastreável e acompanhado pelo seu painel.' : 'Divulgue os cursos da Unidade Flex e receba matrículas online vinculadas à sua operação.' ?></p></div>
+      <div class="earning-path__track">
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-links-line"></i></div><strong>Link exclusivo</strong><span><?= $ehAfiliado ? 'Você recebe sua identificação de afiliado.' : 'A unidade recebe links de campanha por curso.' ?></span></div>
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-share-forward-line"></i></div><strong>Divulgação</strong><span>Compartilhe em redes sociais, WhatsApp, anúncios ou contatos.</span></div>
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-user-add-line"></i></div><strong>Matrícula online</strong><span><?= $ehAfiliado ? 'O aluno entra pelo seu link e fica identificado.' : 'A matrícula chega vinculada à sua Unidade Flex.' ?></span></div>
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-flashlight-line"></i></div><strong>Crédito automático</strong><span><?= $ehAfiliado ? 'Pagamento elegível confirmado: 15% creditados.' : 'Pagamento elegível confirmado: repasse creditado.' ?></span></div>
+        <div class="earning-step"><div class="earning-step__icon"><i class="ri-bank-card-line"></i></div><strong>PIX quando quiser</strong><span>Com saldo e dados validados, solicite a transferência pelo painel.</span></div>
+      </div>
+      <div class="earning-path__promise"><span><i class="ri-eye-line"></i> Acompanhamento pelo painel</span><span><i class="ri-time-line"></i> Solicitação disponível dia e noite</span><span><i class="ri-shield-check-line"></i> Confirmação com segurança</span></div>
+    </div>
+  </section>
+
+  <?php if ($ehAfiliado): ?>
+  <section class="par-section"><div class="container"><div class="par-head"><small>Dúvidas frequentes</small><h2>Entenda o programa de afiliados</h2></div><div class="flex-faq">
+    <details><summary>Preciso pagar para enviar minha candidatura?</summary><p>O envio da candidatura não cria cobrança nem garante aprovação. As condições da parceria são apresentadas pela equipe antes da formalização.</p></details>
+    <details><summary>Como minhas indicações são identificadas?</summary><p>Depois da aprovação, você recebe um acesso e um link próprio. As matrículas realizadas a partir dessa identificação ficam relacionadas à sua conta conforme as regras do programa.</p></details>
+    <details><summary>Qual é a comissão do afiliado?</summary><p>O afiliado recebe 15% de comissão nas matrículas elegíveis vinculadas à sua conta, conforme os critérios formalizados no contrato da parceria.</p></details>
+    <details><summary>Quando a comissão entra na minha conta?</summary><p>Quando um pagamento elegível da matrícula é confirmado, o sistema calcula o percentual e credita a comissão automaticamente na sua conta virtual.</p></details>
+    <details><summary>Posso transferir o dinheiro a qualquer hora?</summary><p>Sim. Com saldo disponível, chave PIX cadastrada e validações de segurança concluídas, você pode solicitar a transferência pelo painel a qualquer hora do dia ou da noite.</p></details>
+    <details><summary>Posso divulgar em redes sociais?</summary><p>Sim, desde que a divulgação respeite as informações oficiais, a identidade da instituição e as regras apresentadas durante a ativação.</p></details>
+  </div></div></section>
+  <?php endif; ?>
+
   <section class="par-section par-section--soft">
     <div class="container">
-      <div class="par-head"><small>Como funciona</small><h2>Da candidatura ao início da parceria</h2></div>
+      <div class="par-head"><small>Como funciona</small><h2><?= $ehAfiliado ? 'Da candidatura ao início da parceria' : 'Seu caminho até a abertura da Unidade Flex' ?></h2><p><?= $ehAfiliado ? '' : 'Cada candidatura é analisada individualmente para alinhar cidade, perfil, estrutura e condições da parceria.' ?></p></div>
       <div class="par-steps">
         <article class="par-step"><h3>Envie seus dados</h3><p>Preencha o formulário com seus contatos e sua região.</p></article>
-        <article class="par-step"><h3>Análise da escola</h3><p>A equipe avalia o perfil e a disponibilidade na sua localidade.</p></article>
-        <article class="par-step"><h3>Conversa e condições</h3><p>Você conhece as regras, percentuais e responsabilidades.</p></article>
-        <article class="par-step"><h3>Ativação</h3><p>Com a aprovação e o contrato, seu acesso é liberado.</p></article>
+        <article class="par-step"><h3><?= $ehAfiliado ? 'Análise da candidatura' : 'Análise da região' ?></h3><p><?= $ehAfiliado ? 'A equipe avalia seu perfil e as informações enviadas na candidatura.' : 'A equipe avalia o perfil e a disponibilidade na sua localidade.' ?></p></article>
+        <article class="par-step"><h3><?= $ehAfiliado ? 'Conversa e condições' : 'Plano de implantação' ?></h3><p><?= $ehAfiliado ? 'Você conhece as regras, percentuais e responsabilidades.' : 'Alinhamos estrutura, responsabilidades, documentação e próximos passos.' ?></p></article>
+        <article class="par-step"><h3><?= $ehAfiliado ? 'Ativação' : 'Capacitação e abertura' ?></h3><p><?= $ehAfiliado ? 'Com a aprovação e o contrato, seu acesso é liberado.' : 'Após aprovação e contrato, a unidade recebe acesso e orientação para iniciar.' ?></p></article>
       </div>
     </div>
   </section>
 
+  <?php if (!$ehAfiliado): ?>
+  <section class="par-section">
+    <div class="container"><div class="par-head"><small>Dúvidas frequentes</small><h2>Antes de dar o primeiro passo</h2></div><div class="flex-faq">
+      <details><summary>A Unidade Flex é uma unidade física?</summary><p>Sim. É uma unidade com presença física na cidade, preparada para acolher, orientar e atender alunos. “Flex” descreve uma implantação mais adaptável e moderna, não uma operação exclusivamente digital.</p></details>
+      <details><summary>Preciso ter uma grande estrutura pronta?</summary><p>Não necessariamente. A estrutura é avaliada conforme a região, o atendimento previsto e os requisitos aplicáveis. A equipe orientará o que é necessário antes da abertura.</p></details>
+      <details><summary>Posso abrir uma Unidade Flex em qualquer cidade?</summary><p>A disponibilidade depende da análise territorial e estratégica da instituição. Informe sua cidade no formulário para que a equipe verifique a possibilidade.</p></details>
+      <details><summary>Que suporte receberei?</summary><p>O parceiro recebe orientação de implantação, acesso aos processos e ao sistema de gestão, além dos canais de suporte definidos na formalização da parceria.</p></details>
+      <details><summary>Como recebo matrículas pela internet?</summary><p>A Unidade Flex recebe um link exclusivo de campanha. O gestor pode divulgá-lo em redes sociais, anúncios, WhatsApp e outros canais; as matrículas online feitas por esse caminho ficam vinculadas à unidade.</p></details>
+      <details><summary>Como funcionam os repasses?</summary><p>O repasse pode chegar a 50%, conforme a modalidade e o contrato. Após a confirmação de um pagamento elegível, o sistema calcula e credita automaticamente o valor na conta virtual da unidade.</p></details>
+      <details><summary>Quando posso transferir o saldo?</summary><p>O repasse da primeira mensalidade ou do pagamento à vista fica em carência durante 7 dias corridos completos e é liberado para saque no 8º dia. Da segunda mensalidade em diante, o repasse fica disponível imediatamente após a confirmação do pagamento. Com saldo disponível e as validações concluídas, o gestor pode solicitar uma transferência instantânea via PIX pelo painel a qualquer hora.</p></details>
+      <details><summary>O envio da candidatura garante a aprovação?</summary><p>Não. A candidatura inicia o processo de análise. A abertura depende da aprovação, do alinhamento das condições e da formalização contratual.</p></details>
+    </div></div>
+  </section>
+  <?php endif; ?>
+
+  <section class="final-cta"><div class="container"><div class="final-cta__box"><div><h2><?= $ehAfiliado ? 'Uma indicação pode mudar uma trajetória.' : 'Sua cidade pode estar pronta para uma Unidade Flex.' ?></h2><p><?= $ehAfiliado ? 'Dê o primeiro passo para construir uma parceria organizada, transparente e conectada a novas oportunidades.' : 'Apresente seu perfil e descubra se existe disponibilidade para desenvolver essa oportunidade na sua região.' ?></p></div><a href="#candidatura" class="btn"><?= $ehAfiliado ? 'Quero fazer parte' : 'Quero avaliar minha cidade' ?> <i class="ri-arrow-right-line"></i></a></div></div></section>
+
   <section class="par-section" id="candidatura">
     <div class="container par-form-wrap">
       <div class="par-form-copy">
-        <h2><?= $ehAfiliado ? 'Quero ser afiliado' : 'Quero abrir uma unidade' ?></h2>
+        <h2><?= $ehAfiliado ? 'Quero ser afiliado' : 'Quero abrir uma Unidade Flex' ?></h2>
         <p>Preencha os dados abaixo. Sua candidatura será enviada diretamente para a equipe da <?= e($marca) ?>.</p>
         <ul class="par-checks"><li><i class="ri-check-line"></i><span>Envio seguro para o sistema da escola</span></li><li><i class="ri-check-line"></i><span>Análise sem compromisso</span></li><li><i class="ri-check-line"></i><span>Retorno pelos contatos informados</span></li></ul>
       </div>
       <form class="par-form" id="parForm">
         <input class="par-hp" type="text" name="empresa_site" tabindex="-1" autocomplete="off">
         <div class="par-fields">
-          <div class="par-field full"><label for="nome">Nome completo *</label><input id="nome" name="nome" required minlength="3" maxlength="120" autocomplete="name"></div>
-          <div class="par-field"><label for="email">E-mail *</label><input id="email" name="email" type="email" required maxlength="160" autocomplete="email"></div>
-          <div class="par-field"><label for="telefone">WhatsApp *</label><input id="telefone" name="telefone" type="tel" required minlength="10" maxlength="20" autocomplete="tel" placeholder="(00) 00000-0000"></div>
+          <div class="par-form-section"><i class="ri-user-line"></i> <?= $ehAfiliado ? 'Dados pessoais' : 'Responsável pela unidade' ?></div>
+          <div class="par-field full"><label for="nome"><?= $ehAfiliado ? 'Nome completo' : 'Nome completo do responsável' ?> *</label><input id="nome" name="nome" required minlength="3" maxlength="120" autocomplete="name"></div>
+          <div class="par-field"><label for="cpf">CPF *</label><input id="cpf" name="cpf" required inputmode="numeric" maxlength="14" placeholder="000.000.000-00"></div>
+          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="data_nascimento">Data de nascimento *</label><input id="data_nascimento" name="data_nascimento" type="date" required></div><?php endif; ?>
+          <div class="par-field"><label for="email">E-mail para notificações *</label><input id="email" name="email" type="email" required maxlength="160" autocomplete="email"></div>
+          <div class="par-field"><label for="telefone">WhatsApp *</label><input id="telefone" name="telefone" type="tel" required minlength="6" maxlength="15" autocomplete="tel" placeholder="(00) 00000-0000"></div>
+
+          <?php if (!$ehAfiliado): ?>
+          <div class="par-form-section"><i class="ri-store-2-line"></i> Dados da Unidade Flex</div>
+          <div class="par-field"><label for="nome_empresa">Nome da empresa *</label><input id="nome_empresa" name="nome_empresa" required minlength="3" maxlength="160" autocomplete="organization" placeholder="Razão social ou nome empresarial"></div>
+          <div class="par-field"><label for="cnpj">CNPJ *</label><input id="cnpj" name="cnpj" required inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00"></div>
+          <?php endif; ?>
+
+          <div class="par-form-section"><i class="ri-map-pin-line"></i> <?= $ehAfiliado ? 'Localização' : 'Endereço da futura unidade' ?></div>
+          <?php if (!$ehAfiliado): ?><div class="par-field"><label for="cep">CEP *</label><input id="cep" name="cep" required inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000"></div><div class="par-field"><label for="endereco">Endereço, número e complemento *</label><input id="endereco" name="endereco" required maxlength="200" autocomplete="street-address"></div><div class="par-field full"><label for="bairro">Bairro *</label><input id="bairro" name="bairro" required minlength="2" maxlength="100" autocomplete="address-level3" placeholder="Ex.: Jóquei"></div><?php endif; ?>
           <div class="par-field"><label for="cidade">Cidade *</label><input id="cidade" name="cidade" required maxlength="100" autocomplete="address-level2"></div>
-          <div class="par-field"><label for="estado">Estado *</label><select id="estado" name="estado" required><option value="">Selecione...</option><?php foreach (['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'] as $uf): ?><option><?= $uf ?></option><?php endforeach; ?></select></div>
-          <div class="par-field full"><label for="experiencia"><?= $ehAfiliado ? 'Como pretende divulgar os cursos?' : 'Conte sobre sua experiência e estrutura atual' ?></label><textarea id="experiencia" name="experiencia" maxlength="1200" placeholder="<?= $ehAfiliado ? 'Redes sociais, contatos, atuação comercial...' : 'Experiência comercial ou educacional, espaço disponível, região de atuação...' ?>"></textarea></div>
+          <div class="par-field"><label for="estado">Estado *</label><select id="estado" name="estado" required autocomplete="address-level1"><option value="">Selecione...</option><?php foreach (['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'] as $uf): ?><option><?= $uf ?></option><?php endforeach; ?></select></div>
+          <?php if (!$ehAfiliado): ?><div class="unit-preview"><div class="unit-preview__box"><i class="ri-building-line"></i><div><small>Nome institucional do polo (automático)</small><strong id="unidadeNomePreview">Preencha bairro, cidade e estado</strong></div></div><div class="unit-preview__box"><i class="ri-at-line"></i><div><small>E-mail institucional do polo (automático)</small><strong id="unidadeEmailPreview">Preencha bairro, cidade e estado</strong></div></div><div id="unidadeStatus" class="unit-preview__status" role="status"></div></div><input type="hidden" id="unidade_nome" name="unidade_nome" required><input type="hidden" id="unidade_identificacao" name="unidade_identificacao" required><?php endif; ?>
+
+          <div class="par-form-section"><i class="ri-bank-card-line"></i> Dados para recebimento</div>
+          <div class="par-field"><label for="pix_tipo">Tipo de chave PIX *</label><select id="pix_tipo" name="pix_tipo" required><option value="">Selecione...</option><option value="CPF">CPF</option><option value="CNPJ">CNPJ</option><option value="E-mail">E-mail</option><option value="Telefone">Telefone</option><option value="Chave aleatória">Chave aleatória</option></select></div>
+          <div class="par-field"><label for="pix_chave">Chave PIX *</label><input id="pix_chave" name="pix_chave" required maxlength="140"><small>Será usada como destino das transferências após aprovação e validação.</small></div>
+          <div class="par-field"><label for="banco_codigo">Código do banco *</label><input id="banco_codigo" name="banco_codigo" required inputmode="numeric" maxlength="10" placeholder="Ex.: 001"></div>
+          <div class="par-field"><label for="banco_nome">Nome do banco *</label><input id="banco_nome" name="banco_nome" required maxlength="80"></div>
+
+          <div class="par-form-section"><i class="ri-questionnaire-line"></i> Perfil da candidatura</div>
+          <?php if ($ehAfiliado): ?><div class="par-field full"><label for="canal_divulgacao">Principal canal de divulgação *</label><select id="canal_divulgacao" name="canal_divulgacao" required><option value="">Selecione...</option><option>Redes sociais</option><option>WhatsApp e contatos</option><option>Site ou blog</option><option>Atuação comercial presencial</option><option>Outro</option></select></div><?php else: ?><div class="par-field"><label for="espaco">Já possui espaço físico? *</label><select id="espaco" name="espaco" required><option value="">Selecione...</option><option>Sim, já está pronto</option><option>Sim, precisa de adequações</option><option>Ainda estou procurando</option></select></div><div class="par-field"><label for="experiencia_educacional">Já atua na área educacional? *</label><select id="experiencia_educacional" name="experiencia_educacional" required><option value="">Selecione...</option><option>Sim</option><option>Não</option></select></div><?php endif; ?>
+          <div class="par-field full"><label for="experiencia"><?= $ehAfiliado ? 'Como pretende divulgar os cursos?' : 'Conte sobre sua experiência e estrutura atual' ?> *</label><textarea id="experiencia" name="experiencia" required minlength="10" maxlength="1200" placeholder="<?= $ehAfiliado ? 'Redes sociais, contatos, atuação comercial...' : 'Experiência comercial ou educacional, espaço disponível, região de atuação...' ?>"></textarea></div>
         </div>
-        <label class="par-consent"><input type="checkbox" name="consentimento" required><span>Autorizo o contato da <?= e($marca) ?> sobre esta candidatura e confirmo que os dados informados são verdadeiros.</span></label>
+        <label class="par-consent"><input type="checkbox" name="consentimento" required><span>Autorizo o tratamento dos dados informados para análise, contato, validação e eventual cadastro desta parceria. Confirmo que os dados são verdadeiros.</span></label>
         <button class="btn btn-primary par-submit" type="submit" id="parSubmit">Enviar candidatura <i class="ri-send-plane-line"></i></button>
         <div class="par-status" id="parStatus" role="status"></div>
-        <p class="par-alt">Prefere conversar agora? <a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener">Fale pelo WhatsApp</a></p>
       </form>
     </div>
   </section>
 </main>
 
-<footer class="footer"><div class="container"><div class="footer__bottom"><span>© <?= $ano ?> <?= e($marca) ?> · Todos os direitos reservados.</span><span><a href="index.php">Voltar ao site</a></span></div></div></footer>
+<footer class="footer"><div class="container">
+  <div class="footer__grid">
+    <div class="footer__brand"><img src="<?= e($logoNegativa) ?>" alt="<?= e($marca) ?>"><p>Educação, tecnologia e atendimento próximo para criar novas oportunidades de aprendizagem.</p><div class="footer__social"><?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?><?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="ri-whatsapp-line"></i></a><?php if (config('youtube')): ?><a href="<?= e(config('youtube')) ?>" target="_blank" rel="noopener" aria-label="YouTube"><i class="ri-youtube-fill"></i></a><?php endif; ?></div></div>
+    <div><h5>Modalidades</h5><ul><li><a href="index.php#cursos">Supletivo EJA</a></li><li><a href="index.php#cursos">Cursos técnicos</a></li><li><a href="/profissionalizantes">Cursos profissionalizantes</a></li></ul></div>
+    <div><h5>Institucional</h5><ul><li><a href="index.php#categorias">Sobre nós</a></li><li><a href="unidades.php">Unidades</a></li><li><a href="afiliados.php">Programa de afiliados</a></li><li><a href="seja-uma-unidade.php">Abra sua Unidade Flex</a></li><li><a href="index.php#diferenciais">Diferenciais</a></li></ul></div>
+    <div><h5>Atendimento</h5><ul><li><a href="index.php#contato">Central do aluno</a></li><li><a href="index.php#contato">Fale conosco</a></li><li><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener">WhatsApp</a></li></ul></div>
+  </div>
+  <div class="footer__bottom"><span>© <?= $ano ?> <?= e($marca) ?> · Todos os direitos reservados.</span><span><a href="index.php">Voltar ao site</a></span></div>
+</div></footer>
 
+<script src="assets/js/intl-phone.js"></script>
 <script>
+const somenteDigitos = valor => valor.replace(/\D/g, '');
+const mascaras = {
+  cpf(valor) { const d = somenteDigitos(valor).slice(0,11); return d.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); },
+  cnpj(valor) { const d = somenteDigitos(valor).slice(0,14); return d.replace(/(\d{2})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1/$2').replace(/(\d{4})(\d{1,2})$/,'$1-$2'); },
+  cep(valor) { return somenteDigitos(valor).slice(0,8).replace(/(\d{5})(\d)/,'$1-$2'); },
+  telefone(valor) { const d = somenteDigitos(valor).slice(0,11); return d.replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{4})$/,'$1-$2'); }
+};
+[['cpf','cpf'],['cnpj','cnpj'],['cep','cep']].forEach(([id,tipo]) => { const el=document.getElementById(id); if(el) el.addEventListener('input',()=>el.value=mascaras[tipo](el.value)); });
+// Seletor DDI internacional para telefone
+var intlParceria = IntlPhone.init('#telefone', {});
+
+// Menus próprios: permanecem abertos até a escolha e evitam o fechamento
+// prematuro dos selects nativos em páginas que atualizam campos dinamicamente.
+function prepararSelects() {
+  const fecharTodos = excecao => document.querySelectorAll('.par-select.open').forEach(box => { if (box !== excecao) { box.classList.remove('open'); box.querySelector('.par-select__toggle').setAttribute('aria-expanded','false'); } });
+  document.querySelectorAll('#parForm select').forEach(select => {
+    const box = document.createElement('div'); box.className = 'par-select';
+    select.parentNode.insertBefore(box, select); box.appendChild(select); select.classList.add('par-select__native');
+    const toggle = document.createElement('button'); toggle.type='button'; toggle.className='par-select__toggle'; toggle.setAttribute('aria-haspopup','listbox'); toggle.setAttribute('aria-expanded','false');
+    const texto = document.createElement('span'); const seta = document.createElement('i'); seta.className='ri-arrow-down-s-line'; toggle.append(texto,seta);
+    const menu = document.createElement('div'); menu.className='par-select__menu'; menu.setAttribute('role','listbox');
+    const montar = () => {
+      texto.textContent = select.options[select.selectedIndex]?.textContent || 'Selecione...'; menu.replaceChildren();
+      [...select.options].forEach(opt => { const item=document.createElement('button'); item.type='button'; item.className='par-select__option'; item.setAttribute('role','option'); item.setAttribute('aria-selected',String(opt.value===select.value)); item.textContent=opt.textContent; item.addEventListener('click',()=>{ select.value=opt.value; select.dispatchEvent(new Event('change',{bubbles:true})); montar(); box.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }); menu.appendChild(item); });
+    };
+    toggle.addEventListener('click',()=>{ const abrir=!box.classList.contains('open'); fecharTodos(box); box.classList.toggle('open',abrir); toggle.setAttribute('aria-expanded',String(abrir)); if(abrir) menu.querySelector('[aria-selected="true"]')?.focus(); });
+    box.append(toggle,menu); montar();
+  });
+  document.addEventListener('click',ev=>{ if(!ev.target.closest('.par-select')) fecharTodos(); });
+  document.addEventListener('keydown',ev=>{ if(ev.key==='Escape') fecharTodos(); });
+}
+prepararSelects();
+
+<?php if (!$ehAfiliado): ?>
+let unidadeDuplicada = false, unidadeVerificacao = null;
+const semAcento = valor => valor.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+// Mesmo padrão do cadastro real: remove espaços/sinais dentro de bairro,
+// cidade e UF; os pontos existem somente entre essas três partes.
+const slugUnidade = valor => semAcento(valor.trim().toLowerCase()).replace(/[^a-z0-9]/g,'');
+async function verificarUnidade(imediato = false) {
+  const estado = document.getElementById('estado').value.trim().toUpperCase();
+  const cidade = document.getElementById('cidade').value.trim();
+  const bairro = document.getElementById('bairro').value.trim();
+  const nomeEl = document.getElementById('unidadeNomePreview');
+  const emailEl = document.getElementById('unidadeEmailPreview');
+  const statusEl = document.getElementById('unidadeStatus');
+  const nome = [estado, semAcento(cidade), semAcento(bairro)].filter(Boolean).join(' - ');
+  const local = [slugUnidade(bairro), slugUnidade(cidade), slugUnidade(estado)].filter(Boolean).join('.');
+  nomeEl.textContent = nome || 'Preencha bairro, cidade e estado';
+  emailEl.textContent = local || 'Preencha bairro, cidade e estado';
+  document.getElementById('unidade_nome').value = nome;
+  document.getElementById('unidade_identificacao').value = local;
+  unidadeDuplicada = false;
+  if (!estado || !cidade || !bairro) { statusEl.className='unit-preview__status'; statusEl.textContent='Informe bairro, cidade e estado para consultar a disponibilidade.'; return false; }
+  statusEl.className='unit-preview__status checking'; statusEl.textContent='Verificando disponibilidade da unidade...';
+  try {
+    const q = new URLSearchParams({estado,cidade,bairro});
+    const r = await fetch('api/verificar-unidade.php?' + q.toString(), {cache:'no-store'});
+    const j = await r.json();
+    if (!r.ok || !j.ok) throw new Error(j.mensagem || 'Não foi possível verificar.');
+    nomeEl.textContent = j.nome; emailEl.textContent = j.email;
+    document.getElementById('unidade_nome').value = j.nome;
+    document.getElementById('unidade_identificacao').value = j.email;
+    unidadeDuplicada = !!j.existe;
+    statusEl.className = 'unit-preview__status ' + (j.existe ? 'duplicate' : 'available');
+    statusEl.textContent = j.existe ? j.mensagem : 'Identificação disponível para candidatura.';
+    return !j.existe;
+  } catch (erro) {
+    statusEl.className='unit-preview__status duplicate';
+    statusEl.textContent='Não foi possível verificar a disponibilidade agora. Tente novamente.';
+    unidadeDuplicada = true;
+    return false;
+  }
+}
+['estado','cidade','bairro'].forEach(id => { const el=document.getElementById(id); const evento=el.tagName==='SELECT'?'change':'input'; el.addEventListener(evento,()=>{ clearTimeout(unidadeVerificacao); unidadeVerificacao=setTimeout(verificarUnidade,500); }); });
+<?php endif; ?>
+
 document.getElementById('parForm').addEventListener('submit', async function (ev) {
   ev.preventDefault();
   const form = ev.currentTarget, btn = document.getElementById('parSubmit'), status = document.getElementById('parStatus');
   if (form.empresa_site.value) return;
+  <?php if (!$ehAfiliado): ?>if (!await verificarUnidade(true)) { document.getElementById('unidadeStatus').scrollIntoView({behavior:'smooth',block:'center'}); return; }<?php endif; ?>
   const original = btn.innerHTML;
   btn.disabled = true; btn.innerHTML = 'Enviando...'; status.className = 'par-status';
   const dados = new FormData(form);
+  const valor = nome => dados.get(nome) || 'Não informado';
   const mensagem = [
     'Tipo de candidatura: <?= e($titulo) ?>',
-    'Cidade/UF: ' + dados.get('cidade') + '/' + dados.get('estado'),
-    'Experiência/observações: ' + (dados.get('experiencia') || 'Não informado')
+    'CPF: ' + valor('cpf'),
+    'Cidade/UF: ' + valor('cidade') + '/' + valor('estado'),
+    <?php if ($ehAfiliado): ?>'Canal de divulgação: ' + valor('canal_divulgacao'),<?php else: ?>'Nome da empresa: ' + valor('nome_empresa'),
+    'Nome institucional do polo: ' + valor('unidade_nome'),
+    'Identificação da unidade: ' + valor('unidade_identificacao'),
+    'Data de nascimento: ' + valor('data_nascimento'),
+    'CNPJ: ' + valor('cnpj'),
+    'Endereço: ' + valor('endereco') + ' - ' + valor('bairro') + ' - CEP ' + valor('cep'),
+    'Espaço físico: ' + valor('espaco'),
+    'Experiência educacional: ' + valor('experiencia_educacional'),<?php endif; ?>
+    'PIX: ' + valor('pix_tipo') + ' - ' + valor('pix_chave'),
+    'Banco: ' + valor('banco_codigo') + ' - ' + valor('banco_nome'),
+    'Experiência/observações: ' + valor('experiencia')
   ].join('\n');
   try {
-    const r = await fetch('api/contato.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nome:dados.get('nome'), email:dados.get('email'), telefone:dados.get('telefone'), interesse:'<?= e($interesse) ?>', mensagem }) });
+    const r = await fetch('api/contato.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nome:dados.get('nome'), email:dados.get('email'), telefone:dados.get('telefone'), telefone_ddi:dados.get('telefone_ddi'), interesse:'<?= e($interesse) ?>', mensagem, tipo_candidatura:'<?= $ehAfiliado ? 'afiliado' : 'unidade' ?>', campos:Object.fromEntries(dados.entries()) }) });
     const j = await r.json();
     if (!r.ok || !j.ok) throw new Error(j.mensagem || 'Não foi possível enviar.');
     status.className = 'par-status ok'; status.textContent = 'Candidatura enviada! Nossa equipe entrará em contato em breve.'; form.reset();
