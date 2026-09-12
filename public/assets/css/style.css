@@ -786,6 +786,8 @@ ul { list-style: none; }
 .form-etapa + .field, .form-etapa + .form-linha { margin-top: 0; }
 .form-linha { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 .form-linha--contato { grid-template-columns: minmax(150px, 3fr) minmax(0, 5fr); }
+.field .celular-label { display: flex; align-items: center; gap: 5px; }
+.celular-label__whatsapp { width: 16px; height: 16px; color: #16a34a; flex: 0 0 16px; }
 .campo-armadilha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .form-nota--esq { text-align: left; margin-bottom: 16px; }
 

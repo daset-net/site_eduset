@@ -58,14 +58,22 @@ var IntlPhone = (function () {
     cssInjetado = true;
     var style = document.createElement('style');
     style.textContent =
-      '.intl-phone-wrap{display:flex;align-items:stretch;gap:0;}' +
+      '.intl-phone-wrap{display:flex;align-items:stretch;gap:0;position:relative;}' +
       '.intl-phone-wrap .intl-phone-ddi{' +
         'flex:0 0 96px;width:96px;min-width:96px;max-width:96px;' +
         'padding:6px 8px;font-size:14px;' +
         'border:1px solid #ced4da;border-right:none;' +
         'border-radius:6px 0 0 6px;background:#f8f9fa;' +
-        'cursor:pointer;appearance:auto;' +
+        'cursor:pointer;appearance:auto;color:transparent;position:relative;z-index:2;' +
       '}' +
+      '.intl-phone-wrap .intl-phone-ddi option{color:#111827;background:#fff;}' +
+      '.intl-phone-country-display{' +
+        'position:absolute;z-index:3;pointer-events:none;left:0;top:0;bottom:0;width:96px;padding-right:22px;box-sizing:border-box;' +
+        'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1;' +
+      '}' +
+      '.intl-phone-country-display:after{content:"";position:absolute;right:11px;top:50%;width:6px;height:6px;border-right:1.5px solid #374151;border-bottom:1.5px solid #374151;transform:translateY(-70%) rotate(45deg);}' +
+      '.intl-phone-country-code{font-size:12px;font-weight:600;color:#111827;}' +
+      '.intl-phone-country-flag{font-size:16px;line-height:16px;}' +
       '.intl-phone-wrap .intl-phone-ddi:focus{outline:none;border-color:#2f74f0;box-shadow:0 0 0 3px rgba(47,116,240,.12);}' +
       '.intl-phone-wrap .intl-phone-input{' +
         'flex:1 1 auto;min-width:0;' +
@@ -125,9 +133,9 @@ var IntlPhone = (function () {
     for (var i = 0; i < paises.length; i++) {
       var opt = document.createElement('option');
       opt.value = paises[i].iso;
-      // Exibe o DDI separado do número para evitar que ele seja digitado duas
-      // vezes. O mesmo valor segue no campo oculto enviado pelo formulário.
-      opt.textContent = '+' + paises[i].ddi;
+      // A lista aberta identifica o país por completo. No campo fechado, uma
+      // camada própria exibe o DDI em cima e a bandeira logo abaixo.
+      opt.textContent = paises[i].emoji + ' ' + paises[i].nome + ' (+' + paises[i].ddi + ')';
       opt.setAttribute('aria-label', paises[i].nome + ', +' + paises[i].ddi);
       opt.title = paises[i].nome + ' (+' + paises[i].ddi + ')';
       if (paises[i].iso === paisInicial) opt.selected = true;
@@ -154,10 +162,20 @@ var IntlPhone = (function () {
 
     // Criar select
     var select = criarSelect(paisInicial);
+    var countryDisplay = document.createElement('span');
+    countryDisplay.className = 'intl-phone-country-display';
+    countryDisplay.setAttribute('aria-hidden', 'true');
+    var countryCode = document.createElement('span');
+    countryCode.className = 'intl-phone-country-code';
+    var countryFlag = document.createElement('span');
+    countryFlag.className = 'intl-phone-country-flag';
+    countryDisplay.appendChild(countryCode);
+    countryDisplay.appendChild(countryFlag);
 
     // Inserir wrapper no lugar do input
     inputEl.parentNode.insertBefore(wrapper, inputEl);
     wrapper.appendChild(select);
+    wrapper.appendChild(countryDisplay);
     wrapper.appendChild(inputEl);
 
     // Adicionar classe ao input
@@ -166,6 +184,9 @@ var IntlPhone = (function () {
     // Ajustar placeholder e máscara conforme país
     function ajustarPais() {
       var iso = select.value;
+      var pais = getPais(iso);
+      countryCode.textContent = '+' + pais.ddi;
+      countryFlag.textContent = pais.emoji;
       if (iso === 'BR') {
         inputEl.placeholder = '(00) 00000-0000';
         inputEl.maxLength = 15;
@@ -181,9 +202,9 @@ var IntlPhone = (function () {
         inputEl.value = digits;
       }
       // Atualizar hidden DDI
-      if (hiddenDDI) hiddenDDI.value = getPais(iso).ddi;
+      if (hiddenDDI) hiddenDDI.value = pais.ddi;
       if (typeof opcoes.onCountryChange === 'function') {
-        opcoes.onCountryChange(getPais(iso));
+        opcoes.onCountryChange(pais);
       }
     }
 
