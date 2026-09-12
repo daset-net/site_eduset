@@ -58,7 +58,7 @@ var IntlPhone = (function () {
     cssInjetado = true;
     var style = document.createElement('style');
     style.textContent =
-      '.intl-phone-wrap{display:flex;align-items:stretch;gap:0;position:relative;margin-bottom:24px;}' +
+      '.intl-phone-wrap{display:flex;align-items:stretch;gap:0;position:relative;}' +
       '.intl-phone-wrap .intl-phone-ddi{' +
         'flex:0 0 96px;width:96px;min-width:96px;max-width:96px;' +
         'padding:6px 8px;font-size:14px;' +
@@ -73,7 +73,6 @@ var IntlPhone = (function () {
       '}' +
       '.intl-phone-country-display:after{content:"";position:absolute;right:11px;top:50%;width:6px;height:6px;border-right:1.5px solid #374151;border-bottom:1.5px solid #374151;transform:translateY(-70%) rotate(45deg);}' +
       '.intl-phone-country-code{font-size:12px;font-weight:600;color:#111827;}' +
-      '.intl-phone-country-flag{position:absolute;left:0;top:calc(100% + 5px);width:74px;text-align:center;font-size:17px;line-height:17px;}' +
       '.intl-phone-wrap .intl-phone-ddi:focus{outline:none;border-color:#2f74f0;box-shadow:0 0 0 3px rgba(47,116,240,.12);}' +
       '.intl-phone-wrap .intl-phone-input{' +
         'flex:1 1 auto;min-width:0;' +
@@ -134,7 +133,7 @@ var IntlPhone = (function () {
       var opt = document.createElement('option');
       opt.value = paises[i].iso;
       // A lista aberta identifica o país por completo. No campo fechado, uma
-      // camada própria exibe o DDI em cima e a bandeira logo abaixo.
+      // camada própria exibe apenas o DDI de forma compacta.
       opt.textContent = paises[i].emoji + ' ' + paises[i].nome + ' (+' + paises[i].ddi + ')';
       opt.setAttribute('aria-label', paises[i].nome + ', +' + paises[i].ddi);
       opt.title = paises[i].nome + ' (+' + paises[i].ddi + ')';
@@ -167,10 +166,7 @@ var IntlPhone = (function () {
     countryDisplay.setAttribute('aria-hidden', 'true');
     var countryCode = document.createElement('span');
     countryCode.className = 'intl-phone-country-code';
-    var countryFlag = document.createElement('span');
-    countryFlag.className = 'intl-phone-country-flag';
     countryDisplay.appendChild(countryCode);
-    countryDisplay.appendChild(countryFlag);
 
     // Inserir wrapper no lugar do input
     inputEl.parentNode.insertBefore(wrapper, inputEl);
@@ -186,7 +182,6 @@ var IntlPhone = (function () {
       var iso = select.value;
       var pais = getPais(iso);
       countryCode.textContent = '+' + pais.ddi;
-      countryFlag.textContent = pais.emoji;
       if (iso === 'BR') {
         inputEl.placeholder = '(00) 00000-0000';
         inputEl.maxLength = 15;
