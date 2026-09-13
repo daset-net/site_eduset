@@ -378,6 +378,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
               <option value="">Selecione</option>
               <option value="M">Masculino</option>
               <option value="F">Feminino</option>
+              <option value="O">Outros</option>
             </select>
           </div>
           <div class="field">

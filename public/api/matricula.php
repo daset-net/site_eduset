@@ -128,7 +128,7 @@ if ($celular_ddi === '55') {
 } else {
     if (strlen($celular) < 6 || strlen($celular) > 15) $erros[] = 'Informe um número de celular válido.';
 }
-if (!in_array($sexo, ['M', 'F'], true))                  $erros[] = 'Selecione o sexo.';
+if (!in_array($sexo, ['M', 'F', 'O'], true))             $erros[] = 'Selecione o sexo.';
 if (strlen($cep) !== 8)                                  $erros[] = 'Informe um CEP válido.';
 if ($endereco === '' || $numero === '' || $bairro === '' || $cidade === '') $erros[] = 'Complete o endereço.';
 if (strlen($estado) !== 2)                               $erros[] = 'Informe o estado (UF).';
