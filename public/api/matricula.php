@@ -230,16 +230,19 @@ $resposta = json_decode((string) $corpo, true);
 
 if ($status !== 200 || !is_array($resposta) || empty($resposta['success'])) {
   $motivo = is_array($resposta) ? (string) ($resposta['error'] ?? '') : '';
+  $duplicada = $status === 409 || (is_array($resposta) && ($resposta['code'] ?? '') === 'MATRICULA_DUPLICADA');
   error_log('[matricula] falha status=' . $status . ' motivo=' . $motivo);
 
   // Erro de token/configuração é problema nosso: o visitante recebe um recado
   // genérico. Só repassa a mensagem do AVASET quando ela é sobre os dados.
   $nossoProblema = in_array($status, [401, 403, 503], true) || $motivo === '';
-  fim(502, [
+  fim($duplicada ? 409 : 502, [
     'ok' => false,
-    'mensagem' => $nossoProblema
+    'mensagem' => $duplicada
+      ? 'Você já possui matrícula ativa neste curso.'
+      : ($nossoProblema
       ? 'Não conseguimos concluir sua matrícula agora. Tente novamente em instantes ou fale com um consultor pelo WhatsApp.'
-      : $motivo,
+      : $motivo),
   ]);
 }
 

@@ -10,6 +10,8 @@
   var alerta   = document.getElementById('form-alerta');
   var sucesso  = document.getElementById('matricula-sucesso');
   var idCurso  = form.dataset.curso || '';
+  var envioEmAndamento = false;
+  var matriculaConcluida = false;
 
   // ---------------------------------------------------------------- afiliado
   // Link de indicação (?af=email) vale por 30 dias, para creditar a comissão.
@@ -228,6 +230,7 @@
 
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
+    if (envioEmAndamento || matriculaConcluida) return;
 
     if (!form.checkValidity()) {
       mostrar('err', 'Preencha todos os campos obrigatórios.');
@@ -240,6 +243,8 @@
       form.celular.focus();
       return;
     }
+
+    envioEmAndamento = true;
 
     var botao = form.querySelector('button[type=submit]');
     var textoOriginal = botao.innerHTML;
@@ -280,6 +285,7 @@
           mostrar('err', d.mensagem || 'Verifique os dados e tente novamente.');
           return;
         }
+        matriculaConcluida = true;
         document.getElementById('suc-nome').textContent    = form.nome.value.split(' ')[0];
         document.getElementById('suc-curso').textContent   = d.curso || '';
         document.getElementById('suc-numero').textContent  = d.matricula || '';
@@ -295,8 +301,11 @@
         mostrar('err', 'Não foi possível concluir agora. Tente novamente em instantes.');
       })
       .finally(function () {
-        botao.disabled = false;
-        botao.innerHTML = textoOriginal;
+        envioEmAndamento = false;
+        if (!matriculaConcluida) {
+          botao.disabled = false;
+          botao.innerHTML = textoOriginal;
+        }
       });
   });
 })();
