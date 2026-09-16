@@ -245,6 +245,7 @@ function linkDeRegistro(string $codigo): string {
  * A sugestão sai sempre do catálogo real: o atendimento nunca inventa curso.
  */
 const AREAS = [
+  'jurídico e serviços legais' => ['direito', 'juridico', 'juridica', 'advocacia', 'advogado', 'cartorio', 'tabeliao', 'tabelionato', 'notarial', 'forense', 'leis', 'processos', 'pje', 'judicial', 'legal', 'compliance'],
   'saúde' => ['enfermagem', 'saude', 'bucal', 'odonto', 'dentista', 'farmacia', 'farmaceutico',
               'radiologia', 'estetica', 'cuidador', 'idoso', 'veterinaria', 'nutricao',
               'fisioterapia', 'psicologia', 'laboratorio', 'analises', 'socorrista', 'samu',

@@ -34,7 +34,7 @@ const COR_VERDE = 'linear-gradient(140deg,#044928,#0f7a44)';
 
 // Emoji por palavra-chave, usado só quando o curso não tem emoji nem capa definidos.
 $EMOJIS = [
-  'enfermagem' => '🩺', 'saúde bucal' => '🦷', 'estética' => '💅',
+  'enfermagem' => '🩺', 'saúde bucal' => '🦷', 'serviços jurídicos' => '⚖️', 'jurídico' => '⚖️', 'juridico' => '⚖️', 'estética' => '💅',
   'segurança' => '🦺', 'eletrot' => '⚡', 'eletromec' => '⚙️',
   'meio ambiente' => '🌱', 'edificações' => '🏗️',
   'administra' => '💼', 'contábil' => '🧾', 'informática' => '💻',
