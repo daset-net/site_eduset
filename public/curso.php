@@ -140,7 +140,12 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
       </div>
 
       <!-- Cartão de oferta -->
-      <aside class="oferta" id="oferta">
+      <aside class="oferta<?= $curso['desconto'] ? ' oferta--promo' : '' ?>" id="oferta">
+        <?php if ($curso['desconto']): ?>
+          <p class="oferta__faixa">
+            <i class="ri-flashlight-fill"></i> Oferta relâmpago · <?= (int) $curso['desconto'] ?>% OFF
+          </p>
+        <?php endif; ?>
         <div class="oferta__topo" style="background: <?= e($curso['cor']) ?>">
           <?php if ($curso['imagem'] !== ''): ?>
             <img class="oferta__capa" src="<?= e($curso['imagem']) ?>" alt="<?= e($curso['nome']) ?>" loading="lazy">
@@ -148,38 +153,51 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             <span class="oferta__emoji"><?= e($curso['emoji']) ?></span>
           <?php endif; ?>
           <?php if ($curso['desconto']): ?>
-            <span class="oferta__off">-<?= (int) $curso['desconto'] ?>% hoje</span>
+            <span class="oferta__off">
+              <strong>-<?= (int) $curso['desconto'] ?>%</strong>
+              <small>hoje</small>
+            </span>
           <?php endif; ?>
         </div>
         <div class="oferta__corpo">
           <span class="oferta__cat"><?= e($curso['categoriaLabel']) ?></span>
           <h2><?= e($curso['nome']) ?></h2>
 
-          <?php if ($curso['precoDe'] !== '0,00'): ?>
-            <p class="oferta__de">De <s>R$ <?= e($curso['precoDe']) ?></s><?= $curso['categoria'] === 'tecnico-competencia' ? ' à vista' : ' por mês' ?></p>
-          <?php endif; ?>
+          <div class="oferta__preco">
+            <?php if ($curso['precoDe'] !== '0,00'): ?>
+              <p class="oferta__de">
+                De <s>R$ <?= e($curso['precoDe']) ?></s><?= $curso['categoria'] === 'tecnico-competencia' ? ' à vista' : ' por mês' ?>
+                <?php if ($curso['desconto']): ?>
+                  <span class="oferta__de-tag">-<?= (int) $curso['desconto'] ?>%</span>
+                <?php endif; ?>
+              </p>
+            <?php endif; ?>
 
-          <p class="oferta__por">
-            <?php if ($curso['parcelas']): ?><em><?= (int) $curso['parcelas'] ?>x de</em><?php endif; ?>
-            <strong>R$ <?= e($curso['preco']) ?></strong>
-          </p>
-          <?php if ($curso['valorTotal'] !== '0,00'): ?>
-            <p class="oferta__total">Total do curso: R$ <?= e($curso['valorTotal']) ?></p>
-          <?php endif; ?>
-          <?php if ($economia > 0): ?>
-            <p class="oferta__economia"><i class="ri-price-tag-3-line"></i> Você economiza R$ <?= e(number_format($economia, 2, ',', '.')) ?><?= $curso['categoria'] === 'tecnico-competencia' ? ' no pagamento à vista' : ' por parcela' ?></p>
-          <?php endif; ?>
+            <p class="oferta__por">
+              <?php if ($curso['parcelas']): ?><em><?= (int) $curso['parcelas'] ?>x de</em><?php endif; ?>
+              <strong>R$ <?= e($curso['preco']) ?></strong>
+            </p>
+            <?php if ($curso['valorTotal'] !== '0,00'): ?>
+              <p class="oferta__total">Total do curso: R$ <?= e($curso['valorTotal']) ?></p>
+            <?php endif; ?>
+            <?php if ($economia > 0): ?>
+              <p class="oferta__economia">
+                <i class="ri-scissors-cut-line"></i>
+                <span>Você economiza <strong>R$ <?= e(number_format($economia, 2, ',', '.')) ?></strong><?= $curso['categoria'] === 'tecnico-competencia' ? ' no pagamento à vista' : ' por parcela' ?></span>
+              </p>
+            <?php endif; ?>
+          </div>
 
           <?php if ($curso['desconto']): ?>
           <div class="contador" data-fim="<?= e($curso['ofertaFim']) ?>">
-            <p class="contador__titulo"><i class="ri-timer-flash-line"></i> Condição de <?= (int) $curso['desconto'] ?>% termina em</p>
+            <p class="contador__titulo"><i class="ri-timer-flash-line"></i> A condição de <?= (int) $curso['desconto'] ?>% termina em</p>
             <div class="contador__relogio">
               <span><strong data-parte="dias">--</strong><small>dias</small></span>
               <span><strong data-parte="horas">--</strong><small>horas</small></span>
               <span><strong data-parte="min">--</strong><small>min</small></span>
               <span><strong data-parte="seg">--</strong><small>seg</small></span>
             </div>
-            <p class="contador__nota">Depois disso o valor volta para a tabela do próximo ciclo.</p>
+            <p class="contador__nota">Quando zerar, o valor volta para a tabela do próximo ciclo.</p>
           </div>
           <?php endif; ?>
 
@@ -189,6 +207,10 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
           </p>
 
           <a href="#matricula" class="btn btn-primary oferta__btn">Quero me matricular <i class="ri-arrow-right-line"></i></a>
+          <p class="oferta__cta-nota">
+            <i class="ri-shield-check-line"></i>
+            <?= $curso['desconto'] ? 'Garanta o valor de hoje — matrícula online, sem taxa' : 'Matrícula online, sem taxa — leva poucos minutos' ?>
+          </p>
 
           <ul class="oferta__lista">
             <li><i class="ri-check-line"></i> Sem taxa de matrícula</li>

@@ -746,36 +746,92 @@ ul { list-style: none; }
 .form-polo strong { font-weight: 700; }
 
 /* ---- contador da oferta ---- */
+/* O prazo é real: vem do fim do ciclo da campanha. Por isso ele é o bloco mais
+   forte do cartão — fundo quente, números grandes e o segundo piscando. */
 .contador {
-  background: var(--bg-soft); border: 1px solid var(--line);
-  border-radius: 14px; padding: 16px; margin: 18px 0;
+  position: relative; overflow: hidden;
+  margin: 16px 0;
+  padding: 16px 16px 14px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #2d0612 0%, #8d1030 52%, #c01a3c 100%);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(157, 23, 56, .30);
+}
+/* Brilho que atravessa o bloco de tempos em tempos, para o olho voltar nele. */
+.contador::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.20), transparent);
+  transform: translateX(-160%);
+  animation: brilho-oferta 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes brilho-oferta {
+  0%, 72% { transform: translateX(-160%); }
+  100%    { transform: translateX(330%); }
 }
 .contador__titulo {
-  font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px;
-  color: var(--azul-600); margin-bottom: 12px;
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
+  color: #ffd8a8; margin-bottom: 12px; line-height: 1.3;
 }
-.contador__relogio { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.contador__titulo i { font-size: 17px; color: #ffb224; animation: pisca-alerta 1.6s ease-in-out infinite; }
+@keyframes pisca-alerta { 50% { opacity: .35; } }
+
+.contador__relogio {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
 .contador__relogio span {
-  background: #fff; border: 1px solid var(--line); border-radius: 10px;
-  padding: 8px 4px; display: grid; gap: 2px; text-align: center;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22);
+  border-radius: 12px; padding: 10px 4px 8px;
+  display: grid; gap: 3px; text-align: center;
 }
-.contador__relogio strong { font-size: 22px; font-variant-numeric: tabular-nums; line-height: 1.1; }
-.contador__relogio small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-.contador__nota { font-size: 12px; color: var(--muted); margin-top: 10px; }
+.contador__relogio strong {
+  font-size: 27px; font-weight: 800; color: #fff;
+  font-variant-numeric: tabular-nums; line-height: 1.05;
+}
+.contador__relogio small {
+  font-size: 10px; color: rgba(255,255,255,.78);
+  text-transform: uppercase; letter-spacing: .7px;
+}
+/* Só os segundos pulsam: é o que dá a sensação de tempo correndo. */
+.contador__relogio span:last-child strong { animation: pulso-segundo 1s steps(1, end) infinite; }
+@keyframes pulso-segundo { 50% { opacity: .5; } }
+
+.contador__nota {
+  position: relative; z-index: 1;
+  font-size: 11.5px; color: rgba(255,255,255,.82); margin-top: 10px; line-height: 1.45;
+}
 .contador--fim { opacity: .6; }
+.contador--fim::after { animation: none; }
 
 /* ---- gente vendo agora ---- */
 .online {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: var(--muted); margin: -6px 0 14px;
+  display: inline-flex; align-items: center; gap: 8px;
+  margin: 12px 0 0;
+  padding: 7px 12px; border-radius: 100px;
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  font-size: 12.5px; font-weight: 600; color: #15803d;
 }
 .online__ponto {
-  width: 8px; height: 8px; border-radius: 50%; background: #16a34a;
+  width: 8px; height: 8px; border-radius: 50%; background: #16a34a; flex-shrink: 0;
   box-shadow: 0 0 0 0 rgba(22,163,74,.5); animation: pulso 2s infinite;
 }
 @keyframes pulso {
   70%  { box-shadow: 0 0 0 8px rgba(22,163,74,0); }
   100% { box-shadow: 0 0 0 0 rgba(22,163,74,0); }
+}
+
+/* Quem pediu menos movimento vê o mesmo cartão, parado. */
+@media (prefers-reduced-motion: reduce) {
+  .contador::after,
+  .contador__titulo i,
+  .contador__relogio span:last-child strong,
+  .online__ponto,
+  .oferta__faixa::after,
+  .oferta__off,
+  .oferta__btn { animation: none; }
 }
 
 /* ---- formulário de matrícula (página do curso) ---- */
@@ -991,11 +1047,37 @@ ul { list-style: none; }
 
 /* --- Cartão de oferta ---------------------------------------------------- */
 .oferta {
+  /* Tokens do cartão: a marca pinta o preço, o vermelho pinta a urgência. */
+  --promo-forte: var(--azul-700);
+  --promo-medio: var(--azul-600);
+  --promo-eco: #0f7a44;
+  --promo-eco-bg: #e6f9ef;
+  --promo-urgente: #e11d48;
+
   position: sticky; top: 100px;
   background: #fff; color: var(--ink);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
+}
+/* Com desconto no ar o cartão ganha um anel quente e sai do plano da página. */
+.oferta--promo {
+  box-shadow: var(--shadow-lg), 0 0 0 2px rgba(225, 29, 72, .22);
+}
+.oferta__faixa {
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(90deg, #a1102f 0%, #e11d48 48%, #fb5f7e 100%);
+  color: #fff; text-align: center;
+  font-size: 12px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+  padding: 10px 12px;
+}
+.oferta__faixa i { font-size: 15px; }
+.oferta__faixa::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent);
+  transform: translateX(-160%);
+  animation: brilho-oferta 6s ease-in-out infinite;
 }
 .oferta__topo {
   position: relative;
@@ -1005,32 +1087,98 @@ ul { list-style: none; }
 .oferta__emoji { font-size: 52px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.3)); }
 .oferta__off {
   position: absolute; top: 14px; right: 14px;
-  background: #e11d48; color: #fff;
-  font-size: 12px; font-weight: 700;
-  padding: 6px 12px; border-radius: 100px;
+  display: grid; justify-items: center; gap: 1px; line-height: 1;
+  background: linear-gradient(150deg, #fb5f7e 0%, #e11d48 45%, #a1102f 100%);
+  color: #fff; padding: 9px 14px; border-radius: 14px;
+  border: 2px solid rgba(255,255,255,.55);
+  box-shadow: 0 10px 22px rgba(161, 16, 47, .45);
+  transform: rotate(3deg);
+  animation: bate-selo 2.4s ease-in-out infinite;
+}
+.oferta__off strong { font-size: 21px; font-weight: 800; letter-spacing: -.5px; }
+.oferta__off small { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; opacity: .92; }
+@keyframes bate-selo {
+  50% { transform: rotate(3deg) scale(1.07); }
 }
 .oferta__corpo { padding: 24px; }
 .oferta__cat {
   display: inline-block;
   font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-  color: var(--azul-600); background: var(--bg-softer);
+  color: var(--promo-medio); background: var(--bg-softer);
   padding: 5px 12px; border-radius: 100px; margin-bottom: 12px;
 }
-.oferta__corpo h2 { font-size: 21px; font-weight: 700; margin-bottom: 16px; }
-.oferta__de { font-size: 14px; color: var(--muted); }
-.oferta__por { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.oferta__corpo h2 { font-size: 21px; font-weight: 700; margin-bottom: 14px; }
+
+/* Caixa do preço: o "de" some de importância e o "por" domina o cartão. */
+.oferta__preco {
+  padding: 16px 16px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: linear-gradient(165deg, var(--bg-soft) 0%, #fff 72%);
+}
+.oferta__de {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  font-size: 13.5px; color: var(--muted);
+}
+.oferta__de s {
+  color: #94a3b8;
+  text-decoration-color: var(--promo-urgente);
+  text-decoration-thickness: 2px;
+}
+.oferta__de-tag {
+  background: #ffe4e9; color: #be123c;
+  font-size: 11px; font-weight: 800; letter-spacing: .4px;
+  padding: 3px 9px; border-radius: 100px;
+}
+.oferta__por { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 2px 0 4px; }
 .oferta__por em { font-style: normal; font-size: 15px; font-weight: 600; color: var(--muted); }
-.oferta__por strong { font-size: 34px; font-weight: 700; color: var(--azul-700); line-height: 1.1; }
+.oferta__por strong {
+  font-size: 42px; font-weight: 800; color: var(--promo-forte);
+  line-height: 1.05; letter-spacing: -1.4px;
+}
 .oferta__total { font-size: 13px; color: var(--muted); }
 .oferta__economia {
-  display: flex; align-items: center; gap: 6px;
-  margin-top: 10px; font-size: 13px; font-weight: 600; color: #0f7a44;
-  background: #e6f9ef; padding: 8px 12px; border-radius: 10px;
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 12px; font-size: 13px; color: var(--promo-eco);
+  background: var(--promo-eco-bg);
+  border: 1px dashed currentColor;
+  padding: 9px 12px; border-radius: 12px; line-height: 1.35;
 }
-.oferta__btn { width: 100%; justify-content: center; margin: 18px 0 16px; }
+.oferta__economia i { font-size: 16px; flex-shrink: 0; }
+.oferta__economia strong { font-weight: 800; }
+
+.oferta__btn {
+  width: 100%; justify-content: center;
+  margin: 16px 0 10px;
+  font-size: 16px; padding: 15px 22px;
+}
+/* Halo pulsando no botão — só quando há promoção, e para no hover para o
+   próprio botão voltar a mandar no efeito. */
+.oferta--promo .oferta__btn { animation: respira-cta 2.8s ease-in-out infinite; }
+.oferta--promo .oferta__btn:hover { animation: none; }
+@keyframes respira-cta {
+  0%, 100% { box-shadow: 0 8px 22px rgba(0,0,0,.22), 0 0 0 0 rgba(225,29,72,.45); }
+  70%      { box-shadow: 0 8px 22px rgba(0,0,0,.22), 0 0 0 12px rgba(225,29,72,0); }
+  100%     { box-shadow: 0 8px 22px rgba(0,0,0,.22), 0 0 0 0 rgba(225,29,72,0); }
+}
+.oferta__cta-nota {
+  font-size: 12px; font-weight: 600; color: var(--promo-medio);
+  margin-bottom: 16px; text-align: center; line-height: 1.5;
+}
+.oferta__cta-nota i { margin-right: 5px; vertical-align: -1px; }
 .oferta__lista { display: grid; gap: 8px; font-size: 14px; color: var(--muted); }
-.oferta__lista i { color: var(--azul-600); margin-right: 6px; }
+.oferta__lista i { color: var(--promo-medio); margin-right: 6px; }
 .oferta__nota { margin-top: 14px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* Telas estreitas: o cartão ocupa a tela inteira, então os números encolhem
+   um pouco para o relógio não quebrar em duas linhas. */
+@media (max-width: 420px) {
+  .oferta__corpo { padding: 20px 16px; }
+  .oferta__por strong { font-size: 36px; }
+  .contador__relogio { gap: 6px; }
+  .contador__relogio strong { font-size: 22px; }
+  .contador__relogio small { font-size: 9px; letter-spacing: .4px; }
+}
 
 /* --- Conteúdo ------------------------------------------------------------ */
 .curso-cols {
