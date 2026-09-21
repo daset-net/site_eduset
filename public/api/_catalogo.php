@@ -37,7 +37,7 @@ $EMOJIS = [
   'enfermagem' => '🩺', 'saúde bucal' => '🦷', 'serviços jurídicos' => '⚖️', 'jurídico' => '⚖️', 'juridico' => '⚖️', 'estética' => '💅',
   'segurança' => '🦺', 'eletrot' => '⚡', 'eletromec' => '⚙️',
   'meio ambiente' => '🌱', 'edificações' => '🏗️',
-  'administra' => '💼', 'contábil' => '🧾', 'informática' => '💻',
+  'administra' => '💼', 'secretaria' => '🏫', 'contábil' => '🧾', 'informática' => '💻',
   'design' => '🎨', 'fundamental e médio' => '📚', '3º ano' => '📝',
   'médio' => '🎓',
 ];
