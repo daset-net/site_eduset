@@ -1384,6 +1384,11 @@ function gradesPorCurso(): array {
   return $mapa;
 }
 
+/** Tira o rótulo de modalidade do começo do nome ("Profissionalizante X" -> "X"). */
+function semRotuloModalidade(string $nome): string {
+  return (string) preg_replace('/^\s*profissionalizante\b\s*(em\s+)?/iu', '', $nome);
+}
+
 /**
  * Matérias do curso, na ordem em que o aluno estuda.
  * Vazio quando o pacote não tem grade ou quando o id aponta para outro curso.
@@ -1391,9 +1396,12 @@ function gradesPorCurso(): array {
 function materiasDoCurso(array $curso): array {
   $grades = gradesPorCurso();
 
-  // Caminho normal: mesmo id nas duas tabelas, confirmado pelo nome.
+  // Caminho normal: mesmo id nas duas tabelas, confirmado pelo nome. O pacote
+  // costuma escrever o rótulo da modalidade na frente ("Profissionalizante
+  // Design Gráfico") e o site não: com o id igual, o rótulo não desempata nada.
   $grade = $grades[strtoupper($curso['idCatalogo'] ?? $curso['id'])] ?? null;
-  if ($grade && mesmoCurso($curso['nome'], $grade['nome'])) {
+  if ($grade && (mesmoCurso($curso['nome'], $grade['nome'])
+              || mesmoCurso($curso['nome'], semRotuloModalidade($grade['nome'])))) {
     return respeitarCargaMinima($grade['materias'], $curso);
   }
 
