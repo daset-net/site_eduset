@@ -9,14 +9,16 @@
  *                 página do curso desaparece: o site não inventa urgência.
  *   PROGRAMADO  — desconto valendo de uma data até outra (data sazonal, semana
  *                 do cliente, aniversário da escola). O contador aponta para o
- *                 fim real da campanha.
+ *                 fim real da campanha. Pode valer para todos os cursos ou só
+ *                 para uma categoria do catálogo (ex.: EJA); as demais seguem
+ *                 a rotação normal.
  *
  * Um permanente ligado impede programar datas, e datas programadas impedem
  * ligar o permanente — é a regra pedida, e ela evita a pergunta "qual dos dois
  * vale hoje?", que ninguém saberia responder olhando a tela.
  *
  * BOLSA nunca entra: as faixas ofertáveis vêm de faixasDeDesconto(), que aplica
- * a mesma régua da vitrine (ingresso=bolsa ou 60%+ ficam fora).
+ * a mesma régua da vitrine (o que o GESET marca como bolsa fica fora).
  */
 
 require __DIR__ . '/_auth.php';
@@ -69,20 +71,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'inicio'   => trim((string) ($_POST['inicio'] ?? '')),
         'fim'      => trim((string) ($_POST['fim'] ?? '')),
       ];
+      $categoria = trim((string) ($_POST['categoria'] ?? ''));
+      if ($categoria !== '') $nova['categoria'] = $categoria;
 
       $conflito = conflita($nova, $estado['programadas']);
 
       if ($estado['permanente'] > 0) {
         $aviso = 'Existe um desconto permanente de ' . $estado['permanente'] . '% ligado. Desligue-o para programar datas.';
         $tipo  = 'erro';
-      } elseif (!in_array($nova['desconto'], $faixas, true)) {
-        $aviso = 'Escolha uma das faixas de desconto do catálogo.';
+      } elseif ($categoria !== '' && !in_array($categoria, categoriasDoCatalogo(), true)) {
+        $aviso = 'Essa categoria não existe no catálogo do AVASET.';
+        $tipo  = 'erro';
+      } elseif (!in_array($nova['desconto'], faixasDeDesconto($categoria), true)) {
+        $aviso = $categoria !== ''
+          ? 'Os cursos de ' . $categoria . ' não têm a faixa de ' . $nova['desconto'] . '% (ou ela é bolsa, que não pode ser anunciada).'
+          : 'Escolha uma das faixas de desconto do catálogo.';
         $tipo  = 'erro';
       } elseif (!janelaCampanha($nova)) {
         $aviso = 'Confira as datas: a de fim não pode ser antes da de início.';
         $tipo  = 'erro';
       } elseif ($conflito) {
-        $aviso = 'Esse período se cruza com a campanha de '
+        $aviso = 'Esse período se cruza com a campanha'
+               . (trim((string) ($conflito['categoria'] ?? '')) !== '' ? ' de ' . $conflito['categoria'] : ' de todos os cursos')
+               . ' de '
                . dataBr((string) $conflito['inicio']) . ' a ' . dataBr((string) $conflito['fim'])
                . '. Ajuste as datas para não haver dois descontos no mesmo dia.';
         $tipo  = 'erro';
@@ -109,8 +120,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $estado   = campanhasAtuais();
 $faixas   = faixasDeDesconto();
+$categorias = categoriasDoCatalogo();
 $vigente  = campanhaDe($estado);
 $hoje     = (new DateTime('now', new DateTimeZone(TZ_CAMPANHA)))->getTimestamp();
+// Campanhas de uma categoria só, no ar agora (as gerais aparecem em $vigente).
+$noArPorCategoria = array_values(array_filter($estado['programadas'], function ($c) use ($hoje) {
+  $j = janelaCampanha($c);
+  return $j && trim((string) ($c['categoria'] ?? '')) !== '' && $hoje >= $j[0] && $hoje <= $j[1];
+}));
 $cicloFim = cicloOferta()['fim'];
 
 $titulo   = 'Campanhas de desconto';
@@ -152,6 +169,11 @@ require __DIR__ . '/_topo.php';
     <?php elseif ($vigente): ?>
       <strong>No ar agora: <?= (int) $vigente['desconto'] ?>% até <?= e(date('d/m/Y', $vigente['fim'])) ?>.</strong>
       <p>O contador da página do curso aponta para essa data.</p>
+    <?php elseif ($noArPorCategoria): ?>
+      <?php foreach ($noArPorCategoria as $c): ?>
+        <strong>No ar agora: <?= (int) $c['desconto'] ?>% nos cursos de <?= e($c['categoria']) ?> até <?= e(dataBr((string) $c['fim'])) ?><?= trim((string) ($c['nome'] ?? '')) !== '' ? ' — “' . e($c['nome']) . '”' : '' ?>.</strong>
+      <?php endforeach; ?>
+      <p>As outras categorias seguem a rotação automática.</p>
     <?php else: ?>
       <strong>Nenhuma campanha ativa — o site está girando os descontos sozinho.</strong>
       <p>
@@ -225,6 +247,15 @@ require __DIR__ . '/_topo.php';
         <input type="text" name="nome" maxlength="60" placeholder="Semana do Cliente">
       </label>
       <label>
+        Cursos
+        <select name="categoria">
+          <option value="">Todos os cursos</option>
+          <?php foreach ($categorias as $cat): ?>
+            <option value="<?= e($cat) ?>">Só <?= e($cat) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </label>
+      <label>
         Desconto
         <select name="desconto">
           <?php foreach ($faixas as $f): ?>
@@ -250,7 +281,7 @@ require __DIR__ . '/_topo.php';
   <?php else: ?>
     <table class="campanha-tabela">
       <thead>
-        <tr><th>Campanha</th><th>Desconto</th><th>Período</th><th>Situação</th><th></th></tr>
+        <tr><th>Campanha</th><th>Cursos</th><th>Desconto</th><th>Período</th><th>Situação</th><th></th></tr>
       </thead>
       <tbody>
         <?php foreach ($estado['programadas'] as $i => $c): ?>
@@ -262,6 +293,7 @@ require __DIR__ . '/_topo.php';
           ?>
           <tr class="campanha-linha--<?= $classe ?>">
             <td><?= e(trim((string) ($c['nome'] ?? '')) !== '' ? $c['nome'] : '—') ?></td>
+            <td><?= e(trim((string) ($c['categoria'] ?? '')) !== '' ? $c['categoria'] : 'Todos') ?></td>
             <td><strong><?= (int) $c['desconto'] ?>%</strong></td>
             <td><?= e(dataBr((string) $c['inicio'])) ?> a <?= e(dataBr((string) $c['fim'])) ?></td>
             <td><span class="campanha-situacao campanha-situacao--<?= $classe ?>"><?= e($situacao) ?></span></td>

@@ -748,6 +748,18 @@ ul { list-style: none; }
 /* ---- contador da oferta ---- */
 /* O prazo é real: vem do fim do ciclo da campanha. Por isso ele é o bloco mais
    forte do cartão — fundo quente, números grandes e o segundo piscando. */
+.oferta__campanha {
+  display: flex; align-items: center; gap: 8px;
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--verde-200);
+  color: var(--verde-600);
+  border: 1px solid var(--verde-400);
+  font-weight: 700; font-size: 14px; line-height: 1.35;
+}
+.oferta__campanha i { font-size: 18px; flex-shrink: 0; }
+
 .contador {
   position: relative; overflow: hidden;
   margin: 16px 0;

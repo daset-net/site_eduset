@@ -138,28 +138,35 @@ function gravarCampanhas(array $estado): array {
 function conflita(array $nova, array $existentes): ?array {
   $janelaNova = janelaCampanha($nova);
   if (!$janelaNova) return null;
+  $categoriaNova = categoriaCampanha($nova['categoria'] ?? '');
 
   foreach ($existentes as $c) {
     $janela = janelaCampanha($c);
     if (!$janela) continue;
+    // Categorias diferentes não disputam a vitrine. Campanha sem categoria
+    // vale para todos os cursos, então cruza com qualquer outra.
+    $categoria = categoriaCampanha($c['categoria'] ?? '');
+    if ($categoriaNova !== '' && $categoria !== '' && $categoriaNova !== $categoria) continue;
     if ($janelaNova[0] <= $janela[1] && $janela[0] <= $janelaNova[1]) return $c;
   }
   return null;
 }
 
 /**
- * Faixas de desconto que a escola pode anunciar, da maior para a menor.
+ * Faixas de desconto que a escola pode anunciar, da maior para a menor —
+ * de todo o catálogo ou só de uma categoria.
  *
- * Bolsa fica fora: é concessão da escola caso a caso, a matrícula externa
- * recusa 60% ou mais, e anunciar isso seria prometer o que não se entrega
- * (mesma régua de ehBolsa, usada na vitrine).
+ * Bolsa fica fora: é concessão da escola caso a caso, e anunciar isso seria
+ * prometer o que não se entrega (mesma régua de ehBolsa, usada na vitrine).
  */
-function faixasDeDesconto(): array {
-  $linhas = buscarColecao(COL_PRECOS, ['fields' => 'ingresso,desconto,ativo']) ?? [];
+function faixasDeDesconto(?string $categoria = null): array {
+  $linhas = buscarColecao(COL_PRECOS, ['fields' => 'ingresso,desconto,ativo,categoria']) ?? [];
+  $alvo = categoriaCampanha($categoria);
 
   $faixas = [];
   foreach ($linhas as $l) {
     if (($l['ativo'] ?? true) === false) continue;
+    if ($alvo !== '' && categoriaCampanha($l['categoria'] ?? '') !== $alvo) continue;
     if (ehBolsa($l)) continue;
     $d = (int) ($l['desconto'] ?? 0);
     if ($d > 0) $faixas[$d] = true;
@@ -168,6 +175,19 @@ function faixasDeDesconto(): array {
   $faixas = array_keys($faixas);
   rsort($faixas);
   return $faixas;
+}
+
+/** Categorias do catálogo do AVASET (nome como está no GESET), em ordem alfabética. */
+function categoriasDoCatalogo(): array {
+  $nomes = [];
+  foreach (buscarColecao(COL_PRECOS, ['fields' => 'categoria,ativo']) ?? [] as $l) {
+    if (($l['ativo'] ?? true) === false) continue;
+    $c = trim((string) ($l['categoria'] ?? ''));
+    if ($c !== '') $nomes[categoriaCampanha($c)] = $c;
+  }
+  $nomes = array_values($nomes);
+  sort($nomes, SORT_NATURAL | SORT_FLAG_CASE);
+  return $nomes;
 }
 
 /**

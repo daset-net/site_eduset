@@ -188,6 +188,10 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             <?php endif; ?>
           </div>
 
+          <?php if (!empty($curso['campanhaNome'])): ?>
+          <p class="oferta__campanha"><i class="ri-megaphone-line"></i> <?= e($curso['campanhaNome']) ?></p>
+          <?php endif; ?>
+
           <?php if ($curso['desconto']): ?>
           <div class="contador" data-fim="<?= e($curso['ofertaFim']) ?>">
             <p class="contador__titulo"><i class="ri-timer-flash-line"></i> A condição de <?= (int) $curso['desconto'] ?>% termina em</p>

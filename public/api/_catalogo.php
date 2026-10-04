@@ -622,14 +622,18 @@ function urlImagem(?string $uuid): string {
 /**
  * Linha de BOLSA do catálogo — não pode ser anunciada nem vendida pelo site.
  *
- * Bolsa é concessão da escola, decidida caso a caso no GESET, e o próprio
- * endpoint de matrícula externa do AVASET recusa desconto de 60% ou mais vindo
- * de fora. Anunciar esse preço seria prometer o que a matrícula não entrega,
- * então ele é descartado antes de qualquer cálculo: nem vitrine, nem contador,
- * nem formulário.
+ * Bolsa é concessão da escola, decidida caso a caso no GESET. Anunciar esse
+ * preço seria prometer o que a matrícula não entrega (venda pelo site entra
+ * sempre como normal), então ele é descartado antes de qualquer cálculo: nem
+ * vitrine, nem contador, nem formulário.
+ *
+ * Quem diz o que é bolsa é a marcação do catálogo (ingresso), não o tamanho do
+ * desconto: no GESET, 60% pode ser bolsa numa escola e preço comercial em
+ * outra. O corte de 60% fica só para linha antiga sem marcação.
  */
 function ehBolsa(array $linha): bool {
-  if (strtolower(trim((string) ($linha['ingresso'] ?? ''))) === 'bolsa') return true;
+  $ingresso = strtolower(trim((string) ($linha['ingresso'] ?? '')));
+  if ($ingresso !== '') return $ingresso === 'bolsa';
   return (float) ($linha['desconto'] ?? 0) >= 60;
 }
 
@@ -663,7 +667,13 @@ const TZ_CAMPANHA = 'America/Fortaleza';
  *
  *   {"permanente": 50,
  *    "programadas": [{"nome":"Semana do Cliente","desconto":50,
- *                     "inicio":"2026-09-01","fim":"2026-09-10"}]}
+ *                     "inicio":"2026-09-01","fim":"2026-09-10"},
+ *                    {"nome":"EJA de outubro","desconto":65,"categoria":"EJA",
+ *                     "inicio":"2026-10-04","fim":"2026-10-31"}]}
+ *
+ * Programada com `categoria` vale só para os cursos daquela categoria do
+ * catálogo (mesmo nome do GESET, sem diferenciar acento e caixa); sem ela,
+ * vale para todos. As outras categorias seguem a rotação de sempre.
  *
  * Só uma coisa vale por vez, e é isso que o painel garante ao salvar: com um
  * desconto permanente ligado não existe programação, e com programação não
@@ -675,12 +685,18 @@ const TZ_CAMPANHA = 'America/Fortaleza';
  *
  * @return array{desconto:int, fim:?int, permanente:bool}|null  fim em epoch
  */
-function campanhaVigente(): ?array {
-  static $achada = false;
-  if ($achada !== false) return $achada;
+function campanhaVigente(?string $categoria = null): ?array {
+  static $achadas = [];
+  $chave = categoriaCampanha($categoria);
+  if (array_key_exists($chave, $achadas)) return $achadas[$chave];
 
   $dados = json_decode(trim(config('oferta_campanhas', '')), true);
-  return $achada = is_array($dados) ? campanhaDe($dados) : null;
+  return $achadas[$chave] = is_array($dados) ? campanhaDe($dados, $categoria) : null;
+}
+
+/** Categoria comparável: "EJA", "eja " e "Éja" são a mesma. Vazio = todos os cursos. */
+function categoriaCampanha(?string $categoria): string {
+  return strtoupper(trim(semAcento((string) $categoria)));
 }
 
 /**
@@ -688,12 +704,13 @@ function campanhaVigente(): ?array {
  * mostrar o que está no ar logo depois de salvar, sem esbarrar no cache da
  * leitura pública. Uma implementação só, para painel e site nunca discordarem.
  */
-function campanhaDe(array $dados): ?array {
+function campanhaDe(array $dados, ?string $categoria = null): ?array {
   // Permanente ganha de tudo: não tem prazo, então o contador nem aparece.
   $permanente = (int) ($dados['permanente'] ?? 0);
   if ($permanente > 0) {
-    return ['desconto' => $permanente, 'fim' => null, 'permanente' => true];
+    return ['desconto' => $permanente, 'fim' => null, 'permanente' => true, 'categoria' => '', 'nome' => ''];
   }
+  $alvo = categoriaCampanha($categoria);
 
   $tz    = new DateTimeZone(TZ_CAMPANHA);
   $agora = (new DateTime('now', $tz))->getTimestamp();
@@ -702,11 +719,17 @@ function campanhaDe(array $dados): ?array {
     $janela = janelaCampanha($c);
     if (!$janela) continue;
 
+    // Campanha de uma categoria só vale para os cursos dela.
+    $daCampanha = categoriaCampanha($c['categoria'] ?? '');
+    if ($daCampanha !== '' && $daCampanha !== $alvo) continue;
+
     if ($agora >= $janela[0] && $agora <= $janela[1]) {
       return [
         'desconto'   => (int) $c['desconto'],
         'fim'        => $janela[1],
         'permanente' => false,
+        'categoria'  => (string) ($c['categoria'] ?? ''),
+        'nome'       => trim((string) ($c['nome'] ?? '')),
       ];
     }
   }
@@ -751,8 +774,8 @@ function janelaCampanha(array $c): ?array {
  * sozinho (curso.js some com o bloco quando a data não é válida). Prazo só
  * aparece quando existe prazo de verdade — o site não inventa urgência.
  */
-function fimDaOferta(): string {
-  $campanha = campanhaVigente();
+function fimDaOferta(?string $categoria = null): string {
+  $campanha = campanhaVigente($categoria);
   if ($campanha) {
     return $campanha['permanente'] ? '' : date('c', $campanha['fim']);
   }
@@ -807,8 +830,9 @@ function ofertaDoCiclo(array $versoes): ?array {
     return (float) $a['valor_parcela'] <=> (float) $b['valor_parcela'];
   });
 
-  // Campanha da escola manda: enquanto ela vale, não há rotação.
-  $campanha = campanhaVigente();
+  // Campanha da escola manda: enquanto ela vale, não há rotação. A categoria
+  // é a do curso (todas as versões de um curso são da mesma categoria).
+  $campanha = campanhaVigente($ativas[0]['categoria'] ?? null);
   if ($campanha) return versaoParaCampanha($ativas, $campanha['desconto']);
 
   if (strtolower(config('oferta_modo', 'rotativo')) === 'fixo') return $ativas[0];
@@ -966,7 +990,9 @@ function montarCatalogo(array $precos, array $editorial, array $ctx): array {
       // — no conjugado ela aponta um só, o do SISTEC.
       'linkMec'        => trim((string) ($s['link_consulta_mec'] ?? '')),
       'economia'       => moeda(max(0, $valorParcelaNormal - $valorParcela)),
-      'ofertaFim'      => fimDaOferta(),
+      'ofertaFim'      => fimDaOferta($l['categoria'] ?? null),
+      // Frase da campanha da escola que vale para este curso (vazia na rotação).
+      'campanhaNome'   => (string) (campanhaVigente($l['categoria'] ?? null)['nome'] ?? ''),
 
       // conteúdo da página de conversão
       'chamada'        => $s['chamada']  ?? '',
