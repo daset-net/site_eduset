@@ -1674,3 +1674,31 @@ ul { list-style: none; }
   .unid-hero__actions .btn { width: 100%; justify-content: center; }
   .unid-busca { flex-direction: column; align-items: stretch; }
 }
+
+/* Topo com arte de campanha: os selos saem de cima da imagem e viram uma
+   faixa logo abaixo dela, para não esconder o texto da arte. Sem arte (só a
+   logo), o .hero__chips não interfere e os selos seguem flutuando. */
+.hero__chips { display: contents; }
+.hero__visual--arte { flex-direction: column; align-items: center; min-width: 0; }
+.hero__visual--arte .hero__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  position: relative;
+}
+/* Sem "display" aqui: no celular a regra que esconde os selos continua valendo. */
+.hero__visual--arte .hero__chip {
+  position: static;
+  animation: none;
+  padding: 8px 12px;
+  gap: 7px;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.hero__visual--arte .hero__chip i { font-size: 16px; }
+@media (min-width: 1200px) {
+  /* Telas largas: os três selos numa linha só, centralizados sob a arte. */
+  .hero__visual--arte .hero__chips { flex-wrap: nowrap; width: max-content; }
+}

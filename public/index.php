@@ -128,7 +128,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         </ul>
       </div>
 
-      <div class="hero__visual">
+      <div class="hero__visual<?= $heroImg !== '' ? ' hero__visual--arte' : '' ?>">
         <div class="glow"></div>
         <?php $heroFormato = config('hero_formato', 'retangular'); ?>
         <div class="hero__media hero__media--<?= e($heroFormato) ?><?= $heroImg === '' ? ' hero__media--vazio' : '' ?>">
@@ -138,9 +138,13 @@ function selosModalidade(array $tags, int $limite = 3): string {
             <img class="hero__media-logo" src="assets/img/eduset-negativo.png" alt="EDUSET">
           <?php endif; ?>
         </div>
-        <div class="hero__chip hero__chip--1"><i class="ri-award-fill"></i> Certificado reconhecido</div>
-        <div class="hero__chip hero__chip--2"><i class="ri-play-circle-fill"></i> Aulas 100% online</div>
-        <div class="hero__chip hero__chip--3"><i class="ri-wifi-line"></i> Estude de onde estiver</div>
+        <!-- Com arte no topo, os selos vão para uma faixa abaixo dela: flutuando
+             por cima, cobriam o texto da campanha (ex.: o percentual de desconto). -->
+        <div class="hero__chips">
+          <div class="hero__chip hero__chip--1"><i class="ri-award-fill"></i> Certificado reconhecido</div>
+          <div class="hero__chip hero__chip--2"><i class="ri-play-circle-fill"></i> Aulas 100% online</div>
+          <div class="hero__chip hero__chip--3"><i class="ri-wifi-line"></i> Estude de onde estiver</div>
+        </div>
       </div>
     </div>
 
