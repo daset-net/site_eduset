@@ -256,8 +256,10 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
     @media(max-width:900px){ .par-hero__grid,.par-form-wrap,.flex-intro__box,.flex-band__grid,.aff-intro__grid,.aff-highlight__grid,.conviction__grid,.final-cta__box{grid-template-columns:1fr}.money-strip__grid{grid-template-columns:1fr 1fr}.money-strip__lead{grid-column:1/-1}.unit-stories__grid{grid-template-columns:1fr}.unit-story{min-height:0}.conviction__copy{position:static}.par-visual{max-width:560px}.par-grid{grid-template-columns:1fr 1fr}.par-steps{grid-template-columns:1fr 1fr}.par-header .nav{display:none}.par-menu{display:block} }
     @media(max-width:600px){ .par-hero{padding:52px 0 64px}.par-visual,.par-grid,.par-steps,.par-fields,.flex-points,.aff-flow,.aff-tools,.aff-values,.compare__grid,.money-strip__grid,.earning-path__track,.unit-preview{grid-template-columns:1fr}.earning-path__track:before{display:none}.earning-step{display:grid;grid-template-columns:58px 1fr;text-align:left;column-gap:14px}.earning-step__icon{grid-row:1/3;margin:0}.money-strip__lead{grid-column:auto}.par-metric:first-child,.par-field.full{grid-column:auto}.par-form{padding:21px}.final-cta__box{padding:28px 24px}.par-header .header__cta .btn{display:none} }
   </style>
+<?= codigosRastreamento('head') ?>
 </head>
 <body class="par-page">
+<?= codigosRastreamento('body') ?>
 <header class="header par-header">
   <div class="container header__inner">
     <a href="index.php" class="brand"><img class="brand__neg" src="<?= e(versao($logoNegativa)) ?>" alt="<?= e($marca) ?>"><img class="brand__cor" src="<?= e(versao($logoNormal)) ?>" alt="<?= e($marca) ?>"></a>

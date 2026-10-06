@@ -1536,3 +1536,111 @@ function cursoPorId(string $chave): ?array {
   }
   return null;
 }
+
+// ---------------------------------------------------------------- rastreamento
+/**
+ * Códigos de acompanhamento de anúncios (Google Ads, GA4, Tag Manager, Meta,
+ * Pinterest, TikTok), configurados pela escola na aba "Rastreamento" do painel.
+ *
+ * Cada ferramenta guarda só o ID na sua chave de site_configuracoes, e o
+ * script oficial é montado aqui: quem cola o snippet inteiro no painel não
+ * quebra a página, e o ID é validado antes de ir para dentro de um <script>.
+ * O campo livre (rastreio_extra_head / _body) é para ferramenta que não está na
+ * lista e entra como foi colado.
+ */
+const RASTREIO_FERRAMENTAS = [
+  'rastreio_google_ads' => ['Google Ads',          '/^AW-\d{6,}$/',                 'AW-1234567890'],
+  'rastreio_ga4'        => ['Google Analytics 4',  '/^G-[A-Z0-9]{6,}$/',            'G-XXXXXXXXXX'],
+  'rastreio_gtm'        => ['Google Tag Manager',  '/^GTM-[A-Z0-9]{4,}$/',          'GTM-XXXXXXX'],
+  'rastreio_meta_pixel' => ['Meta (Facebook/Instagram) Pixel', '/^\d{10,20}$/',     '123456789012345'],
+  'rastreio_pinterest'  => ['Pinterest Tag',       '/^\d{10,16}$/',                 '2612345678901'],
+  'rastreio_tiktok'     => ['TikTok Pixel',        '/^[A-Z0-9]{15,25}$/',           'CXXXXXXXXXXXXXXXXXXX'],
+];
+
+/**
+ * Tira o ID de um valor que pode ser o ID puro ou o snippet inteiro colado.
+ * Devolve '' se não achar um ID válido para a ferramenta.
+ */
+function rastreioId(string $chave, string $valor): string {
+  $valor = trim($valor);
+  if ($valor === '' || !isset(RASTREIO_FERRAMENTAS[$chave])) return '';
+  $regra = RASTREIO_FERRAMENTAS[$chave][1];
+  if (preg_match($regra, strtoupper($valor))) return strtoupper($valor);
+
+  $procura = [
+    'rastreio_google_ads' => '/\bAW-\d{6,}\b/i',
+    'rastreio_ga4'        => '/\bG-[A-Z0-9]{6,}\b/i',
+    'rastreio_gtm'        => '/\bGTM-[A-Z0-9]{4,}\b/i',
+    'rastreio_meta_pixel' => "/fbq\\(\\s*['\"]init['\"]\\s*,\\s*['\"](\\d{10,20})['\"]/i",
+    'rastreio_pinterest'  => "/pintrk\\(\\s*['\"]load['\"]\\s*,\\s*['\"](\\d{10,16})['\"]/i",
+    'rastreio_tiktok'     => "/ttq\\.load\\(\\s*['\"]([A-Z0-9]{15,25})['\"]/i",
+  ][$chave];
+  if (!preg_match($procura, $valor, $m)) return '';
+  $id = strtoupper($m[1] ?? $m[0]);
+  return preg_match($regra, $id) ? $id : '';
+}
+
+/** HTML dos códigos de acompanhamento para o <head> ou para o início do <body>. */
+function codigosRastreamento(string $onde): string {
+  $id = [];
+  foreach (array_keys(RASTREIO_FERRAMENTAS) as $chave) $id[$chave] = rastreioId($chave, config($chave));
+  $h = [];
+
+  if ($onde === 'head') {
+    // Google Ads e GA4 dividem um único gtag.js; cada ID ganha seu config.
+    $google = array_values(array_filter([$id['rastreio_google_ads'], $id['rastreio_ga4']]));
+    if ($google) {
+      $h[] = '<script async src="https://www.googletagmanager.com/gtag/js?id=' . $google[0] . '"></script>';
+      $h[] = "<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());"
+           . implode('', array_map(fn($g) => "gtag('config','" . $g . "');", $google)) . '</script>';
+    }
+    if ($id['rastreio_gtm'] !== '') {
+      $h[] = "<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});"
+           . "var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;"
+           . "j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})"
+           . "(window,document,'script','dataLayer','" . $id['rastreio_gtm'] . "');</script>";
+    }
+    if ($id['rastreio_meta_pixel'] !== '') {
+      $h[] = "<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};"
+           . "if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;"
+           . "t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script',"
+           . "'https://connect.facebook.net/en_US/fbevents.js');fbq('init','" . $id['rastreio_meta_pixel'] . "');fbq('track','PageView');</script>";
+    }
+    if ($id['rastreio_pinterest'] !== '') {
+      $h[] = "<script>!function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};"
+           . "var n=window.pintrk;n.queue=[],n.version='3.0';var t=document.createElement('script');t.async=!0,t.src=e;"
+           . "var r=document.getElementsByTagName('script')[0];r.parentNode.insertBefore(t,r)}}('https://s.pinimg.com/ct/core.js');"
+           . "pintrk('load','" . $id['rastreio_pinterest'] . "');pintrk('page');</script>";
+    }
+    if ($id['rastreio_tiktok'] !== '') {
+      $h[] = "<script>!function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=['page','track','identify','instances','debug','on','off','once','ready','alias','group','enableCookie','disableCookie'];"
+           . "ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};"
+           . "for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);"
+           . "ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};"
+           . "ttq.load=function(e,n){var i='https://analytics.tiktok.com/i18n/pixel/events.js';ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,"
+           . "ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement('script');"
+           . "o.type='text/javascript',o.async=!0,o.src=i+'?sdkid='+e+'&lib='+t;var a=document.getElementsByTagName('script')[0];a.parentNode.insertBefore(o,a)};"
+           . "ttq.load('" . $id['rastreio_tiktok'] . "');ttq.page();}(window,document,'ttq');</script>";
+    }
+    $extra = trim(config('rastreio_extra_head'));
+    if ($extra !== '') $h[] = $extra;
+  } else {
+    // Versões <noscript> (navegador sem JavaScript) e o campo livre do <body>.
+    if ($id['rastreio_gtm'] !== '') {
+      $h[] = '<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=' . $id['rastreio_gtm']
+           . '" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>';
+    }
+    if ($id['rastreio_meta_pixel'] !== '') {
+      $h[] = '<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id='
+           . $id['rastreio_meta_pixel'] . '&ev=PageView&noscript=1"></noscript>';
+    }
+    if ($id['rastreio_pinterest'] !== '') {
+      $h[] = '<noscript><img height="1" width="1" style="display:none;" alt="" src="https://ct.pinterest.com/v3/?event=init&tid='
+           . $id['rastreio_pinterest'] . '&noscript=1"></noscript>';
+    }
+    $extra = trim(config('rastreio_extra_body'));
+    if ($extra !== '') $h[] = $extra;
+  }
+
+  return $h ? "\n  <!-- Rastreamento (painel do site → Rastreamento) -->\n  " . implode("\n  ", $h) . "\n" : '';
+}

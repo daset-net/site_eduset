@@ -155,6 +155,7 @@ require __DIR__ . '/_topo.php';
 
     <?php foreach ($configs as $c):
       if (in_array($c['chave'] ?? '', ['hero_imagem', 'hero_formato'])) continue; // tem uploader e controle próprios
+      if (str_starts_with((string) ($c['chave'] ?? ''), 'rastreio_')) continue; // aba Rastreamento
       $valor = trim((string) ($c['valor_extendido'] ?? '')) !== ''
         ? $c['valor_extendido'] : ($c['valor'] ?? '');
       $longo = mb_strlen((string) $valor) > 80 || in_array($c['chave'], ['hero_subtitulo', 'seo_descricao'], true);

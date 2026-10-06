@@ -38,6 +38,9 @@ $abaAtiva = $abaAtiva ?? '';
       <a href="campanhas.php" class="<?= $abaAtiva === 'campanhas' ? 'ativa' : '' ?>">
         <i class="ri-price-tag-3-line"></i> Campanhas
       </a>
+      <a href="rastreamento.php" class="<?= $abaAtiva === 'rastreamento' ? 'ativa' : '' ?>">
+        <i class="ri-radar-line"></i> Rastreamento
+      </a>
     </nav>
 
     <div class="admin-usuario">

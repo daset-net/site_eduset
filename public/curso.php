@@ -90,8 +90,10 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
+<?= codigosRastreamento('head') ?>
 </head>
 <body class="page-curso">
+<?= codigosRastreamento('body') ?>
 
   <!-- ===================== HEADER ===================== -->
   <header class="header" id="header">
