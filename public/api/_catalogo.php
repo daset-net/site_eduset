@@ -1622,6 +1622,8 @@ function codigosRastreamento(string $onde): string {
            . "o.type='text/javascript',o.async=!0,o.src=i+'?sdkid='+e+'&lib='+t;var a=document.getElementsByTagName('script')[0];a.parentNode.insertBefore(o,a)};"
            . "ttq.load('" . $id['rastreio_tiktok'] . "');ttq.page();}(window,document,'ttq');</script>";
     }
+    $conv = scriptConversaoMatricula();
+    if ($conv !== '') $h[] = $conv;
     $extra = trim(config('rastreio_extra_head'));
     if ($extra !== '') $h[] = $extra;
   } else {
@@ -1643,4 +1645,38 @@ function codigosRastreamento(string $onde): string {
   }
 
   return $h ? "\n  <!-- Rastreamento (painel do site → Rastreamento) -->\n  " . implode("\n  ", $h) . "\n" : '';
+}
+
+/**
+ * Rótulo de conversão do Google Ads ("AW-123/AbC_xyz"), tirado do valor puro ou
+ * do snippet de evento colado no painel (do 'send_to'). '' se não houver.
+ */
+function rastreioConversaoGoogle(string $valor): string {
+  return preg_match('#\bAW-\d{6,}/[A-Za-z0-9_-]{6,}\b#', $valor, $m) ? $m[0] : '';
+}
+
+/**
+ * window.registrarMatricula({id, valor, email, telefone}) — chamado pelo
+ * matricula.js quando a API confirma a matrícula. Avisa cada ferramenta
+ * configurada: conversão do Google Ads (com os dados do aluno para as
+ * conversões otimizadas; o gtag os envia criptografados), e o evento de
+ * cadastro do Meta, do Pinterest e do TikTok. O id da matrícula vai junto para
+ * a mesma matrícula não contar duas vezes.
+ */
+function scriptConversaoMatricula(): string {
+  $google = rastreioConversaoGoogle(config('rastreio_google_ads_conversao'));
+  $outros = rastreioId('rastreio_meta_pixel', config('rastreio_meta_pixel')) !== ''
+         || rastreioId('rastreio_pinterest', config('rastreio_pinterest')) !== ''
+         || rastreioId('rastreio_tiktok', config('rastreio_tiktok')) !== '';
+  if ($google === '' && !$outros) return '';
+
+  return "<script>window.registrarMatricula=function(m){m=m||{};var v=Number(m.valor)||0,id=String(m.id||'');try{"
+    . ($google !== ''
+        ? "if(window.gtag){var u={};if(m.email)u.email=m.email;if(m.telefone)u.phone_number=m.telefone;if(u.email||u.phone_number)gtag('set','user_data',u);"
+          . "gtag('event','conversion',{send_to:'" . $google . "',value:v,currency:'BRL',transaction_id:id});}"
+        : '')
+    . "if(window.fbq)fbq('track','CompleteRegistration',{value:v,currency:'BRL'},{eventID:id||undefined});"
+    . "if(window.pintrk)pintrk('track','signup',{value:v,currency:'BRL',order_id:id});"
+    . "if(window.ttq)ttq.track('CompleteRegistration',{value:v,currency:'BRL'});"
+    . "}catch(e){}};</script>";
 }

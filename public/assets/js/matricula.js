@@ -295,6 +295,18 @@
 
         form.hidden = true;
         sucesso.hidden = false;
+
+        // Conversão dos anúncios (Google Ads, Meta, Pinterest, TikTok), quando a
+        // escola configurou na aba Rastreamento do painel. Valor = total do curso.
+        if (window.registrarMatricula) {
+          var ddiConv = String(dados.celular_ddi || '55').replace(/\D/g, '');
+          window.registrarMatricula({
+            id: d.matricula || '',
+            valor: parseFloat(form.getAttribute('data-valor')) || 0,
+            email: String(dados.email || '').trim().toLowerCase(),
+            telefone: dados.celular ? '+' + ddiConv + String(dados.celular).replace(/\D/g, '') : ''
+          });
+        }
         sucesso.scrollIntoView({ behavior: 'smooth', block: 'center' });
       })
       .catch(function () {

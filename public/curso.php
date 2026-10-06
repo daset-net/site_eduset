@@ -363,7 +363,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <div class="line"><div class="ic"><i class="ri-map-pin-line"></i></div><div><strong>Atendimento</strong><span><?= e(config('horario_atendimento', 'Segunda a sexta, das 8h às 18h')) ?></span></div></div>
       </div>
 
-      <form class="contact-form" id="form-matricula" data-curso="<?= e($curso['id']) ?>" novalidate>
+      <form class="contact-form" id="form-matricula" data-curso="<?= e($curso['id']) ?>" data-valor="<?= e(number_format((float) str_replace(['.', ','], ['', '.'], $curso['preco']) * max(1, (int) ($curso['parcelas'] ?? 1)), 2, '.', '')) ?>" novalidate>
         <!-- Deixa claro, antes do primeiro campo, que aqui a matrícula é feita de verdade. -->
         <div class="form-topo">
           <span class="form-topo__selo"><i class="ri-file-list-3-line"></i> Ficha de matrícula</span>

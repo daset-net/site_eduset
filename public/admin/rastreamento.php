@@ -29,6 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       [$ok, $msg] = salvarConfig($chave, $id, 'ID de ' . $nome . ' (aba Rastreamento do painel)');
       if (!$ok) $erros[] = $msg;
     }
+    // Conversão de matrícula do Google Ads: o rótulo "AW-.../xxxx" sai do snippet de evento colado.
+    $convBruto = trim((string) ($_POST['rastreio_google_ads_conversao'] ?? ''));
+    $conv = rastreioConversaoGoogle($convBruto);
+    if ($convBruto !== '' && $conv === '') {
+      $invalidos[] = 'Conversão de matrícula (Google Ads)';
+    } else {
+      [$ok, $msg] = salvarConfig('rastreio_google_ads_conversao', $conv, 'Rótulo de conversão de matrícula do Google Ads (aba Rastreamento do painel)');
+      if (!$ok) $erros[] = $msg;
+    }
     foreach (['rastreio_extra_head' => 'Código extra no <head>', 'rastreio_extra_body' => 'Código extra no início do <body>'] as $chave => $desc) {
       [$ok, $msg] = salvarConfig($chave, trim((string) ($_POST[$chave] ?? '')), $desc . ' (aba Rastreamento do painel)');
       if (!$ok) $erros[] = $msg;
@@ -59,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($invalidos)) {
   foreach (RASTREIO_FERRAMENTAS as $chave => [$nome]) {
     if (in_array($nome, $invalidos, true)) $atual[$chave] = (string) ($_POST[$chave] ?? '');
   }
+  if (in_array('Conversão de matrícula (Google Ads)', $invalidos, true)) $atual['rastreio_google_ads_conversao'] = (string) ($_POST['rastreio_google_ads_conversao'] ?? '');
 }
 
 $titulo   = 'Rastreamento';
@@ -94,6 +104,16 @@ require __DIR__ . '/_topo.php';
         <input id="<?= e($chave) ?>" type="text" name="<?= e($chave) ?>" value="<?= e($valor) ?>" placeholder="Ex.: <?= e($exemplo) ?>" autocomplete="off" spellcheck="false">
       </div>
     <?php endforeach; ?>
+
+    <?php $convAtual = $atual['rastreio_google_ads_conversao'] ?? ''; ?>
+    <div class="campo">
+      <label for="rastreio_google_ads_conversao">
+        Conversão de matrícula (Google Ads)
+        <?php if (rastreioConversaoGoogle($convAtual) !== ''): ?><small style="color:#15803d"><i class="ri-checkbox-circle-fill"></i> ativa no site</small><?php endif; ?>
+        <small>Cole o "snippet de evento" da conversão (ou só o send_to, ex.: AW-123/AbC_xyz). Dispara quando a matrícula é confirmada no site, com o valor do curso. Meta, Pinterest e TikTok recebem o evento de cadastro sozinhos.</small>
+      </label>
+      <textarea id="rastreio_google_ads_conversao" name="rastreio_google_ads_conversao" rows="3" spellcheck="false" placeholder="AW-1234567890/AbCdEfGhIjK"><?= e($convAtual) ?></textarea>
+    </div>
 
     <div class="campo">
       <label for="rastreio_extra_head">
