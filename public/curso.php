@@ -80,9 +80,9 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   <meta property="og:image" content="<?= e(urlAbsoluta($curso['imagem'] . '&w=1200')) ?>">
   <?php endif; ?>
 
-  <link rel="icon" href="assets/img/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" href="assets/img/favicon.png">
-  <link rel="apple-touch-icon" href="assets/img/favicon.png">
+  <link rel="icon" href="<?= versao('assets/img/favicon.ico') ?>" sizes="any">
+  <link rel="icon" type="image/png" href="<?= versao('assets/img/favicon.png') ?>">
+  <link rel="apple-touch-icon" href="<?= versao('assets/img/favicon.png') ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -97,8 +97,8 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   <header class="header" id="header">
     <div class="container header__inner">
       <a href="index.php" class="brand">
-        <img class="brand__neg" src="assets/img/eduset-negativo.png" alt="EDUSET">
-        <img class="brand__cor" src="assets/img/eduset.png" alt="EDUSET">
+        <img class="brand__neg" src="<?= versao('assets/img/eduset-negativo.png') ?>" alt="EDUSET">
+        <img class="brand__cor" src="<?= versao('assets/img/eduset.png') ?>" alt="EDUSET">
       </a>
       <nav class="nav">
         <a href="index.php">Início</a>
@@ -622,7 +622,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
     <div class="container">
       <div class="footer__grid">
         <div class="footer__brand">
-          <img src="assets/img/eduset-negativo.png" alt="EDUSET">
+          <img src="<?= versao('assets/img/eduset-negativo.png') ?>" alt="EDUSET">
           <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos profissionalizantes com certificação reconhecida e 100% online.</p>
           <div class="footer__social">
             <?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?>

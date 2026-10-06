@@ -55,8 +55,8 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <meta name="theme-color" content="<?= e($corTema) ?>">
   <title><?= e($titulo . ' · ' . $marca) ?></title>
   <link rel="canonical" href="<?= e(urlAbsoluta('/' . basename($_SERVER['SCRIPT_NAME'] ?? 'index.php'))) ?>">
-  <link rel="icon" href="assets/img/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="icon" href="<?= versao('assets/img/favicon.ico') ?>" sizes="any">
+  <link rel="icon" type="image/png" href="<?= versao('assets/img/favicon.png') ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -260,7 +260,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
 <body class="par-page">
 <header class="header par-header">
   <div class="container header__inner">
-    <a href="index.php" class="brand"><img class="brand__neg" src="<?= e($logoNegativa) ?>" alt="<?= e($marca) ?>"><img class="brand__cor" src="<?= e($logoNormal) ?>" alt="<?= e($marca) ?>"></a>
+    <a href="index.php" class="brand"><img class="brand__neg" src="<?= e(versao($logoNegativa)) ?>" alt="<?= e($marca) ?>"><img class="brand__cor" src="<?= e(versao($logoNormal)) ?>" alt="<?= e($marca) ?>"></a>
     <nav class="nav"><a href="index.php">Início</a><a href="index.php#cursos">Cursos</a><a href="unidades.php">Unidades</a><a href="afiliados.php"<?= $ehAfiliado ? ' class="ativo"' : '' ?>>Afiliados</a><a href="seja-uma-unidade.php"<?= !$ehAfiliado ? ' class="ativo"' : '' ?>>Abra sua unidade</a></nav>
     <div class="header__cta"><a href="#candidatura" class="btn btn-primary">Quero participar</a></div>
   </div>
@@ -499,7 +499,7 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
 
 <footer class="footer"><div class="container">
   <div class="footer__grid">
-    <div class="footer__brand"><img src="<?= e($logoNegativa) ?>" alt="<?= e($marca) ?>"><p>Educação, tecnologia e atendimento próximo para criar novas oportunidades de aprendizagem.</p><div class="footer__social"><?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?><?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="ri-whatsapp-line"></i></a><?php if (config('youtube')): ?><a href="<?= e(config('youtube')) ?>" target="_blank" rel="noopener" aria-label="YouTube"><i class="ri-youtube-fill"></i></a><?php endif; ?></div></div>
+    <div class="footer__brand"><img src="<?= e(versao($logoNegativa)) ?>" alt="<?= e($marca) ?>"><p>Educação, tecnologia e atendimento próximo para criar novas oportunidades de aprendizagem.</p><div class="footer__social"><?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?><?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="ri-whatsapp-line"></i></a><?php if (config('youtube')): ?><a href="<?= e(config('youtube')) ?>" target="_blank" rel="noopener" aria-label="YouTube"><i class="ri-youtube-fill"></i></a><?php endif; ?></div></div>
     <div><h5>Modalidades</h5><ul><li><a href="index.php#cursos">Supletivo EJA</a></li><li><a href="index.php#cursos">Cursos técnicos</a></li><li><a href="/profissionalizantes">Cursos profissionalizantes</a></li></ul></div>
     <div><h5>Institucional</h5><ul><li><a href="index.php#categorias">Sobre nós</a></li><li><a href="unidades.php">Unidades</a></li><li><a href="afiliados.php">Programa de afiliados</a></li><li><a href="seja-uma-unidade.php">Abra sua Unidade Flex</a></li><li><a href="index.php#diferenciais">Diferenciais</a></li></ul></div>
     <div><h5>Atendimento</h5><ul><li><a href="index.php#contato">Central do aluno</a></li><li><a href="index.php#contato">Fale conosco</a></li><li><a href="<?= e($whatsapp) ?>" target="_blank" rel="noopener">WhatsApp</a></li></ul></div>

@@ -73,9 +73,9 @@ function selosModalidade(array $tags, int $limite = 3): string {
   <link rel="preload" as="image" href="<?= e($heroImg) ?>&w=800" imagesrcset="<?= e($heroSrcset) ?>" imagesizes="<?= e($heroSizes) ?>" fetchpriority="high">
   <?php endif; ?>
 
-  <link rel="icon" href="assets/img/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" href="assets/img/favicon.png">
-  <link rel="apple-touch-icon" href="assets/img/favicon.png">
+  <link rel="icon" href="<?= versao('assets/img/favicon.ico') ?>" sizes="any">
+  <link rel="icon" type="image/png" href="<?= versao('assets/img/favicon.png') ?>">
+  <link rel="apple-touch-icon" href="<?= versao('assets/img/favicon.png') ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -92,8 +92,8 @@ function selosModalidade(array $tags, int $limite = 3): string {
     <div class="container header__inner">
       <a href="#home" class="brand">
         <!-- negativa sobre o hero escuro, colorida quando o header fica branco -->
-        <img class="brand__neg" src="assets/img/eduset-negativo.png" alt="EDUSET">
-        <img class="brand__cor" src="assets/img/eduset.png" alt="EDUSET">
+        <img class="brand__neg" src="<?= versao('assets/img/eduset-negativo.png') ?>" alt="EDUSET">
+        <img class="brand__cor" src="<?= versao('assets/img/eduset.png') ?>" alt="EDUSET">
       </a>
 
       <nav class="nav" :class="{ open: menuOpen }" @click="menuOpen = false">
@@ -154,7 +154,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
           <?php if ($heroImg !== ''): ?>
             <img src="<?= e($heroImg) ?>&w=800" srcset="<?= e($heroSrcset) ?>" sizes="<?= e($heroSizes) ?>" width="1200" height="1200" fetchpriority="high" decoding="async" alt="Estude na EDUSET">
           <?php else: ?>
-            <img class="hero__media-logo" src="assets/img/eduset-negativo.png" alt="EDUSET">
+            <img class="hero__media-logo" src="<?= versao('assets/img/eduset-negativo.png') ?>" alt="EDUSET">
           <?php endif; ?>
         </div>
         <!-- Com arte no topo, os selos vão para uma faixa abaixo dela: flutuando
@@ -449,7 +449,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
     <div class="container">
       <div class="footer__grid">
         <div class="footer__brand">
-          <img src="assets/img/eduset-negativo.png" alt="EDUSET">
+          <img src="<?= versao('assets/img/eduset-negativo.png') ?>" alt="EDUSET">
           <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos profissionalizantes com certificação reconhecida e 100% online.</p>
           <div class="footer__social">
             <?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?>
