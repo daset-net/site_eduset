@@ -37,6 +37,7 @@ sort($ufsNaLista);
   <meta name="description" content="<?= e(config('unidades_seo_descricao', 'Veja em que cidades a EDUSET tem unidade e matricule-se pela unidade da sua região.')) ?>">
   <meta name="theme-color" content="#002454">
   <title><?= e(config('unidades_seo_titulo', 'Unidades · EDUSET')) ?></title>
+  <link rel="canonical" href="<?= e(urlAbsoluta('/unidades.php')) ?>">
 
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="assets/img/favicon.png">
@@ -44,7 +45,9 @@ sort($ufsNaLista);
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+  <!-- Ícones fora do caminho crítico: a página pinta sem esperar o CSS do CDN. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
 </head>
 <body class="page-unidades">

@@ -54,12 +54,15 @@ function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8')
   <meta name="description" content="<?= e($ehAfiliado ? 'Indique alunos, acompanhe suas matrículas e receba comissões com o programa de afiliados da ' . $marca . '.' : 'Leve a ' . $marca . ' para sua cidade e empreenda no setor educacional com estrutura e suporte.') ?>">
   <meta name="theme-color" content="<?= e($corTema) ?>">
   <title><?= e($titulo . ' · ' . $marca) ?></title>
+  <link rel="canonical" href="<?= e(urlAbsoluta('/' . basename($_SERVER['SCRIPT_NAME'] ?? 'index.php'))) ?>">
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+  <!-- Ícones fora do caminho crítico: a página pinta sem esperar o CSS do CDN. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
   <style>
     .par-page { background:#fff; }

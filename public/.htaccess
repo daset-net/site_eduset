@@ -16,6 +16,10 @@ RewriteEngine On
 RewriteRule ^cursos-livres/?$ /profissionalizantes [R=301,L,NE]
 RewriteRule ^profissionalizantes/?$ index.php?categoria=profissionalizantes [L,QSA]
 
+# sitemap.xml e llms.txt são gerados na hora a partir do catálogo e das unidades.
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+RewriteRule ^llms\.txt$ llms.php [L]
+
 # 1. Arquivo ou pasta que existe de verdade é servido normalmente.
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

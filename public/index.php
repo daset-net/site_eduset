@@ -12,6 +12,13 @@ $whatsapp = whatsappLink();
 // de qualquer saída e, se a unidade existir, anuncia por quem o visitante veio.
 $polo = poloUnidade();
 $paginaProfissionalizantes = ($_GET['categoria'] ?? '') === 'profissionalizantes';
+$heroImg = urlImagem(config('hero_imagem'));
+// Tamanhos da imagem do topo: o navegador baixa só o que a tela precisa
+// (o celular não leva a de 1200px). O "sizes" nunca é menor que a caixa da
+// imagem (até 460px no celular, ~560px no desktop), então ela continua
+// preenchendo a caixa como antes.
+$heroSrcset = $heroImg === '' ? '' : implode(', ', array_map(fn($w) => $heroImg . '&w=' . $w . ' ' . $w . 'w', [600, 800, 1200]));
+$heroSizes  = '(max-width: 980px) min(460px, 100vw), 560px';
 
 function e(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
 
@@ -53,7 +60,18 @@ function selosModalidade(array $tags, int $limite = 3): string {
   <meta name="description" content="<?= e($paginaProfissionalizantes ? 'Profissionalizantes EAD - Eduset' : config('seo_descricao', 'EDUSET — Educação que transforma. Supletivo EJA, Cursos Técnicos e Profissionalizantes com certificação reconhecida, 100% online e no seu ritmo.')) ?>">
   <meta name="theme-color" content="#002454">
   <title><?= e($paginaProfissionalizantes ? 'Profissionalizantes EAD - Eduset' : config('seo_titulo', 'EDUSET · Educação que transforma vidas')) ?></title>
-  <?php if ($paginaProfissionalizantes): ?><link rel="canonical" href="/profissionalizantes"><?php endif; ?>
+  <link rel="canonical" href="<?= e(urlAbsoluta($paginaProfissionalizantes ? '/profissionalizantes' : '/')) ?>">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="<?= e(SITE_NOME) ?>">
+  <meta property="og:url" content="<?= e(urlAbsoluta($paginaProfissionalizantes ? '/profissionalizantes' : '/')) ?>">
+  <meta property="og:title" content="<?= e($paginaProfissionalizantes ? 'Profissionalizantes EAD · ' . SITE_NOME : config('seo_titulo', SITE_NOME)) ?>">
+  <meta property="og:description" content="<?= e(config('seo_descricao', '')) ?>">
+  <?php if ($heroImg !== ''): ?>
+  <meta property="og:image" content="<?= e(urlAbsoluta($heroImg . '&w=1200')) ?>">
+  <!-- A arte do topo é o maior elemento da primeira tela (LCP): começa a baixar junto com o HTML. -->
+  <link rel="preload" as="image" href="<?= e($heroImg) ?>&w=800" imagesrcset="<?= e($heroSrcset) ?>" imagesizes="<?= e($heroSizes) ?>" fetchpriority="high">
+  <?php endif; ?>
 
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="assets/img/favicon.png">
@@ -61,7 +79,9 @@ function selosModalidade(array $tags, int $limite = 3): string {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+  <!-- Ícones fora do caminho crítico: a página pinta sem esperar o CSS do CDN. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
 </head>
 <body>
@@ -95,7 +115,6 @@ function selosModalidade(array $tags, int $limite = 3): string {
   </header>
 
   <!-- ===================== HERO ===================== -->
-  <?php $heroImg = urlImagem(config('hero_imagem')); ?>
   <section class="hero" id="home">
     <div class="container hero__grid">
       <div class="hero__content">
@@ -133,7 +152,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <?php $heroFormato = config('hero_formato', 'retangular'); ?>
         <div class="hero__media hero__media--<?= e($heroFormato) ?><?= $heroImg === '' ? ' hero__media--vazio' : '' ?>">
           <?php if ($heroImg !== ''): ?>
-            <img src="<?= e($heroImg) ?>&w=1200" alt="Estude na EDUSET">
+            <img src="<?= e($heroImg) ?>&w=800" srcset="<?= e($heroSrcset) ?>" sizes="<?= e($heroSizes) ?>" width="1200" height="1200" fetchpriority="high" decoding="async" alt="Estude na EDUSET">
           <?php else: ?>
             <img class="hero__media-logo" src="assets/img/eduset-negativo.png" alt="EDUSET">
           <?php endif; ?>
@@ -230,8 +249,8 @@ function selosModalidade(array $tags, int $limite = 3): string {
       <div class="section-head" data-reveal>
         <span class="eyebrow">Catálogo</span>
         <h2>Encontre o curso <span class="gradient-text">perfeito para você</span></h2>
-        <p v-if="irMatricula">Escolha o seu curso para abrir o formulário de matrícula.</p>
-        <p v-else>Filtre por modalidade e comece a estudar hoje mesmo.</p>
+        <p v-cloak v-if="irMatricula">Escolha o seu curso para abrir o formulário de matrícula.</p>
+        <p v-cloak v-else>Filtre por modalidade e comece a estudar hoje mesmo.</p>
       </div>
 
       <div class="filter-bar">
@@ -242,14 +261,14 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <button :class="{active: filtro==='profissionalizante'}" @click="filtro='profissionalizante'">Profissionalizantes</button>
       </div>
 
-      <div class="course-grid">
+      <div class="course-grid" v-cloak>
         <div v-if="carregando" class="empty">Carregando cursos…</div>
         <div v-else-if="cursosFiltrados.length === 0" class="empty">Nenhum curso encontrado nesta modalidade.</div>
 
         <article class="course-card" v-for="c in cursosFiltrados" :key="c.id">
           <a class="course-card__link" :href="linkCurso(c)">
           <div class="course-card__media" :style="{ background: c.cor }">
-            <img v-if="c.imagem" class="course-card__capa" :src="c.imagem" :alt="c.nome" loading="lazy">
+            <img v-if="c.imagem" class="course-card__capa" :src="c.imagem" alt="Capa do curso" :alt="c.nome" loading="lazy">
             <span v-else class="emoji">{{ c.emoji }}</span>
             <span class="course-card__badge">{{ c.categoriaLabel }}</span>
             <span v-if="c.desconto" class="course-card__off">-{{ c.desconto }}%</span>
@@ -384,7 +403,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         </a>
       </div>
       <?php else: ?>
-      <form class="contact-form" data-reveal @submit.prevent="enviar">
+      <form class="contact-form" data-reveal v-cloak @submit.prevent="enviar">
         <div class="form-alert" :class="feedback.tipo" v-if="feedback.msg">{{ feedback.msg }}</div>
 
         <div class="field">
@@ -479,9 +498,9 @@ function selosModalidade(array $tags, int $limite = 3): string {
   </a>
 </div>
 
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="<?= versao('assets/js/intl-phone.js') ?>"></script>
-  <script src="<?= versao('assets/js/app.js') ?>"></script>
-<script src="<?= versao('assets/js/avisos.js') ?>"></script>
+<script defer src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script defer src="<?= versao('assets/js/intl-phone.js') ?>"></script>
+  <script defer src="<?= versao('assets/js/app.js') ?>"></script>
+<script defer src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>
 </html>

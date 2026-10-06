@@ -41,7 +41,7 @@
 
   function avatar(item) {
     if (item.imagem) {
-      return '<img class="aviso-pop__foto" src="' + escapar(item.imagem) + '&w=400" alt="" loading="lazy">';
+      return '<img class="aviso-pop__foto" src="' + escapar(item.imagem) + '&w=400" alt="Foto do aluno" loading="lazy">';
     }
     if (item.emoji) {
       return '<span class="aviso-pop__foto aviso-pop__foto--emoji">' + escapar(item.emoji) + '</span>';

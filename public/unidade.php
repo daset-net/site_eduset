@@ -56,6 +56,7 @@ $vizinhas = visitaDoPolo() ? [] : array_slice(array_values(array_filter(
   <meta name="description" content="<?= e('Unidade EDUSET em ' . ($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) . ($unidade['uf'] !== '' ? ' (' . $unidade['uf'] . ')' : '') . '. Cursos 100% online com matrícula por esta unidade.') ?>">
   <meta name="theme-color" content="#002454">
   <title><?= e($titulo . ' · Unidades EDUSET') ?></title>
+  <link rel="canonical" href="<?= e(urlAbsoluta('/unidade.php?id=' . $codigo)) ?>">
 
   <meta property="og:title" content="<?= e('Unidade EDUSET · ' . $titulo) ?>">
   <meta property="og:description" content="<?= e('Cursos 100% online com matrícula pela unidade de ' . ($unidade['cidade'] !== '' ? $unidade['cidade'] : $unidade['nome']) . '.') ?>">
@@ -67,7 +68,9 @@ $vizinhas = visitaDoPolo() ? [] : array_slice(array_values(array_filter(
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+  <!-- Ícones fora do caminho crítico: a página pinta sem esperar o CSS do CDN. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
 </head>
 <body class="page-unidades">

@@ -1702,3 +1702,8 @@ ul { list-style: none; }
   /* Telas largas: os três selos numa linha só, centralizados sob a arte. */
   .hero__visual--arte .hero__chips { flex-wrap: nowrap; width: max-content; }
 }
+
+/* Trechos que são template do Vue ficam invisíveis até ele montar (os scripts
+   carregam com defer, então o resto da página já aparece antes). Mantém o
+   espaço reservado, para não empurrar o conteúdo quando o Vue assume. */
+[v-cloak] { visibility: hidden; }
