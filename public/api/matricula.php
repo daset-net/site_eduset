@@ -209,6 +209,9 @@ $payload = [
 ];
 if ($afiliado !== '') $payload['afiliado_email'] = $afiliado;
 if ($polo !== '')     $payload['polo'] = $polo;
+// Indicação de aluno (?indica=). Só vale sem afiliado explícito; o AVASET decide.
+$indica = indicaSlug();
+if ($indica !== '' && $afiliado === '') $payload['indica'] = $indica;
 
 // ---------------------------------------------------------------- envio
 $url = conexao('AVASET_MATRICULA_URL', MATRICULA_URL_PADRAO);

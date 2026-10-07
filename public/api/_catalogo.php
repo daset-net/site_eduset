@@ -240,6 +240,37 @@ function poloSlug(): string {
   return $slug = $valido($doCookie) ? $doCookie : '';
 }
 
+// ------------------------------------------------------- indicação (aluno)
+// Link "Indique e ganhe" do portal do aluno: eduset.../?indica=<código>. O código
+// é o e-mail de acesso do afiliado sem o domínio. Fica 30 dias em cookie, como o
+// do polo, e viaja na matrícula; quem descobre o afiliado e recusa autoindicação
+// é o AVASET. Não muda nada na página: o indicado vê o site normal.
+const INDICA_COOKIE = 'eduset_indica';
+
+function indicaSlug(): string {
+  static $slug = null;
+  if ($slug !== null) return $slug;
+
+  $valido = fn(string $v): bool => (bool) preg_match('/^[a-z0-9._-]{2,80}$/', $v);
+
+  $doLink = strtolower(trim((string) ($_GET['indica'] ?? '')));
+  if ($valido($doLink)) {
+    if (!headers_sent()) {
+      setcookie(INDICA_COOKIE, $doLink, [
+        'expires'  => time() + POLO_DIAS * 86400,
+        'path'     => '/',
+        'samesite' => 'Lax',
+      ]);
+    }
+    return $slug = $doLink;
+  }
+
+  $doCookie = strtolower(trim((string) ($_COOKIE[INDICA_COOKIE] ?? '')));
+  return $slug = $valido($doCookie) ? $doCookie : '';
+}
+// Grava o cookie já na página em que o link chega, seja ela qual for.
+indicaSlug();
+
 /**
  * Dados públicos do polo do link (nome/cidade/estado/telefone), para o selo da
  * página e para o atendimento. Devolve null se não houver link, se a unidade não
