@@ -72,6 +72,7 @@ $vizinhas = visitaDoPolo() ? [] : array_slice(array_values(array_filter(
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
+  <link rel="stylesheet" href="<?= versao('assets/css/busca.css') ?>">
 <?= codigosRastreamento('head') ?>
 </head>
 <body class="page-unidades">
@@ -92,6 +93,7 @@ $vizinhas = visitaDoPolo() ? [] : array_slice(array_values(array_filter(
         <a href="index.php#contato">Contato</a>
       </nav>
       <div class="header__cta">
+        <button type="button" class="busca-abrir" data-busca-abrir aria-label="Buscar cursos" title="Buscar cursos"><i class="ri-search-line"></i></button>
         <a href="<?= e($linkCursos) ?>" class="btn btn-primary">Ver cursos <i class="ri-arrow-right-line"></i></a>
       </div>
     </div>
@@ -273,6 +275,7 @@ $vizinhas = visitaDoPolo() ? [] : array_slice(array_values(array_filter(
   </a>
 
 <script src="<?= versao('assets/js/unidades.js') ?>"></script>
+<script src="<?= versao('assets/js/busca.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>
 </html>

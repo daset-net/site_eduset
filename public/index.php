@@ -83,6 +83,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
+  <link rel="stylesheet" href="<?= versao('assets/css/busca.css') ?>">
 <?= codigosRastreamento('head') ?>
 </head>
 <body>
@@ -108,6 +109,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
       </nav>
 
       <div class="header__cta">
+        <button type="button" class="busca-abrir" data-busca-abrir aria-label="Buscar cursos" title="Buscar cursos"><i class="ri-search-line"></i></button>
         <a href="#cursos" class="btn btn-primary">Ver cursos <i class="ri-arrow-right-line"></i></a>
         <button class="nav-toggle" @click="menuOpen = !menuOpen" aria-label="Menu">
           <span></span><span></span><span></span>
@@ -255,6 +257,13 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <p v-cloak v-else>Filtre por modalidade e comece a estudar hoje mesmo.</p>
       </div>
 
+      <div class="busca-catalogo" v-cloak>
+        <i class="ri-search-line" aria-hidden="true"></i>
+        <input type="search" v-model="busca" placeholder="Busque pelo nome do curso" aria-label="Buscar no catálogo" autocomplete="off" enterkeyhint="search">
+        <button type="button" class="busca-catalogo__limpar" v-if="busca" @click="busca = ''" aria-label="Limpar busca"><i class="ri-close-line"></i></button>
+      </div>
+      <p class="busca-catalogo__total" v-cloak v-if="busca.trim() && !carregando && cursosFiltrados.length">{{ cursosFiltrados.length }} {{ cursosFiltrados.length === 1 ? 'curso encontrado' : 'cursos encontrados' }}</p>
+
       <div class="filter-bar">
         <button :class="{active: filtro==='todos'}" @click="filtro='todos'">Todos</button>
         <button :class="{active: filtro==='eja'}" @click="filtro='eja'">Supletivo EJA</button>
@@ -265,7 +274,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
 
       <div class="course-grid" v-cloak>
         <div v-if="carregando" class="empty">Carregando cursos…</div>
-        <div v-else-if="cursosFiltrados.length === 0" class="empty">Nenhum curso encontrado nesta modalidade.</div>
+        <div v-else-if="cursosFiltrados.length === 0" class="empty"><template v-if="busca.trim()">Nenhum curso encontrado para “{{ busca.trim() }}”. <a href="#" @click.prevent="busca = ''; filtro = 'todos'">Ver todos os cursos</a></template><template v-else>Nenhum curso encontrado nesta modalidade.</template></div>
 
         <article class="course-card" v-for="c in cursosFiltrados" :key="c.id">
           <a class="course-card__link" :href="linkCurso(c)">
@@ -502,6 +511,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
 
 <script defer src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 <script defer src="<?= versao('assets/js/intl-phone.js') ?>"></script>
+<script defer src="<?= versao('assets/js/busca.js') ?>"></script>
   <script defer src="<?= versao('assets/js/app.js') ?>"></script>
 <script defer src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>

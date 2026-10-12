@@ -90,6 +90,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
+  <link rel="stylesheet" href="<?= versao('assets/css/busca.css') ?>">
 <?= codigosRastreamento('head') ?>
 </head>
 <body class="page-curso">
@@ -111,6 +112,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <a href="index.php#contato">Contato</a>
       </nav>
       <div class="header__cta">
+        <button type="button" class="busca-abrir" data-busca-abrir aria-label="Buscar cursos" title="Buscar cursos"><i class="ri-search-line"></i></button>
         <a href="#matricula" class="btn btn-primary">Quero me matricular <i class="ri-arrow-right-line"></i></a>
       </div>
     </div>
@@ -683,6 +685,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
 <script src="<?= versao('assets/js/intl-phone.js') ?>"></script>
 <script src="<?= versao('assets/js/libphonenumber-bundle.min.js') ?>"></script>
 <script src="<?= versao('assets/js/matricula.js') ?>"></script>
+<script src="<?= versao('assets/js/busca.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
 </body>
 </html>

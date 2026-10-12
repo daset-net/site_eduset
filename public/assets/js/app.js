@@ -9,6 +9,7 @@ createApp({
       filtro: location.pathname.replace(/\/+$/, '').endsWith('/profissionalizantes')
         ? 'profissionalizante'
         : 'todos',
+      busca: '',
       carregando: true,
       cursos: [],
       enviando: false,
@@ -21,9 +22,12 @@ createApp({
   },
 
   computed: {
+    // Modalidade e busca valem juntas; com texto digitado, os que casam
+    // melhor com a busca vêm primeiro (mesma regra da lupa do cabeçalho).
     cursosFiltrados() {
-      if (this.filtro === 'todos') return this.cursos;
-      return this.cursos.filter(c => c.categoria === this.filtro);
+      const cat = this.filtro === 'todos' ? '' : this.filtro;
+      if (window.BuscaCursos) return window.BuscaCursos.procurar(this.cursos, this.busca, cat);
+      return cat ? this.cursos.filter(c => c.categoria === cat) : this.cursos;
     }
   },
 
