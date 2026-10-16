@@ -73,8 +73,24 @@ if ($duplicadasEmail === null || $duplicadasNome === null) {
 }
 $existe = !empty($duplicadasEmail) || !empty($duplicadasNome);
 
+// Candidatura do mesmo bairro ainda em análise no GESET também ocupa o nome.
+// Se a coleção não responder, não trava o formulário: a aprovação confere a
+// duplicidade de novo antes de criar a unidade.
+$emAnalise = false;
+if (!$existe) {
+  $pendentes = buscarColecao('site_candidaturas_unidade', [
+    'fields' => 'id',
+    'filter' => ['situacao' => ['_eq' => 'aguardando'], 'unidade_email' => ['_in' => [$email, $local]]],
+    'limit'  => 1,
+  ]);
+  $emAnalise = !empty($pendentes);
+  $existe = $emAnalise;
+}
+
 $mensagem = '';
-if ($existe) {
+if ($emAnalise) {
+  $mensagem = 'Já existe uma candidatura em análise para ' . $nome . '. Se for a sua, aguarde nosso contato; se não, informe outro bairro.';
+} elseif ($existe) {
   $mensagem = 'Já existe um polo com o nome ' . $nome . '. Para continuar, informe outro bairro onde deseja abrir a unidade.';
 }
 

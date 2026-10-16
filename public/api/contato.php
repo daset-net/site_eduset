@@ -63,13 +63,18 @@ function telefoneDigitos(string $bruto): string {
   return $d;
 }
 
+// Quem pede para abrir uma unidade entra também aqui: é a fila que o gestor da
+// escola aprova no GESET (Unidades Pendentes). A unidade só passa a existir em
+// tabela_unidades — com login e senha — depois dessa aprovação.
+const COL_CANDIDATURAS = 'site_candidaturas_unidade';
+
 /** Grava o lead no Directus. Devolve o id criado, ou null se não deu. */
-function gravarLead(array $lead): ?int {
+function gravarLead(array $lead, string $colecao = COL_LEADS): ?int {
   $base  = directusBase();
   $token = conexao('DIRECTUS_TOKEN');
   if ($base === '' || $token === '') return null;
 
-  $ch = curl_init($base . '/items/' . COL_LEADS);
+  $ch = curl_init($base . '/items/' . $colecao);
   curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST           => true,
@@ -89,6 +94,20 @@ function gravarLead(array $lead): ?int {
   if ($corpo === false || $status < 200 || $status >= 300) return null;
   $json = json_decode($corpo, true);
   return isset($json['data']['id']) ? (int) $json['data']['id'] : null;
+}
+
+/** CNPJ pelos dígitos verificadores — o mesmo teste que o GESET faz ao aprovar. */
+function cnpjValido(string $v): bool {
+  $c = preg_replace('/\D/', '', $v);
+  if (strlen($c) !== 14 || preg_match('/^(\d)\1{13}$/', $c)) return false;
+  foreach ([12, 13] as $t) {
+    $pesos = $t === 12 ? [5,4,3,2,9,8,7,6,5,4,3,2] : [6,5,4,3,2,9,8,7,6,5,4,3,2];
+    $soma = 0;
+    for ($i = 0; $i < $t; $i++) $soma += (int) $c[$i] * $pesos[$i];
+    $d = $soma % 11 < 2 ? 0 : 11 - $soma % 11;
+    if ((int) $c[$t] !== $d) return false;
+  }
+  return true;
 }
 
 // Lê o corpo (JSON ou formulário tradicional)
@@ -135,7 +154,7 @@ if ($tipoCandidatura === 'unidade') {
     if (trim((string)($campos[$campo] ?? '')) === '') $erros[] = 'Informe ' . $rotulo . '.';
   }
   if (strlen(preg_replace('/\D/', '', (string)($campos['cpf'] ?? ''))) !== 11) $erros[] = 'Informe um CPF válido.';
-  if (strlen(preg_replace('/\D/', '', (string)($campos['cnpj'] ?? ''))) !== 14) $erros[] = 'Informe um CNPJ válido.';
+  if (!cnpjValido((string)($campos['cnpj'] ?? ''))) $erros[] = 'Informe um CNPJ válido.';
   if (empty($campos['consentimento'])) $erros[] = 'Confirme a autorização para tratamento dos dados.';
 }
 
@@ -162,6 +181,42 @@ $idLead = gravarLead([
   'criado_em'        => date('c'),
   'ip'               => $_SERVER['REMOTE_ADDR'] ?? '',
 ]);
+
+if ($tipoCandidatura === 'unidade') {
+  $c = fn(string $k, int $max = 200) => mb_substr(trim((string)($campos[$k] ?? '')), 0, $max);
+  $idCandidatura = gravarLead([
+    'situacao'                => 'aguardando',
+    'unidade_nome'            => $c('unidade_nome'),
+    'unidade_email'           => $c('unidade_identificacao'),
+    'responsavel'             => $nome,
+    'email'                   => $email,
+    'telefone'                => $telefone,
+    'cpf'                     => $c('cpf', 20),
+    'data_nascimento'         => $c('data_nascimento', 20),
+    'razao_social'            => $c('nome_empresa'),
+    'cnpj'                    => $c('cnpj', 20),
+    'cep'                     => $c('cep', 10),
+    'endereco'                => $c('endereco'),
+    'bairro'                  => $c('bairro', 120),
+    'cidade'                  => $c('cidade', 120),
+    'estado'                  => strtoupper($c('estado', 2)),
+    'pix_tipo'                => $c('pix_tipo', 40),
+    'pix_chave'               => $c('pix_chave', 120),
+    'banco_codigo'            => $c('banco_codigo', 10),
+    'banco_nome'              => $c('banco_nome', 120),
+    'espaco'                  => $c('espaco'),
+    'experiencia_educacional' => $c('experiencia_educacional'),
+    'experiencia'             => $c('experiencia', 2000),
+    'criado_em'               => date('c'),
+    'lead_id'                 => $idLead,
+    'ip'                      => $_SERVER['REMOTE_ADDR'] ?? '',
+  ], COL_CANDIDATURAS);
+  // O lead já guarda a candidatura inteira em texto: ela não se perde, mas
+  // também não aparece para aprovação. Precisa chegar ao log do container.
+  if ($idCandidatura === null) {
+    error_log('contato.php: candidatura de unidade de ' . $email . ' não entrou em ' . COL_CANDIDATURAS);
+  }
+}
 
 // Rede de segurança: o Directus fora do ar não pode custar um lead.
 $linha = [
