@@ -19,6 +19,7 @@ if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
 $larguras = [400, 600, 800, 1200, 1600];
 $w = isset($_GET['w']) ? (int) $_GET['w'] : 800;
 if (!in_array($w, $larguras, true)) $w = 800;
+$w = min($w, 1200);
 
 $base  = directusBase();
 $token = conexao('DIRECTUS_TOKEN');
@@ -27,7 +28,7 @@ if ($base === '' || $token === '') {
   exit('configuracao ausente');
 }
 
-$url = $base . '/assets/' . $id . '?' . http_build_query(['width' => $w, 'quality' => 80, 'fit' => 'cover']);
+$url = $base . '/assets/' . $id . '?' . http_build_query(['width' => $w, 'quality' => 70, 'format' => 'webp', 'fit' => 'cover', 'withoutEnlargement' => true]);
 
 $ch = curl_init($url);
 curl_setopt_array($ch, [
@@ -37,7 +38,7 @@ curl_setopt_array($ch, [
 ]);
 $corpo  = curl_exec($ch);
 $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$tipo   = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'image/jpeg';
+$tipo   = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'image/webp';
 curl_close($ch);
 
 if ($corpo === false || $status !== 200) {
@@ -47,5 +48,5 @@ if ($corpo === false || $status !== 200) {
 
 header('Content-Type: ' . $tipo);
 header('Content-Length: ' . strlen($corpo));
-header('Cache-Control: public, max-age=86400');   // 1 dia no navegador
+header('Cache-Control: public, max-age=604800');  // 7 dias; o UUID muda ao trocar a capa
 echo $corpo;

@@ -279,7 +279,7 @@ function selosModalidade(array $tags, int $limite = 3): string {
         <article class="course-card" v-for="c in cursosFiltrados" :key="c.id">
           <a class="course-card__link" :href="linkCurso(c)">
           <div class="course-card__media" :style="{ background: c.cor }">
-            <img v-if="c.imagem" class="course-card__capa" :src="c.imagem" alt="Capa do curso" :alt="c.nome" loading="lazy">
+            <img v-if="c.imagem" class="course-card__capa" :src="c.imagem + '&w=600'" :srcset="c.imagem + '&w=400 400w, ' + c.imagem + '&w=600 600w, ' + c.imagem + '&w=800 800w'" sizes="(max-width: 600px) calc(100vw - 40px), (max-width: 1000px) calc(50vw - 32px), 360px" :alt="c.nome" width="1200" height="675" loading="lazy" decoding="async">
             <span v-else class="emoji">{{ c.emoji }}</span>
             <span class="course-card__badge">{{ c.categoriaLabel }}</span>
             <span v-if="c.desconto" class="course-card__off">-{{ c.desconto }}%</span>

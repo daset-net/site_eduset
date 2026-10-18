@@ -176,7 +176,7 @@
       '<li role="option" data-i="' + i + '"' + (i === ativo ? ' class="ativo" aria-selected="true"' : '') + '>' +
         '<a href="' + esc(linkCurso(c)) + '">' +
           '<span class="busca__ico" style="background:' + esc(c.cor || '') + '">' +
-            (c.imagem ? '<img src="' + esc(c.imagem) + '" alt="" loading="lazy">' : esc(c.emoji || '🎓')) +
+            (c.imagem ? '<img src="' + esc(c.imagem + '&w=400') + '" alt="" loading="lazy" decoding="async">' : esc(c.emoji || '🎓')) +
           '</span>' +
           '<span class="busca__txt">' +
             '<strong>' + esc(c.nome) + '</strong>' +

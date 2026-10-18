@@ -174,7 +174,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <?php endif; ?>
         <div class="oferta__topo" style="background: <?= e($curso['cor']) ?>">
           <?php if ($curso['imagem'] !== ''): ?>
-            <img class="oferta__capa" src="<?= e($curso['imagem']) ?>" alt="<?= e($curso['nome']) ?>" loading="lazy">
+            <img class="oferta__capa" src="<?= e($curso['imagem'] . '&w=800') ?>" srcset="<?= e($curso['imagem'] . '&w=400') ?> 400w, <?= e($curso['imagem'] . '&w=600') ?> 600w, <?= e($curso['imagem'] . '&w=800') ?> 800w, <?= e($curso['imagem'] . '&w=1200') ?> 1200w" sizes="(max-width: 900px) calc(100vw - 40px), 420px" alt="<?= e($curso['nome']) ?>" width="1200" height="675" loading="eager" fetchpriority="high" decoding="async">
           <?php else: ?>
             <span class="oferta__emoji"><?= e($curso['emoji']) ?></span>
           <?php endif; ?>
@@ -603,7 +603,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
             <a class="course-card__link" href="curso.php?id=<?= e($r['slug'] !== '' ? $r['slug'] : $r['id']) . $sufixoIr ?>">
               <div class="course-card__media" style="background: <?= e($r['cor']) ?>">
                 <?php if ($r['imagem'] !== ''): ?>
-                  <img class="course-card__capa" src="<?= e($r['imagem']) ?>" alt="<?= e($r['nome']) ?>" loading="lazy">
+                  <img class="course-card__capa" src="<?= e($r['imagem'] . '&w=600') ?>" srcset="<?= e($r['imagem'] . '&w=400') ?> 400w, <?= e($r['imagem'] . '&w=600') ?> 600w, <?= e($r['imagem'] . '&w=800') ?> 800w" sizes="(max-width: 600px) calc(100vw - 40px), 360px" alt="<?= e($r['nome']) ?>" width="1200" height="675" loading="lazy" decoding="async">
                 <?php else: ?>
                   <span class="emoji"><?= e($r['emoji']) ?></span>
                 <?php endif; ?>
