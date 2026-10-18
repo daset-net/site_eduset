@@ -57,6 +57,12 @@ $metaDescricao = $curso['seoDescricao'] !== ''
 $materias = materiasDoCurso($curso);
 $horasGrade = array_sum(array_column($materias, 'horas'));
 $certificadoProfissionalizante = metadadosCertificadoProfissionalizante($curso);
+$guiaTurismo = ($curso['idCatalogo'] ?? $curso['id']) === 'CT014';
+if ($guiaTurismo) {
+  require __DIR__ . '/api/_guia_turismo.php';
+  $materias = gradeGuiaTurismo($materias);
+  $horasGrade = array_sum(array_column($materias, 'horas'));
+}
 
 // Sob o link de campanha de um polo, quem recebe a dúvida é o polo.
 $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'] . '.');
@@ -67,6 +73,14 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="<?= e($metaDescricao) ?>">
+  <?php if ($guiaTurismo): ?>
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?= e($tituloPagina) ?>">
+  <meta name="twitter:description" content="<?= e($metaDescricao) ?>">
+  <?php if ($curso['imagem'] !== ''): ?><meta name="twitter:image" content="<?= e(urlAbsoluta($curso['imagem'] . '&w=1200')) ?>"><?php endif; ?>
+  <?= seoGuiaTurismo($curso, $metaDescricao) ?>
+  <?php endif; ?>
   <meta name="theme-color" content="#002454">
   <title><?= e($tituloPagina) ?></title>
   <link rel="canonical" href="<?= e(urlAbsoluta('/curso.php?id=' . ($curso['slug'] !== '' ? $curso['slug'] : $curso['id']))) ?>">
@@ -132,11 +146,14 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <h1><?= e($conteudo['chamada']) ?></h1>
         <p class="curso-hero__nome"><?= e($curso['emoji']) ?> <?= e($curso['nome']) ?> · <?= e($curso['categoriaLabel']) ?></p>
         <p class="lead"><?= e($conteudo['promessa']) ?></p>
+        <?php if ($guiaTurismo): ?>
+        <p>Grade de 22 disciplinas e 1.000 horas, com acervo de videoaulas em implantação progressiva. A oferta 100% online está em validação quanto ao enquadramento técnico. <a href="https://www.gov.br/saude/pt-br/composicao/sgtes/diretrizes-para-formacao-tecnica-na-saude/publicacoes/catalogo-nacional-de-cursos-tecnicos.pdf" target="_blank" rel="noopener">Consulte o referencial oficial do MEC</a>.</p>
+        <?php endif; ?>
 
         <ul class="curso-hero__marcas">
           <li><i class="ri-time-line"></i> <?= e($curso['duracao']) ?></li>
           <li><i class="ri-computer-line"></i> <?= e($curso['modalidade']) ?></li>
-          <li><i class="ri-award-line"></i> Certificado com validade nacional</li>
+          <li><i class="ri-award-line"></i> <?= $guiaTurismo ? 'Enquadramento técnico em validação' : 'Certificado com validade nacional' ?></li>
           <li><i class="ri-calendar-check-line"></i> Comece hoje mesmo</li>
         </ul>
 
@@ -513,6 +530,10 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   </section>
   <?php endif; ?>
 
+  <?php if ($guiaTurismo): ?>
+  <p class="container"><small>Foto de capa: <a href="https://commons.wikimedia.org/wiki/File:Iguazu-Falls-January-2013.jpg" target="_blank" rel="noopener">Cataratas do Iguaçu, Acediscovery</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener">CC BY 4.0</a>.</small></p>
+  <?php endif; ?>
+
   <!-- ===================== FAQ ===================== -->
   <section class="section">
     <div class="container container--estreito">
@@ -522,8 +543,8 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
       </div>
       <div class="faq">
         <details>
-          <summary>O certificado tem validade?</summary>
-          <p>Sim. Ao concluir o curso você recebe o certificado emitido por instituição parceira credenciada, com validade nacional — o mesmo aceito por empresas, instituições de ensino e órgãos públicos.</p>
+          <summary><?= $guiaTurismo ? 'O curso garante diploma técnico ou registro no Cadastur?' : 'O certificado tem validade?' ?></summary>
+          <p><?php if ($guiaTurismo): ?>A proposta reúne 1.000 horas de estudos online. Seu enquadramento como habilitação técnica está em validação. A matrícula e a conclusão dos materiais não garantem diploma técnico reconhecido nem registro automático no Cadastur. As condições de habilitação e de exercício profissional devem ser verificadas junto aos órgãos responsáveis.<?php else: ?>Sim. Ao concluir o curso você recebe o certificado emitido por instituição parceira credenciada, com validade nacional — o mesmo aceito por empresas, instituições de ensino e órgãos públicos.<?php endif; ?></p>
           <?php
             $mec = trim((string) ($curso['codigoMec'] ?? ''));
             if ($mec !== '' && !str_contains($mec, '_')) {
@@ -544,7 +565,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
         <?php endif; ?>
         <details>
           <summary>Preciso ir até algum lugar assistir aula?</summary>
-          <p><?php if ($curso['categoria'] === 'tecnico-competencia'): ?>Nesta modalidade, o AVA disponibiliza somente as provas de cada módulo. Não são exibidos videoaulas, exercícios, apostilas, jornada ou podcast.<?php else: ?>Não. O conteúdo é <?= e($curso['modalidade']) ?>: você estuda de onde estiver, pelo celular ou computador, no horário que der. <?= $curso['categoria'] === 'tecnico' ? 'Nos cursos técnicos, apenas atividades práticas e estágio, quando exigidos, acontecem com apoio de polo.' : '' ?><?php endif; ?></p>
+          <p><?php if ($guiaTurismo): ?>As atividades previstas nesta proposta são 100% online, com estudos de caso, visitas virtuais, simulações e projeto integrador. Essas atividades não equivalem à comprovação de condução de grupos em campo.<?php elseif ($curso['categoria'] === 'tecnico-competencia'): ?>Nesta modalidade, o AVA disponibiliza somente as provas de cada módulo. Não são exibidos videoaulas, exercícios, apostilas, jornada ou podcast.<?php else: ?>Não. O conteúdo é <?= e($curso['modalidade']) ?>: você estuda de onde estiver, pelo celular ou computador, no horário que der. <?= $curso['categoria'] === 'tecnico' ? 'Nos cursos técnicos, apenas atividades práticas e estágio, quando exigidos, acontecem com apoio de polo.' : '' ?><?php endif; ?></p>
         </details>
         <details>
           <summary>Quanto tempo leva para concluir?</summary>
