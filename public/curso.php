@@ -333,7 +333,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
       <div class="inclui-grid">
         <div class="inclui"><i class="ri-smartphone-line"></i><h4>Estude pelo celular</h4><p>Plataforma leve, que abre no celular, no tablet ou no computador, a qualquer hora do dia.</p></div>
         <div class="inclui"><i class="ri-user-voice-line"></i><h4>Tutor de verdade</h4><p>Alguém para responder sua dúvida quando o conteúdo travar — do primeiro ao último módulo.</p></div>
-        <div class="inclui"><i class="ri-award-line"></i><h4>Certificado</h4><p>Documento de conclusão com validade nacional, aceito por empresas e instituições de ensino.</p></div>
+        <div class="inclui"><i class="ri-award-line"></i><h4><?= $guiaTurismo ? 'Sobre a certificação' : 'Certificado' ?></h4><p><?= $guiaTurismo ? 'O enquadramento técnico está em validação. Consulte as condições antes da matrícula; não há garantia de diploma técnico reconhecido ou registro automático no Cadastur.' : 'Documento de conclusão com validade nacional, aceito por empresas e instituições de ensino.' ?></p></div>
         <div class="inclui"><i class="ri-time-line"></i><h4>Seu ritmo</h4><p>Sem horário fixo de aula. Você acelera quando sobra tempo e desacelera quando a semana aperta.</p></div>
         <div class="inclui"><i class="ri-refresh-line"></i><h4>Provas refeitas</h4><p>Não passou de primeira? Refaz. Aqui o objetivo é você concluir, não reprovar.</p></div>
         <div class="inclui"><i class="ri-customer-service-2-line"></i><h4>Suporte na matrícula</h4><p>Um consultor acompanha você desde a documentação até o primeiro acesso à plataforma.</p></div>
@@ -648,7 +648,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
       <div class="footer__grid">
         <div class="footer__brand">
           <img src="<?= versao('assets/img/eduset-negativo.png') ?>" alt="EDUSET">
-          <p>Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos profissionalizantes com certificação reconhecida e 100% online.</p>
+          <p><?= $guiaTurismo ? 'Educação e conteúdos online para ampliar seus conhecimentos. Conheça a grade e as condições de cada formação.' : 'Educação que transforma vidas. Supletivo EJA, cursos técnicos e cursos profissionalizantes com certificação reconhecida e 100% online.' ?></p>
           <div class="footer__social">
             <?php if (config('instagram')): ?><a href="<?= e(config('instagram')) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="ri-instagram-line"></i></a><?php endif; ?>
             <?php if (config('facebook')): ?><a href="<?= e(config('facebook')) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="ri-facebook-fill"></i></a><?php endif; ?>
