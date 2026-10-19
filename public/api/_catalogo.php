@@ -877,6 +877,13 @@ function ofertaDoCiclo(array $versoes): ?array {
   $campanha = campanhaVigente($ativas[0]['categoria'] ?? null);
   if ($campanha) return versaoParaCampanha($ativas, $campanha['desconto']);
 
+  // Versão com `campanha` preenchido no catálogo (ex.: FECHA_MES_202610) foi
+  // criada para uma campanha programada e só vale enquanto ela está no ar.
+  // Acabou a campanha, ela sai da rotação e do modo fixo sozinha — sem isso
+  // o preço de campanha voltaria a cada três ciclos depois do prazo.
+  $ativas = array_values(array_filter($ativas, fn($v) => trim((string) ($v['campanha'] ?? '')) === ''));
+  if (!$ativas) return null;
+
   if (strtolower(config('oferta_modo', 'rotativo')) === 'fixo') return $ativas[0];
 
   $niveis = max(1, (int) config('oferta_niveis', '3'));
@@ -1076,7 +1083,7 @@ function catalogo(): array {
   // gravado no cadastro. Só a busca o lê — quem exibe usa o 'curso'.
   $precos    = buscarColecao(COL_PRECOS, ['fields' =>
     'id_curso,categoria,curso,curso_normalizado,ingresso,desconto,qtd_parcela,valor_parcela,'
-    . 'valor_parcela_normal,valor_total,valor_total_normal,codigo_unico_especial,codigo_mec_parceiro,ativo']);
+    . 'valor_parcela_normal,valor_total,valor_total_normal,codigo_unico_especial,codigo_mec_parceiro,ativo,campanha']);
   $editorial = buscarColecao(COL_CURSOS, ['fields' => '*']);
 
   if ($precos !== null) {
@@ -1114,7 +1121,7 @@ function planoVigente(string $idCurso): ?array {
   $linhas = buscarColecao(COL_PRECOS, [
     'filter' => ['id_curso' => ['_eq' => $idCatalogo]],
     'fields' => 'id_curso,curso,categoria,id_unico,codigo_unico_especial,ingresso,desconto,qtd_parcela,'
-              . 'valor_parcela,valor_parcela_normal,valor_total,valor_total_normal,ativo',
+              . 'valor_parcela,valor_parcela_normal,valor_total,valor_total_normal,ativo,campanha',
   ]);
   if (!$linhas) return null;
 

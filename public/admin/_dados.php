@@ -160,7 +160,7 @@ function conflita(array $nova, array $existentes): ?array {
  * prometer o que não se entrega (mesma régua de ehBolsa, usada na vitrine).
  */
 function faixasDeDesconto(?string $categoria = null): array {
-  $linhas = buscarColecao(COL_PRECOS, ['fields' => 'ingresso,desconto,ativo,categoria']) ?? [];
+  $linhas = buscarColecao(COL_PRECOS, ['fields' => 'ingresso,desconto,ativo,categoria,campanha']) ?? [];
   $alvo = categoriaCampanha($categoria);
 
   $faixas = [];
@@ -168,6 +168,8 @@ function faixasDeDesconto(?string $categoria = null): array {
     if (($l['ativo'] ?? true) === false) continue;
     if ($alvo !== '' && categoriaCampanha($l['categoria'] ?? '') !== $alvo) continue;
     if (ehBolsa($l)) continue;
+    // Versão de campanha (campo `campanha` no catálogo) não é faixa para escolher.
+    if (trim((string) ($l['campanha'] ?? '')) !== '') continue;
     $d = (int) ($l['desconto'] ?? 0);
     if ($d > 0) $faixas[$d] = true;
   }
