@@ -854,6 +854,17 @@ function versaoParaCampanha(array $ativas, int $alvo): ?array {
  *   oferta_ciclo_dias = duração do ciclo em dias (padrão 7)
  *   oferta_offset     = desloca a rotação, para escolher em que degrau ela começa
  */
+/**
+ * Versão criada para uma campanha programada: `campanha` com um código, como
+ * FECHA_MES_202610. Número não conta — o campo já guardava "50"/"60" em quase
+ * todo o catálogo, herança sem uso, e tratar isso como marca tirava do site
+ * todo curso de EJA, técnico e profissionalizante.
+ */
+function versaoDeCampanha(array $v): bool {
+  $marca = trim((string) ($v['campanha'] ?? ''));
+  return $marca !== '' && !is_numeric($marca);
+}
+
 function ofertaDoCiclo(array $versoes): ?array {
   $ativas = [];
   foreach ($versoes as $v) {
@@ -877,11 +888,11 @@ function ofertaDoCiclo(array $versoes): ?array {
   $campanha = campanhaVigente($ativas[0]['categoria'] ?? null);
   if ($campanha) return versaoParaCampanha($ativas, $campanha['desconto']);
 
-  // Versão com `campanha` preenchido no catálogo (ex.: FECHA_MES_202610) foi
+  // Versão marcada como de campanha no catálogo (ex.: FECHA_MES_202610) foi
   // criada para uma campanha programada e só vale enquanto ela está no ar.
   // Acabou a campanha, ela sai da rotação e do modo fixo sozinha — sem isso
   // o preço de campanha voltaria a cada três ciclos depois do prazo.
-  $ativas = array_values(array_filter($ativas, fn($v) => trim((string) ($v['campanha'] ?? '')) === ''));
+  $ativas = array_values(array_filter($ativas, fn($v) => !versaoDeCampanha($v)));
   if (!$ativas) return null;
 
   if (strtolower(config('oferta_modo', 'rotativo')) === 'fixo') return $ativas[0];

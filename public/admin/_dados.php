@@ -168,8 +168,8 @@ function faixasDeDesconto(?string $categoria = null): array {
     if (($l['ativo'] ?? true) === false) continue;
     if ($alvo !== '' && categoriaCampanha($l['categoria'] ?? '') !== $alvo) continue;
     if (ehBolsa($l)) continue;
-    // Versão de campanha (campo `campanha` no catálogo) não é faixa para escolher.
-    if (trim((string) ($l['campanha'] ?? '')) !== '') continue;
+    // Versão de campanha (ver versaoDeCampanha) não é faixa para escolher.
+    if (versaoDeCampanha($l)) continue;
     $d = (int) ($l['desconto'] ?? 0);
     if ($d > 0) $faixas[$d] = true;
   }
