@@ -67,11 +67,12 @@ if ($guiaTurismo) {
 // Sob o link de campanha de um polo, quem recebe a dúvida é o polo.
 $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'] . '.');
 
-// ?enxuto=1 — link enxuto copiado no GESET: só a marca, o resumo da oferta
+// ?minimo=1 — link mínimo copiado no GESET: só a marca, o resumo da oferta
 // (valor, duração, promoção e contador) e o formulário de matrícula. Sem
 // cabeçalho, sem rodapé, sem as seções de venda; serve para mandar direto ao
 // lead que já decidiu. Fica fora do Google para não concorrer com a página cheia.
-$enxuto = ($_GET['enxuto'] ?? '') === '1';
+// ?enxuto=1 é o nome antigo, aceito para os links que já foram enviados.
+$enxuto = ($_GET['minimo'] ?? $_GET['enxuto'] ?? '') === '1';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -420,7 +421,7 @@ $enxuto = ($_GET['enxuto'] ?? '') === '1';
 
 <?php endif; ?>
 <?php if ($enxuto): ?>
-  <!-- ===================== LINK ENXUTO ===================== -->
+  <!-- ===================== LINK MÍNIMO ===================== -->
   <div class="enx">
     <div class="enx__marca"><span><img src="<?= versao('assets/img/eduset.png') ?>" alt="EDUSET"></span></div>
     <section class="enx__card">
