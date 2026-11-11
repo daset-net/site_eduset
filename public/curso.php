@@ -66,6 +66,12 @@ if ($guiaTurismo) {
 
 // Sob o link de campanha de um polo, quem recebe a dúvida é o polo.
 $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'] . '.');
+
+// ?enxuto=1 — link enxuto copiado no GESET: só a marca, o resumo da oferta
+// (valor, duração, promoção e contador) e o formulário de matrícula. Sem
+// cabeçalho, sem rodapé, sem as seções de venda; serve para mandar direto ao
+// lead que já decidiu. Fica fora do Google para não concorrer com a página cheia.
+$enxuto = ($_GET['enxuto'] ?? '') === '1';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -105,11 +111,54 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"></noscript>
   <link rel="stylesheet" href="<?= versao('assets/css/style.css') ?>">
   <link rel="stylesheet" href="<?= versao('assets/css/busca.css') ?>">
+  <?php if ($enxuto): ?>
+  <meta name="robots" content="noindex,follow">
+  <style>
+    body.page-enxuta { --enx: #002454; background: linear-gradient(180deg, var(--enx) 0, var(--enx) 230px, #f2f5fa 230px); }
+    .enx { max-width: 640px; margin: 0 auto; padding: 20px 16px 6px; }
+    .enx__marca { display: flex; justify-content: center; margin-bottom: 16px; }
+    .enx__marca span { background: #fff; padding: 10px 20px; border-radius: 14px; box-shadow: 0 8px 22px rgba(0,0,0,.18); display: inline-flex; }
+    .enx__marca img { height: 40px; width: auto; display: block; }
+    .enx__card { background: #fff; border-radius: 22px; padding: 22px 22px 18px; box-shadow: 0 18px 44px rgba(0,20,50,.16); }
+    .enx__faixa { display: inline-flex; align-items: center; gap: 6px; background: #e11d48; color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; padding: 6px 12px; border-radius: 100px; margin-bottom: 12px; }
+    .enx__cat { font-size: 12px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--enx); margin: 0 0 4px; }
+    .enx__card h1 { font-size: clamp(21px, 5.2vw, 27px); line-height: 1.22; margin: 0 0 12px; color: #0b182b; }
+    .enx__marcas { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; padding: 0; }
+    .enx__marcas li { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #33415c; background: #f2f5fa; border-radius: 100px; padding: 6px 12px; }
+    .enx__marcas i { color: var(--enx); font-size: 15px; }
+    .enx__preco { border-top: 1px dashed #dde3ee; padding-top: 14px; }
+    .enx__de { font-size: 13.5px; color: #5a6b85; margin: 0 0 2px; }
+    .enx__de b { background: #ffe4ea; color: #e11d48; font-size: 12px; border-radius: 6px; padding: 2px 6px; margin-left: 6px; }
+    .enx__por { margin: 0; color: #0b182b; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .enx__por em { font-style: normal; font-size: 15px; color: #33415c; }
+    .enx__por strong { font-size: clamp(30px, 8vw, 38px); font-weight: 800; color: var(--enx); line-height: 1.1; }
+    .enx__total { font-size: 13px; color: #5a6b85; margin: 4px 0 0; }
+    .enx__campanha { display: flex; gap: 8px; align-items: center; font-size: 13.5px; font-weight: 600; color: #0f7a44; background: #e6f9ef; border-radius: 12px; padding: 9px 12px; margin: 14px 0 0; }
+    .enx__lista { list-style: none; padding: 0; margin: 4px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+    .enx__lista li { font-size: 13px; color: #33415c; display: flex; gap: 6px; align-items: center; }
+    .enx__lista i { color: #0f7a44; }
+    .enx .online { margin: 10px 0 0; }
+    .page-enxuta #matricula { background: none; padding: 14px 0 34px; }
+    .page-enxuta #matricula > .container { max-width: 640px; padding: 0 16px; }
+    .page-enxuta #matricula .contact-grid { display: block; }
+    .page-enxuta #matricula .contact-info { display: none; }
+    .page-enxuta .contact-form { padding: 24px; border-radius: 22px; }
+    .page-enxuta .form-topo { margin: -24px -24px 20px; padding: 18px 24px; border-radius: 21px 21px 0 0; }
+    .enx__seguro { text-align: center; font-size: 12px; color: #7a879c; margin: 0 0 24px; }
+    @media (max-width: 480px) {
+      .enx__card { padding: 18px 16px 16px; }
+      .page-enxuta .contact-form { padding: 18px 16px; }
+      .page-enxuta .form-topo { margin: -18px -16px 18px; padding: 16px; }
+      .enx__lista { grid-template-columns: 1fr; }
+    }
+  </style>
+  <?php endif; ?>
 <?= codigosRastreamento('head') ?>
 </head>
-<body class="page-curso">
+<body class="page-curso<?= $enxuto ? ' page-enxuta' : '' ?>">
 <?= codigosRastreamento('body') ?>
 
+<?php if (!$enxuto): ?>
   <!-- ===================== HEADER ===================== -->
   <header class="header" id="header">
     <div class="container header__inner">
@@ -369,6 +418,68 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
     </div>
   </section>
 
+<?php endif; ?>
+<?php if ($enxuto): ?>
+  <!-- ===================== LINK ENXUTO ===================== -->
+  <div class="enx">
+    <div class="enx__marca"><span><img src="<?= versao('assets/img/eduset.png') ?>" alt="EDUSET"></span></div>
+    <section class="enx__card">
+      <?php if ($curso['desconto']): ?>
+        <span class="enx__faixa"><i class="ri-flashlight-fill"></i> Oferta relâmpago · <?= (int) $curso['desconto'] ?>% OFF</span>
+      <?php endif; ?>
+      <p class="enx__cat"><?= e($curso['categoriaLabel']) ?></p>
+      <h1><?= e($curso['nome']) ?></h1>
+      <ul class="enx__marcas">
+        <?php if ($curso['duracao'] !== ''): ?><li><i class="ri-time-line"></i> <?= e($curso['duracao']) ?></li><?php endif; ?>
+        <?php if ($curso['modalidade'] !== ''): ?><li><i class="ri-computer-line"></i> <?= e($curso['modalidade']) ?></li><?php endif; ?>
+        <li><i class="ri-award-line"></i> <?= $guiaTurismo ? 'Enquadramento técnico em validação' : 'Certificado com validade nacional' ?></li>
+      </ul>
+
+      <div class="enx__preco">
+        <?php if ($curso['precoDe'] !== '0,00' && $curso['desconto']): ?>
+          <p class="enx__de">De <s>R$ <?= e($curso['precoDe']) ?></s><?= $curso['categoria'] === 'tecnico-competencia' ? ' à vista' : ' por mês' ?><b>-<?= (int) $curso['desconto'] ?>%</b></p>
+        <?php endif; ?>
+        <p class="enx__por">
+          <?php if ($curso['parcelas']): ?><em><?= (int) $curso['parcelas'] ?>x de</em><?php endif; ?>
+          <strong>R$ <?= e($curso['preco']) ?></strong>
+        </p>
+        <?php if ($curso['valorTotal'] !== '0,00'): ?>
+          <p class="enx__total">Total do curso: R$ <?= e($curso['valorTotal']) ?> · sem taxa de matrícula</p>
+        <?php endif; ?>
+      </div>
+
+      <?php if (!empty($curso['campanhaNome'])): ?>
+        <p class="enx__campanha"><i class="ri-megaphone-line"></i> <?= e($curso['campanhaNome']) ?></p>
+      <?php endif; ?>
+
+      <?php if ($curso['desconto']): ?>
+      <div class="contador" data-fim="<?= e($curso['ofertaFim']) ?>">
+        <p class="contador__titulo"><i class="ri-timer-flash-line"></i> A condição de <?= (int) $curso['desconto'] ?>% termina em</p>
+        <div class="contador__relogio">
+          <span><strong data-parte="dias">--</strong><small>dias</small></span>
+          <span><strong data-parte="horas">--</strong><small>horas</small></span>
+          <span><strong data-parte="min">--</strong><small>min</small></span>
+          <span><strong data-parte="seg">--</strong><small>seg</small></span>
+        </div>
+        <p class="contador__nota">Quando zerar, o valor volta para a tabela do próximo ciclo.</p>
+      </div>
+      <?php endif; ?>
+
+      <ul class="enx__lista">
+        <li><i class="ri-check-line"></i> Sem taxa de matrícula</li>
+        <li><i class="ri-check-line"></i> Material didático incluso</li>
+        <li><i class="ri-check-line"></i> Tutoria durante o curso</li>
+        <li><i class="ri-check-line"></i> Comece hoje mesmo</li>
+      </ul>
+
+      <p class="online" id="online" data-curso="<?= e($curso['id']) ?>" hidden>
+        <span class="online__ponto"></span>
+        <span id="online-texto"></span>
+      </p>
+    </section>
+  </div>
+<?php endif; ?>
+
   <!-- ===================== MATRÍCULA ===================== -->
   <section class="section section--soft" id="matricula">
     <div class="container contact-grid">
@@ -518,6 +629,7 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
     </div>
   </section>
 
+<?php if (!$enxuto): ?>
   <?php if ($certificadoProfissionalizante): ?>
   <section class="section section--soft" id="validacao-certificado">
     <div class="container container--estreito">
@@ -702,11 +814,16 @@ $whatsapp = whatsappLink('Olá! Quero saber mais sobre o curso ' . $curso['nome'
     <a href="#matricula" class="btn btn-primary">Matricular <i class="ri-arrow-right-line"></i></a>
   </div>
 
+<?php else: ?>
+  <p class="enx__seguro"><i class="ri-lock-line"></i> Matrícula online segura · EDUSET</p>
+<?php endif; ?>
 <script src="<?= versao('assets/js/curso.js') ?>"></script>
 <script src="<?= versao('assets/js/intl-phone.js') ?>"></script>
 <script src="<?= versao('assets/js/libphonenumber-bundle.min.js') ?>"></script>
 <script src="<?= versao('assets/js/matricula.js') ?>"></script>
+<?php if (!$enxuto): ?>
 <script src="<?= versao('assets/js/busca.js') ?>"></script>
 <script src="<?= versao('assets/js/avisos.js') ?>"></script>
+<?php endif; ?>
 </body>
 </html>
